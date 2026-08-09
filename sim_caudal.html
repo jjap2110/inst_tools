@@ -1,0 +1,2404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Simulador de Caudal — KROHNE</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f7f7f5;--surface:#ffffff;--surface2:#f2f1ee;
+  --text:#0b0b0b;--text2:#52514e;--text3:#898781;
+  --border:rgba(11,11,11,0.12);--border2:rgba(11,11,11,0.22);
+  --radius:8px;
+  --acc:#2a78d6;--acc-bg:#e6f1fb;--acc-text:#185fa5;
+  --ok:#0ca30c;--ok-bg:#eaf3de;--ok-text:#3b6d11;
+  --warn:#eda100;--warn-bg:#faeeda;--warn-text:#854f0b;
+  --danger:#e24b4a;--danger-bg:#fcebeb;--danger-text:#a32d2d;
+  --purple:#534ab7;--purple-bg:#eeedfe;--purple-text:#3c3489;
+  --steam:#c45e00;--steam-bg:#fef3e2;--steam-text:#7a3800;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#1a1a19;--surface:#252523;--surface2:#2c2c2a;
+  --text:#ffffff;--text2:#c3c2b7;--text3:#898781;
+  --border:rgba(255,255,255,0.10);--border2:rgba(255,255,255,0.20);
+  --acc:#3987e5;--acc-bg:#0c3b6e;--acc-text:#85b7eb;
+  --ok:#199e70;--ok-bg:#083d2a;--ok-text:#5dcaa5;
+  --warn:#c98500;--warn-bg:#3d2800;--warn-text:#fac775;
+  --danger:#e66767;--danger-bg:#3d1010;--danger-text:#f09595;
+  --purple:#9085e9;--purple-bg:#26215c;--purple-text:#afa9ec;
+  --steam:#e07b20;--steam-bg:#3d1f00;--steam-text:#f5b97a;
+}}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-height:100vh}
+.app{max-width:480px;margin:0 auto;padding:16px 14px 40px}
+h1{font-size:18px;font-weight:600;margin-bottom:2px}
+.subtitle{font-size:12px;color:var(--text3);margin-bottom:16px}
+.section-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin:14px 0 8px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.field label{font-size:12px;color:var(--text2);display:block;margin-bottom:3px}
+.field input:not([type="checkbox"]),.field select{width:100%;font-size:16px;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface);color:var(--text);outline:none;-webkit-appearance:none}
+.field input:focus,.field select:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(42,120,214,0.15)}
+.field input:disabled{opacity:.45;cursor:not-allowed}
+.field input.invalid{border-color:var(--danger-border,#d9534f);box-shadow:0 0 0 3px rgba(217,83,79,0.15)}
+.field .field-err{display:none;font-size:11px;color:var(--danger-text,#c0392b);margin-top:3px}
+.field input.invalid + .field-err,.field input.invalid ~ .field-err{display:block}
+.calc-btn:disabled{opacity:.5;cursor:not-allowed}
+.phase-toggle{display:flex;border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden;margin-bottom:12px}
+.phase-toggle button{flex:1;padding:8px 10px;font-size:14px;font-weight:600;border:none;background:var(--surface2);color:var(--text2);cursor:pointer;font-family:inherit;transition:background .15s,color .15s}
+.phase-toggle button.active-liq{background:var(--acc-bg);color:var(--acc-text)}
+.phase-toggle button.active-steam{background:var(--steam-bg);color:var(--steam-text)}
+.steam-box{background:var(--steam-bg);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:10px}
+.steam-box .section-label{color:var(--steam-text);margin-top:0}
+.rec-badge-steam{background:var(--steam-bg);color:var(--steam-text)}
+.ro-field{background:var(--surface2);color:var(--text2);border-color:var(--border);cursor:not-allowed}
+.phase-toggle button.active-gas{background:var(--purple-bg);color:var(--purple-text)}
+.unit-toggle{display:flex;border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden;margin-bottom:10px}
+.unit-toggle button{flex:1;padding:7px 8px;font-size:12px;border:none;background:var(--surface2);color:var(--text2);cursor:pointer;font-family:inherit}
+.unit-toggle button.active{background:var(--surface);color:var(--text);font-weight:600;border-bottom:2px solid var(--acc)}
+.gas-box{background:var(--purple-bg);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:10px}
+.gas-box .section-label{color:var(--purple-text);margin-top:0}
+.norm-toggle{display:flex;border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden;margin-bottom:10px}
+.norm-toggle button{flex:1;padding:6px 8px;font-size:12px;border:none;background:var(--surface2);color:var(--text2);cursor:pointer;font-family:inherit}
+.norm-toggle button.active{background:var(--purple-bg);color:var(--purple-text);font-weight:600}
+.conv-result{font-size:12px;color:var(--purple-text);background:var(--purple-bg);border-radius:var(--radius);padding:7px 10px;margin-top:8px;line-height:1.6}
+.calc-btn{width:100%;margin-top:14px;padding:11px;font-size:15px;font-weight:600;border:none;border-radius:var(--radius);background:var(--acc);color:#fff;cursor:pointer;letter-spacing:.01em}
+.calc-btn:active{opacity:.85}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:14px}
+.rec-header{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.rec-badge{font-size:11px;padding:3px 8px;border-radius:var(--radius);background:var(--ok-bg);color:var(--ok-text);font-weight:600}
+.rec-badge-gas{background:var(--purple-bg);color:var(--purple-text)}
+.rec-badge-emf{background:#27ae60;color:#fff}
+.rec-badge-va{background:#8e44ad;color:#fff}
+.rec-model{font-size:16px;font-weight:600}
+.alert{font-size:12px;padding:8px 10px;border-radius:var(--radius);margin-top:7px;line-height:1.45}
+.alert-warn{background:var(--warn-bg);color:var(--warn-text)}
+.alert-danger{background:var(--danger-bg);color:var(--danger-text)}
+.alert-info{background:var(--acc-bg);color:var(--acc-text)}
+.alert-gas{background:var(--purple-bg);color:var(--purple-text)}
+.stat-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:12px 0 10px}
+.stat{background:var(--surface2);border-radius:var(--radius);padding:9px 11px}
+.stat-label{font-size:11px;color:var(--text3);margin-bottom:2px}
+.stat-val{font-size:15px;font-weight:600;color:var(--text)}
+.stat-val.ok{color:var(--ok)}
+.stat-val.warn{color:var(--warn)}
+.stat-val.danger{color:var(--danger)}
+.stat-val .regime{font-size:11px;padding:2px 6px;border-radius:var(--radius);font-weight:600;vertical-align:middle;margin-left:4px}
+.lam{background:var(--warn-bg);color:var(--warn-text)}
+.trans{background:var(--danger-bg);color:var(--danger-text)}
+.turb{background:var(--ok-bg);color:var(--ok-text)}
+.cmp-title{font-size:13px;font-weight:600;margin:14px 0 4px}
+.selector-hint{font-size:11px;color:var(--text3);margin-bottom:6px;font-style:italic}
+table{width:100%;font-size:12px;border-collapse:collapse}
+th{text-align:left;color:var(--text3);font-weight:500;padding:5px 4px;border-bottom:1px solid var(--border)}
+td{padding:6px 4px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+td:last-child,th:last-child{text-align:right}
+tr.is-selected td{background:var(--acc-bg);color:var(--acc-text);font-weight:600}
+tr.model-row{cursor:pointer}
+tr.model-row:hover td{background:var(--surface2)}
+.sel-badge{font-size:10px;padding:2px 5px;border-radius:4px;background:var(--ok-bg);color:var(--ok-text);font-weight:600;margin-left:4px;vertical-align:middle}
+.rec-star{font-size:10px;padding:2px 5px;border-radius:4px;background:var(--warn-bg);color:var(--warn-text);font-weight:600;margin-left:4px;vertical-align:middle}
+.chart-wrap{position:relative;width:100%;height:320px;margin-top:10px}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:var(--text2);margin-top:7px}
+.legend span{display:flex;align-items:center;gap:5px}
+.leg-line{width:14px;height:2px;border-radius:1px;display:inline-block}
+.op-label{font-size:11px;color:var(--text3);margin-top:6px}
+.hidden{display:none}
+.disclaimer{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:14px;font-size:11px;color:var(--text3);line-height:1.6}
+.disclaimer b{color:var(--text2)}
+.eq-block{margin-top:8px;padding:8px 10px;background:var(--surface2);border-radius:var(--radius);font-family:monospace;font-size:11px;line-height:1.8;color:var(--text2)}
+.warn-block{margin-top:8px;padding:8px 10px;background:var(--danger-bg);border-radius:var(--radius);color:var(--danger-text);font-size:11px;line-height:1.5}
+.alerts-toggle{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);cursor:pointer;padding:4px 0;margin-top:6px;user-select:none;background:none;border:none;font-family:inherit;width:100%;text-align:left}
+.alerts-toggle:hover{color:var(--text2)}
+.alerts-toggle .toggle-icon{font-size:10px;transition:transform .2s}
+.alerts-toggle.open .toggle-icon{transform:rotate(90deg)}
+#alerts-body{display:none;margin-top:4px}
+#alerts-body.open{display:block}
+.tabs{display:flex;border-bottom:1.5px solid var(--border2);margin-bottom:14px;margin-top:14px;gap:0}
+.tab-btn{flex:1;padding:9px 8px;font-size:13px;font-weight:600;border:none;background:transparent;color:var(--text3);cursor:pointer;font-family:inherit;border-bottom:2.5px solid transparent;margin-bottom:-1.5px;transition:color .15s}
+.tab-btn.active{color:var(--acc);border-bottom-color:var(--acc)}
+.tab-pane{display:none}.tab-pane.active{display:block}
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>Simulador de Caudalimetros</h1>
+  <p class="subtitle">Coriolis · Vortex · EMF · Área Variable · Líquidos, gases y vapor</p>
+  <p style="font-size:11px;color:var(--text3);margin:-12px 0 16px;opacity:0.7">por <b>Josmar Angulo</b> · <a href="https://wa.me/59599131290" style="color:var(--acc);text-decoration:none">Contacto</a></p>
+
+  <!-- PHASE SELECTOR -->
+  <div class="section-label">Fase del fluido</div>
+  <div class="phase-toggle">
+    <button id="btn-liq" class="active-liq" onclick="setPhase('liquid')">💧 Líquido</button>
+    <button id="btn-gas" onclick="setPhase('gas')">💨 Gas</button>
+    <button id="btn-stm" onclick="setPhase('steam')">♨ Vapor Sat.</button>
+  </div>
+
+  <!-- FLUID CONDITIONS -->
+  <div class="section-label" id="lbl-fluid-cond">Condiciones del fluido</div>
+
+  <div id="fluid-fields">
+  <!-- Liquid library (hidden for gas/steam) -->
+  <div id="liq-library-row" class="field" style="margin-bottom:8px">
+    <label>Líquido preconfigurado (opcional)</label>
+    <select id="liq-preset" onchange="applyLiqPreset()">
+      <option value="">— Ingresar manualmente —</option>
+      <option value="water" selected>Agua</option>
+      <option value="ethanol96">Alcohol etílico 96%</option>
+      <option value="soybean_oil">Aceite de soja</option>
+      <option value="sunflower_oil">Aceite de girasol</option>
+      <option value="beef_tallow">Grasa vacuna (sebo)</option>
+    </select>
+  </div>
+
+  <!-- Gas library (hidden for liquid) -->
+  <div id="gas-library-row" class="field hidden" style="margin-bottom:8px">
+    <label>Gas preconfigurado (opcional)</label>
+    <select id="gas-preset" onchange="applyGasPreset()">
+      <option value="">— Ingresar manualmente —</option>
+      <option value="air">Aire</option>
+      <option value="n2">Nitrógeno (N₂)</option>
+      <option value="co2">Dióxido de carbono (CO₂)</option>
+      <option value="glp">GLP / Propano (C₃H₈)</option>
+      <option value="h2">Hidrógeno (H₂)</option>
+      <option value="ch4">Metano (CH₄)</option>
+      <option value="natgas">Gas natural (típico PY)</option>
+      <option value="nh3">Amoníaco (NH₃)</option>
+    </select>
+    <p style="font-size:10px;color:var(--purple-text);margin-top:4px">¿Necesitás vapor de agua? Usá el modo ♨ Vapor Sat. arriba — calcula ρ y μ exactas por presión (IAPWS).</p>
+  </div>
+
+  <div class="field" style="margin-bottom:8px">
+    <label>Nombre del fluido</label>
+    <input type="text" id="f-name" value="Agua">
+  </div>
+  <div class="grid2">
+    <div class="field"><label>Temperatura (°C)</label><input type="number" id="f-temp" value="20" step="1" oninput="onConditionChangeDebounced()"></div>
+    <div class="field">
+      <label>Presión proceso</label>
+      <div style="display:flex;gap:6px;align-items:center">
+        <input type="number" id="f-pres" value="1" step="0.1" style="flex:1" oninput="onConditionChangeDebounced()">
+        <div class="unit-toggle" style="margin:0;flex-shrink:0;width:100px">
+          <button id="btn-barg" onclick="setPressUnit('g')" style="font-size:11px;padding:5px 6px">barg</button>
+          <button id="btn-bara" class="active" onclick="setPressUnit('a')" style="font-size:11px;padding:5px 6px">bara</button>
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Densidad proceso</label>
+      <div style="display:flex;gap:6px;align-items:center">
+        <input type="number" id="f-rho" value="1000" step="0.1" style="flex:1" oninput="syncRhoCache()">
+        <select id="u-rho" onchange="onRhoUnitChange()" style="width:80px;font-size:16px;padding:8px 4px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface);color:var(--text);-webkit-appearance:none;appearance:none;text-align:center">
+          <option value="kgm3">kg/m³</option>
+          <option value="gcm3">g/cm³</option>
+          <option value="kgl">kg/L</option>
+          <option value="gml">g/mL</option>
+          <option value="gl">g/L</option>
+          <option value="lbft3">lb/ft³</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Viscosidad</label>
+      <div style="display:flex;gap:6px;align-items:center">
+        <input type="number" id="f-mu" value="1.0" step="0.001" style="flex:1" oninput="syncMuCache()">
+        <select id="u-mu" onchange="onMuUnitChange()" style="width:80px;font-size:16px;padding:8px 4px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface);color:var(--text);-webkit-appearance:none;appearance:none;text-align:center">
+          <option value="mpas">mPa·s</option>
+          <option value="cp">cP</option>
+          <option value="pas">Pa·s</option>
+          <option value="p">P</option>
+          <option value="cst">cSt</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAS EXTRAS BOX -->
+  <div id="gas-box" class="gas-box hidden">
+    <div class="section-label">Condiciones de referencia (conversión volumétrica)</div>
+    <div class="norm-toggle">
+      <button id="btn-nm3" class="active" onclick="setNorm('Nm3')">Nm³/h (0°C · 1.01325 bar)</button>
+      <button id="btn-sm3" onclick="setNorm('Sm3')">Sm³/h (15°C · 1.01325 bar)</button>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Peso molecular (g/mol)</label><input type="number" id="f-mw" value="28.97" step="0.01" oninput="onConditionChangeDebounced()"></div>
+      <div class="field"><label>Factor Z proceso</label><input type="number" id="f-z" value="1.00" step="0.001" oninput="onConditionChangeDebounced()"></div>
+    </div>
+    <div class="field" style="margin-top:8px">
+      <label id="std-q-label">Caudal en condiciones Nm³/h</label>
+      <input type="number" id="f-stdq" value="" placeholder="ej. 500" step="1" oninput="updateConversionDebounced()">
+    </div>
+    <div id="conv-result" class="conv-result hidden"></div>
+  </div>
+
+  </div><!-- /fluid-fields -->
+
+  <!-- STEAM BOX -->
+  <div id="steam-box" class="steam-box hidden">
+    <div class="section-label">Vapor saturado — propiedades por presión</div>
+    <div class="grid2">
+      <div class="field">
+        <label>Presión de vapor</label>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input type="number" id="f-pstm" value="10" step="0.1" min="0.01" oninput="calcSteamDebounced()" style="flex:1">
+          <div class="norm-toggle" style="margin:0;flex-shrink:0;width:88px">
+            <button id="btn-stm-barg" onclick="setSteamPUnit('g')" style="font-size:11px;padding:5px 5px">barg</button>
+            <button id="btn-stm-bara" class="active" onclick="setSteamPUnit('a')" style="font-size:11px;padding:5px 5px">bara</button>
+          </div>
+        </div>
+      </div>
+      <div class="field"><label>T saturación (°C)</label><input type="text" id="f-tsat" readonly class="ro-field" placeholder="calculado"></div>
+      <div class="field"><label>ρ vapor (kg/m³)</label><input type="text" id="f-rhostm" readonly class="ro-field" placeholder="calculado"></div>
+      <div class="field"><label>μ vapor (mPa·s)</label><input type="text" id="f-mustm" readonly class="ro-field" placeholder="calculado"></div>
+    </div>
+    <div id="steam-alert" style="font-size:11px;margin-top:6px;display:none"></div>
+    <p style="font-size:10px;color:var(--steam-text);margin-top:6px">
+      Correlaciones: Wagner (P↔T) · IAPWS-IF97 (ρ) · IAPWS-2008 (μ) · Válido 1–220 bar · Alerta &gt;150 bar (zona cercana al punto crítico)
+    </p>
+  </div>
+
+  <!-- CONDUCTIVITY + TECHNOLOGY SELECTOR -->
+  <div id="cond-row" style="margin:8px 0 4px;display:flex;align-items:center;gap:6px">
+    <input type="checkbox" id="f-cond" checked style="width:auto;margin:0;accent-color:var(--acc)" onchange="updateTechOptions()">
+    <label for="f-cond" style="font-size:13px;color:var(--text-sec);margin:0;cursor:pointer">Líquido conductivo (≥ 5 μS/cm)</label>
+  </div>
+  <div class="field" id="tech-select-row" style="margin-bottom:8px">
+    <label>Tipo de caudalímetro</label>
+    <select id="f-tech" onchange="">
+      <option value="all">Todos los compatibles</option>
+      <option value="coriolis">Coriolis (OPTIMASS)</option>
+      <option value="vortex">Vortex (OPTISWIRL 4200)</option>
+      <option value="emf">Electromagnético (OPTIFLUX 1050)</option>
+      <option value="h250">Área Variable (H250)</option>
+    </select>
+  </div>
+
+  <!-- FLOW INPUT -->
+  <div class="section-label">Caudal de operación</div>
+  <div class="unit-toggle">
+    <button class="active" id="btn-kgh" onclick="setUnit('kgh')">kg/h</button>
+    <button id="btn-m3h" onclick="setUnit('m3h')">m³/h proceso</button>
+  </div>
+  <div class="field">
+    <label id="q-label">Caudal másico (kg/h)</label>
+    <input type="number" id="f-q" value="1000" step="1" min="0">
+  </div>
+
+  <button class="calc-btn" onclick="simulate()">Calcular →</button>
+
+  <!-- RESULTS -->
+  <div id="results" class="hidden">
+    <div id="tab-results">
+    <div class="card">
+      <div class="rec-header">
+        <span class="rec-badge" id="r-badge">Recomendado</span>
+        <span class="rec-model" id="r-model">—</span>
+      </div>
+      <button class="alerts-toggle" id="alerts-toggle" onclick="toggleAlerts()" style="display:none">
+        <span class="toggle-icon">▶</span>
+        <span id="alerts-label">Avisos</span>
+      </button>
+      <div id="alerts-body">
+        <div id="r-alerts"></div>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-label">Error en punto op.</div><div class="stat-val" id="r-err">—</div></div>
+        <div class="stat"><div class="stat-label">ΔP en punto op.</div><div class="stat-val" id="r-dp">—</div></div>
+        <div class="stat"><div class="stat-label">Velocidad en punto op.</div><div class="stat-val" id="r-vel">—</div></div>
+        <div class="stat"><div class="stat-label">Reynolds · Régimen</div><div class="stat-val" id="r-re">—</div></div>
+      </div>
+
+      <div class="cmp-title">Comparativa de modelos compatibles</div>
+      <p class="selector-hint">Toca una fila para seleccionar y actualizar el gráfico</p>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr>
+            <th>Modelo / DN</th><th>Error (%)</th><th>ΔP (bar)</th><th>ΔP/P</th><th id='th-vel'>Vel. op. (m/s)</th><th id='th-range'>Rango (kg/h)</th>
+          </tr></thead>
+          <tbody id="r-table"></tbody>
+        </table>
+      </div>
+
+      <div class="section-label" style="margin-top:14px">Rendimiento del modelo seleccionado</div>
+      <p class="op-label" id="op-label"></p>
+      <div class="chart-wrap">
+        <canvas id="myChart" role="img" aria-label="Error porcentual y caída de presión vs caudal para el modelo seleccionado"></canvas>
+      </div>
+      <div class="legend">
+        <span><span class="leg-line" style="background:#2a78d6"></span>Error (%)</span>
+        <span><span class="leg-line" style="background:#e34948;border-top:2px dashed #e34948;height:0"></span>ΔP (bar)</span>
+      </div>
+    </div>
+
+    </div><!-- /card results -->
+    </div><!-- /tab-results -->
+
+    <!-- Disclaimer collapsible -->
+    <div id="disc-wrap" style="margin-top:12px">
+      <button class="alerts-toggle" onclick="toggleDisc()" id="disc-toggle" style="width:100%;margin-top:0">
+        <span class="toggle-icon">▶</span>
+        <span>ℹ Información y ecuaciones</span>
+      </button>
+      <div id="disc-body" style="display:none">
+      <div class="card" style="margin-top:6px">
+
+        <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:10px">
+          Este simulador es un <b>desarrollo personal</b> realizado de forma independiente, sin colaboración, patrocinio ni vinculación contractual con KROHNE Group ni ninguna otra empresa. Su objetivo es exclusivamente <b>educativo e informativo</b>, orientado a facilitar la preselección de caudalímetros Coriolis OPTIMASS en etapas tempranas de ingeniería de manera sencilla.
+        </div>
+
+        <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:10px">
+          Los resultados fueron validados comparando con cálculos realizados con <b>KROSS</b>, la aplicación oficial de dimensionamiento de KROHNE. Se obtuvo buena concordancia en velocidad (&lt;1%) y caída de presión (±5–10% en gases, mejor en líquidos). Las diferencias son consecuencia del uso de correlaciones analíticas vs. los modelos internos del fabricante.
+        </div>
+
+        <div class="eq-block">
+— Líquidos —<br>
+Re = 4·Q_m / (π·Di·μ·N_tubos)   [Q_m en kg/s, μ en Pa·s]<br>
+f  = 64/Re (lam) | blend lineal 2300–4000 (trans) | Blasius/Filonenko (turb)<br>
+ΔP_fluido = ΔP_agua(Q_eq) · (f_fluido/f_agua) · (ρ/1000)<br>
+&nbsp;&nbsp;con Q_eq = Q·(1000/ρ) → <b>base de igual velocidad</b>, no igual caudal másico.<br>
+&nbsp;&nbsp;Válido porque la corrección compara el mismo sensor a la misma velocidad<br>
+&nbsp;&nbsp;(misma geometría), cambiando solo ρ y f del fluido. Backtest vs KROSS:<br>
+&nbsp;&nbsp;CO₂/S15 error &lt;0.01% · líquidos &lt;1% · gases ±5–10%.<br>
+E(%) = E_floor + (Zs/Q)·100  [continuo en todo el rango]<br><br>
+— Gases / Vapor —<br>
+E_base = 0.50% (OM1400/5400) | 0.35% (OM6400/7400)<br>
+E_gas(%) = E_base + (Zs·0.1216/Q)·100  [hiperbólico, Zs_gas calibrado vs KROSS N₂/S10]<br>
+ΔP_gas = ΔP_agua(v) · (f_gas/f_agua) · (ρ/1000)  [±5–10% vs KROSS]<br>
+ΔP ≤ P_abs entrada  límite duro todos los fluidos (excluye de lista)<br>
+v ≥ 0.33 m/s (líq/vapor)  1/3 buenas prácticas — modelos más lentos al final<br><br>
+— Vapor saturado (IAPWS) —<br>
+T_sat(P): Wagner (error &lt;0.03°C) · ρ_v: IAPWS-IF97 (&lt;0.3% hasta 150 bar)<br>
+μ_v: IAPWS-2008 tabla interpolada (&lt;3% hasta 100 bar, alerta &gt;150 bar)<br><br>
+— Conversión volumétrica gas —<br>
+ρ_ref = PM·P_ref/(R·T_ref)  [DIN: 0°C · 101.3 kPa]<br>
+ρ_proceso = PM·P/(Z·R·T)  [Z configurable por el usuario]<br><br>
+— Viscosidad de gases —<br>
+μ(T): interpolación lineal sobre tablas NIST WebBook (1 atm)<br>
+Fuente: webbook.nist.gov · 7–10 puntos por gas · −50°C a 400°C<br>
+Error interpolación &lt;0.5% · Corrección por presión despreciable a P &lt;50 bar<br><br>
+— Vortex OPTISWIRL 4200 —<br>
+v = Q_m/(ρ·A)  |  Re = ρ·v·Di/μ  |  ΔP = K·ρ·v²/2  [K validado vs KROSS, fluid-independent]<br>
+E = 0.75% líq / 1.0% gas (Re≥20,000)  |  2.0% (10,000≤Re&lt;20,000)  |  excluido Re&lt;10,000<br>
+Rangeability: Q_op ≥ Q_max/3  |  μ ≤ 1.5 mPa·s  |  Válido: agua, gases, vapor saturado<br><br>
+— EMF OPTIFLUX 1050 —<br>
+E(%) = 0.5 + 0.1/v  [±0.5% del valor medido ± 1 mm/s — match exacto vs KROSS, 55 pts]<br>
+ΔP = f·(L/D)·ρ·v²/2  [L/D por modelo, ajustado vs KROSS: 20/20 pts dentro de ±5%]<br>
+Solo líquidos conductivos ≥5 μS/cm · Ventana óptima 1–3 m/s<br><br>
+— Nota sobre el factor de fricción —<br>
+Se usa 64/Re (laminar), Blasius/Filonenko (turbulento) y blend lineal en la<br>
+zona de transición 2300–4000. Se evaluó la ecuación de Churchill (1977),<br>
+continua en todo el rango de Re, pero se mantuvo el esquema actual porque<br>
+<b>todos los backtests fueron realizados contra KROSS con esta correlación</b>:<br>
+los L/D del EMF y las correcciones ΔP están ajustados a ella. Migrar a<br>
+Churchill requeriría re-derivar esos coeficientes contra los mismos datos.<br>
+En la zona de transición el flujo es físicamente inestable — ninguna<br>
+correlación es confiable ahí y el simulador emite alerta en ese régimen.
+        </div>
+
+        <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.6">
+          <b>Criterio de recomendación:</b> (1) familia por tipo de fluido y conductividad · (2) sin alertas primero · (3) velocidad operativa · (4) error próximo al piso declarado · (5) precio · (6) ΔP mínima · (7) ΔP/P.<br>
+          <b>Curvas de referencia:</b> ajuste de curvas sobre datasheets públicos KROHNE — TD OPTIMASS 1000 R05 · 5000 R01 · 6000 R06 · 7400 R04 · TD OPTISWIRL4200 R12.
+        </div>
+
+        <div class="warn-block" style="margin-top:12px">
+          ⚠ <b>Solo para fines educativos e informativos. Sin validez legal.</b> Los resultados son aproximaciones y no constituyen oferta comercial, especificación técnica vinculante, recomendación de ingeniería ni documento con validez legal de ningún tipo. Para selección definitiva, verificación de proceso y cotización oficial, contacte a <b>i4smart.com.py</b> (representante autorizado KROHNE en Paraguay) o directamente al fabricante en <b>krohne.com</b>. Las especificaciones del fabricante pueden haber sido actualizadas con posterioridad a las datasheets utilizadas como fuente.
+        </div>
+      </div><!-- /card -->
+      </div><!-- /disc-body -->
+    </div><!-- /disc-wrap -->
+
+  </div><!-- /results -->
+</div><!-- /app -->
+
+<script>
+// ── Constants ────────────────────────────────────────────────────────────────
+const C = {
+  // IAPWS steam
+  STEAM_TC:      647.096,   // K  — critical temperature water
+  STEAM_PC:      220.64,    // bar — critical pressure water
+  STEAM_RHOC:    322.0,     // kg/m³ — critical density water
+  STEAM_P_MAX:   220.64,    // bar — upper limit for steam correlations
+  STEAM_P_WARN:  150,       // bar — viscosity uncertainty warning threshold
+  STEAM_T_MAX:   373.9,     // °C  — Newton-Raphson upper bound
+  // Reference pressure
+  P_REF_DIN:     101300,    // Pa  — DIN reference (101.3 kPa, matches KROSS)  // Gas constants
+  R_GAS:         8.314,     // J/(mol·K)
+  // Fluid thresholds
+  RHO_LOW_DENS:  400,       // kg/m³ — below this: low-density fluid rules apply
+  MU_HIGH_VISC:  50.0,      // mPa·s — above this: high-viscosity rules apply
+  MU_VORTEX_MAX: 1.5,       // mPa·s — max viscosity for vortex eligibility
+  // Velocity limits
+  V_LIQ_MIN:     0.33,      // m/s   — soft minimum sensor velocity (liquids)
+  V_LIQ_MAX:     12.0,      // m/s   — hard maximum sensor velocity (liquids)
+  V_GAS_WARN:    20.0,      // m/s   — above this: ΔP estimate ±5–10%
+  // Reynolds thresholds
+  RE_LAM_MAX:    2300,      // laminar upper limit
+  RE_TURB_MIN:   4000,      // turbulent lower limit
+  RE_VORTEX_MIN: 10000,     // vortex minimum operable Re
+  RE_VORTEX_RATED: 20000,   // vortex rated accuracy Re
+  // Accuracy
+  VORTEX_FLOOR_LIQ: 0.75,  // % — vortex liquid accuracy floor
+  VORTEX_FLOOR_GAS: 1.00,  // % — vortex gas accuracy floor
+  VORTEX_FLOOR_LOW: 2.00,  // % — vortex accuracy when Re < RE_VORTEX_RATED
+  // Gas error calibration
+  ZS_GAS_RATIO:  0.1216,   // Zs_gas = Zs_liq × this — calibrated vs KROSS N₂/S10
+  // Sort tolerances
+  SORT_ERR_TOL:  0.05,     // ratio — min difference to prefer lower error
+  SORT_PRICE_TOL: 0.05,    // index units — min difference to prefer lower price
+  SORT_DP_TOL:   0.001,    // bar — min difference to prefer lower ΔP
+  // EMF (electromagnetic) — OPTIFLUX 1050
+  EMF_FLOOR:     0.50,     // % — accuracy floor (±0.5% of measured value)
+  EMF_ZS_V:      0.001,    // m/s — zero stability (±1 mm/s)
+  EMF_V_MIN:     0.01,     // m/s — absolute instrument minimum
+  EMF_V_RATED:   0.30,     // m/s — rated accuracy threshold
+  EMF_V_OPT_LO: 1.0,      // m/s — optimal velocity window lower bound
+  EMF_V_OPT_HI: 3.0,      // m/s — optimal velocity window upper bound
+  EMF_V_MAX:     12.0,     // m/s — maximum recommended velocity
+  // Water reference density (used in di_eff and v calculations)
+  RHO_WATER:     1000,     // kg/m³
+  // Flow unit conversion
+  S_PER_HOUR:    3600,     // s/h
+};
+
+// ── IAPWS Steam Correlations ─────────────────────────────────────────────────
+function pSatWagner(T_C){
+  const Tc=C.STEAM_TC, Pc=C.STEAM_PC, T=T_C+273.15;
+  if(T>=Tc) return Pc;
+  const tau=1-T/Tc;
+  const f=-7.85951783*tau+1.84408259*Math.pow(tau,1.5)
+          -11.7866497*Math.pow(tau,3)+22.6807411*Math.pow(tau,3.5)
+          -15.9618719*Math.pow(tau,4)+1.80122502*Math.pow(tau,7.5);
+  return Pc*Math.exp(Tc/T*f);
+}
+function tSatFromP(P_bara){
+  if(P_bara>=C.STEAM_PC) return C.STEAM_T_MAX+0.2;
+  let T=100+Math.log10(Math.max(P_bara/1.01325,1e-6))*28;
+  T=Math.max(1,Math.min(C.STEAM_T_MAX,T));
+  for(let i=0;i<120;i++){
+    const p=pSatWagner(T), err=p-P_bara;
+    if(Math.abs(err/P_bara)<1e-9) break;
+    const dp=(pSatWagner(T+0.001)-pSatWagner(T-0.001))/0.002;
+    T-=err/dp; T=Math.max(1,Math.min(373.9,T));
+  }
+  return T;
+}
+function rhoSatVapor(T_C){
+  const Tc=C.STEAM_TC, rhoc=C.STEAM_RHOC, T=T_C+273.15;
+  if(T>=Tc) return rhoc;
+  const th=1-T/Tc;
+  const s=-2.0315024*Math.pow(th,1/3)-2.6830294*Math.pow(th,2/3)
+          -5.38626492*Math.pow(th,4/3)-17.2991605*Math.pow(th,3)
+          -44.7586581*Math.pow(th,37/6)-63.9201063*Math.pow(th,71/6);
+  return rhoc*Math.exp(s);
+}
+const MU_STEAM_TBL=[
+  [100,12.27],[110,12.74],[120,13.04],[130,13.44],[140,13.84],
+  [150,14.32],[160,14.80],[170,15.30],[180,15.82],[190,16.36],
+  [200,16.18],[210,17.07],[220,17.62],[230,18.21],[240,18.83],
+  [250,19.14],[260,20.01],[270,20.74],[280,21.53],[290,22.41],
+  [300,23.38],[310,24.46],[320,25.74],[330,27.32],[340,29.38],
+  [350,32.23],[355,34.27],[360,37.27],[365,42.26],[370,51.38],
+  [373,65.00],[374,80.00]
+];
+function muSatVapor(T_C){
+  const tbl=MU_STEAM_TBL;
+  if(T_C<=tbl[0][0]) return tbl[0][1]/1000;
+  if(T_C>=tbl[tbl.length-1][0]) return tbl[tbl.length-1][1]/1000;
+  for(let i=0;i<tbl.length-1;i++){
+    if(T_C>=tbl[i][0]&&T_C<=tbl[i+1][0]){
+      const t=(T_C-tbl[i][0])/(tbl[i+1][0]-tbl[i][0]);
+      return (tbl[i][1]+t*(tbl[i+1][1]-tbl[i][1]))/1000;
+    }
+  }
+}
+
+function setSteamPUnit(u){
+  S.steamPUnit=u;
+  UI['btn-stm-barg'].className=u==='g'?'active':'';
+  UI['btn-stm-bara'].className=u==='a'?'active':'';
+  calcSteam();
+}
+function getSteamPBara(){
+  const p=parseFloat(UI['f-pstm'].value)||1;
+  return S.steamPUnit==='g'?p+1.01325:p;
+}
+// Pure physics — returns {T, rho, mu} for saturated steam at P (bara). No DOM access.
+function steamProps(P){
+  if(P<=0||P>C.STEAM_P_MAX) return null;
+  const T   = tSatFromP(P);
+  const rho = rhoSatVapor(T);
+  const mu  = muSatVapor(T);
+  return {T, rho, mu};
+}
+
+function calcSteam(){
+  const P     = getSteamPBara();
+  const props = steamProps(P);
+  if(!props) return;
+  const {T, rho, mu} = props;
+  // Steam display fields
+  uiSet('f-tsat',  T.toFixed(2));
+  uiSet('f-rhostm',rho.toFixed(4));
+  uiSet('f-mustm', mu.toFixed(6));
+  // Push to main fluid fields
+  uiSet('f-temp', T.toFixed(2));
+  uiSet('f-pres', P.toFixed(4));
+  setRhoDisplay(rho); _rhoBaseCache = rho;
+  setMuDisplay(mu);   _muBaseCache  = mu;
+  UI['f-name'].value = 'Vapor saturado';
+  // Near-critical warning
+  const alertEl = UI['steam-alert'];
+  if(P > C.STEAM_P_WARN){
+    alertEl.style.cssText = 'display:block;color:var(--warn-text);background:var(--warn-bg);padding:6px 8px;border-radius:var(--radius)';
+    alertEl.textContent = `⚠ P = ${P.toFixed(1)} bara > ${C.STEAM_P_WARN} bar (zona cercana al punto crítico, ${T.toFixed(1)}°C): ρ y μ calculadas con mayor incertidumbre (μ ±10–30%).`;
+  } else {
+    alertEl.style.display = 'none';
+  }
+}
+
+// ── State ────────────────────────────────────────────────────────────────────
+const S = {
+  unit:       'kgh',      // 'kgh' | 'm3h'
+  phase:      'liquid',   // 'liquid' | 'gas' | 'steam'
+  norm:       'Nm3',      // 'Nm3' | 'Sm3'
+  pressUnit:  'a',        // 'a'=bara | 'g'=barg
+  steamPUnit: 'a',        // 'a'=bara | 'g'=barg (steam box)
+  chartInst:  null,
+  candidates: [],
+  selIdx:     0,
+  Q:    0,
+  rho:  1000,
+  mu:   1.0,
+};
+
+// ── DOM cache — avoids repeated getElementById lookups ───────────────────────
+// Populated on DOMContentLoaded; all UI access goes through this object.
+const UI = {};
+document.addEventListener('DOMContentLoaded', () => {
+  const ids = [
+    // Phase toggle buttons
+    'btn-liq','btn-gas','btn-stm',
+    // Fluid fields
+    'fluid-fields','lbl-fluid-cond',
+    'f-name','f-temp','f-pres','f-rho','f-mu',
+    'u-rho','u-mu',
+    'btn-barg','btn-bara',
+    // Gas extras
+    'tech-select-row','f-tech',
+    'liq-library-row','liq-preset',
+    'gas-library-row','gas-box','gas-preset',
+    'f-mw','f-z','f-stdq',
+    'btn-nm3','btn-sm3','std-q-label',
+    'conv-result',
+    // Steam box
+    'steam-box','steam-alert',
+    'f-pstm','btn-stm-barg','btn-stm-bara',
+    'f-tsat','f-rhostm','f-mustm',
+    // Flow input
+    'f-q','q-label','btn-kgh','btn-m3h',
+    // Results
+    'results','r-badge','r-model',
+    'r-err','r-dp','r-vel','r-re',
+    'alerts-toggle','alerts-body','alerts-label','r-alerts',
+    'th-vel','th-range','r-table','op-label','myChart',
+    // Conductivity checkbox
+    'cond-row','f-cond',
+    // Disclaimer
+    'disc-toggle','disc-body',
+  ];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) UI[id] = el;
+    else console.warn('UI cache: element not found:', id);
+  });
+});
+
+// Helper — read numeric value from a cached input, with fallback
+function uiNum(id, fallback=0){ return parseFloat(UI[id]?.value) || fallback; }
+// Helper — set value on a cached input
+function uiSet(id, val){ if(UI[id]) UI[id].value = val; }
+
+// ── Unit conversion: density & viscosity ──────────────────────────────────
+const RHO_CONV = {
+  kgm3:  { toBase: v => v,           fromBase: v => v,             step:'0.1' },
+  gcm3:  { toBase: v => v * 1000,    fromBase: v => v / 1000,      step:'0.0001' },
+  kgl:   { toBase: v => v * 1000,    fromBase: v => v / 1000,      step:'0.0001' },
+  gml:   { toBase: v => v * 1000,    fromBase: v => v / 1000,      step:'0.0001' },
+  gl:    { toBase: v => v,           fromBase: v => v,             step:'0.1' },
+  lbft3: { toBase: v => v / 0.062428, fromBase: v => v * 0.062428, step:'0.01' },
+};
+const MU_CONV = {
+  mpas: { toBase: v => v,            fromBase: v => v,             step:'0.001' },
+  cp:   { toBase: v => v,            fromBase: v => v,             step:'0.001' },
+  pas:  { toBase: v => v * 1000,     fromBase: v => v / 1000,      step:'0.000001' },
+  p:    { toBase: v => v * 100,      fromBase: v => v / 100,       step:'0.00001' },
+  cst:  { toBase:(v,rho) => v * rho / 1000, fromBase:(v,rho) => v * 1000 / rho, step:'0.001' },
+};
+
+// Read displayed value → base units (kg/m³, mPa·s)
+function getRhoBase(){
+  const u = UI['u-rho'] ? UI['u-rho'].value : 'kgm3';
+  return RHO_CONV[u].toBase(parseFloat(UI['f-rho'].value) || 0);
+}
+function getMuBase(){
+  const u = UI['u-mu'] ? UI['u-mu'].value : 'mpas';
+  const v = parseFloat(UI['f-mu'].value) || 0;
+  if(u === 'cst') return MU_CONV.cst.toBase(v, getRhoBase());
+  return MU_CONV[u].toBase(v);
+}
+
+// Set display value from base units
+function setRhoDisplay(baseVal){
+  const u = UI['u-rho'] ? UI['u-rho'].value : 'kgm3';
+  const disp = RHO_CONV[u].fromBase(baseVal);
+  UI['f-rho'].value = fmtSmart(disp);
+}
+function setMuDisplay(baseVal){
+  const u = UI['u-mu'] ? UI['u-mu'].value : 'mpas';
+  const rho = getRhoBase();
+  const disp = u === 'cst' ? MU_CONV.cst.fromBase(baseVal, rho) : MU_CONV[u].fromBase(baseVal);
+  UI['f-mu'].value = fmtSmart(disp);
+}
+function fmtSmart(v){
+  if(!isFinite(v) || v === 0) return '0';
+  const a = Math.abs(v);
+  if(a >= 100) return v.toFixed(2);
+  if(a >= 1)   return v.toFixed(4);
+  if(a >= 0.01)return v.toFixed(6);
+  return v.toExponential(4);
+}
+
+// Unit change handlers — convert currently displayed value
+function onRhoUnitChange(){
+  // The OLD displayed value in the input is in the PREVIOUS unit.
+  // We need to know what the previous unit was.
+  // Strategy: store base value before change, then display in new unit.
+  const base = _rhoBaseCache;
+  if(isFinite(base) && base > 0){
+    setRhoDisplay(base);
+  }
+  UI['f-rho'].step = RHO_CONV[UI['u-rho'].value].step;
+  // If viscosity is in cSt, its display value depends on ρ — refresh it
+  if(UI['u-mu'] && UI['u-mu'].value === 'cst'){
+    const muBase = _muBaseCache;
+    if(isFinite(muBase) && muBase > 0) setMuDisplay(muBase);
+  }
+}
+function onMuUnitChange(){
+  const base = _muBaseCache;
+  if(isFinite(base) && base > 0){
+    setMuDisplay(base);
+  }
+  UI['f-mu'].step = MU_CONV[UI['u-mu'].value].step;
+}
+
+// Base-value caches: updated on every input change and preset load
+var _rhoBaseCache = 1000;
+var _muBaseCache  = 1.0;
+function syncRhoCache(){ _rhoBaseCache = getRhoBase(); }
+function syncMuCache(){  _muBaseCache  = getMuBase(); }
+// Helper — set textContent
+function uiText(id, val){ if(UI[id]) UI[id].textContent = val; }
+// Helper — set className
+function uiClass(id, cls){ if(UI[id]) UI[id].className = cls; }
+// Helper — set innerHTML
+function uiHtml(id, val){ if(UI[id]) UI[id].innerHTML = val; }
+
+// Debounce — delays fn until user stops typing (default 300ms)
+function debounce(fn, ms=300){
+  let t = null;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+}
+// Debounced versions used by oninput handlers (avoid recalc on every keystroke)
+const onConditionChangeDebounced = debounce(() => onConditionChange(), 300);
+const calcSteamDebounced         = debounce(() => calcSteam(), 300);
+const updateConversionDebounced  = debounce(() => updateConversion(), 300);
+
+// ── Real-time input validation ───────────────────────────────────────────────
+// Rules per field id: {min, minExclusive, msg}
+const VALIDATION_RULES = {
+  'f-temp': { min: -273.15, msg: 'T debe ser ≥ −273.15 °C' },
+  'f-pres': { min: 0, minExclusive: true, msg: 'P debe ser > 0' },
+  'f-rho':  { min: 0, minExclusive: true, msg: 'ρ debe ser > 0' },
+  'f-mu':   { min: 0, minExclusive: true, msg: 'μ debe ser > 0' },
+  'f-q':    { min: 0, minExclusive: true, msg: 'Caudal debe ser > 0' },
+  'f-mw':   { min: 0, minExclusive: true, msg: 'MW debe ser > 0' },
+  'f-z':    { min: 0, minExclusive: true, msg: 'Z debe ser > 0' },
+  'f-pstm': { min: 0, minExclusive: true, msg: 'P debe ser > 0' },
+};
+
+// Validate one field; toggles .invalid class. Returns true if valid.
+// Empty fields are treated as valid here (they fall back to defaults) —
+// simulate() still hard-blocks empty/invalid critical fields.
+function validateField(id){
+  const el = UI[id];
+  if(!el) return true;
+  const rule = VALIDATION_RULES[id];
+  if(!rule) return true;
+  const raw = el.value.trim();
+  if(raw === ''){ el.classList.remove('invalid'); return true; }
+  const v = parseFloat(raw);
+  const bad = !isFinite(v) || (rule.minExclusive ? v <= rule.min : v < rule.min);
+  el.classList.toggle('invalid', bad);
+  return !bad;
+}
+
+// Validate all visible critical fields; enables/disables the Calc button.
+function validateAll(){
+  const isGas   = S.phase === 'gas';
+  const isSteam = S.phase === 'steam';
+  let fields = ['f-q'];
+  if(isSteam)      fields.push('f-pstm');
+  else             fields.push('f-temp','f-pres','f-rho','f-mu');
+  if(isGas)        fields.push('f-mw','f-z');
+  const allOk = fields.map(validateField).every(Boolean);
+  const btn = document.querySelector('.calc-btn');
+  if(btn) btn.disabled = !allOk;
+  return allOk;
+}
+const validateAllDebounced = debounce(() => validateAll(), 250);
+
+// Attach validation listeners once DOM cache is ready
+document.addEventListener('DOMContentLoaded', () => {
+  Object.keys(VALIDATION_RULES).forEach(id => {
+    const el = UI[id];
+    if(!el) return;
+    el.addEventListener('input', validateAllDebounced);
+    el.addEventListener('blur',  () => validateAll());
+  });
+});
+
+
+
+// ── Gas library ──────────────────────────────────────────────────────────────
+// Properties at ~20°C process unless noted. μ in mPa·s, ρ at 1 bar 20°C kg/m³, MW g/mol
+// ── Gas properties — NIST WebBook data (1 atm, μ in μPa·s) ──────────────────
+// Source: NIST Chemistry WebBook (webbook.nist.gov)
+// Viscosity at 1 atm; pressure correction <2% for P<20 bar — negligible for preselection
+// Interpolation: linear between tabulated points (error <0.5% within table range)
+const GAS_PRESETS = {
+  air:{
+    name:'Aire', mw:28.97,
+    muT:[-50,-20,0,20,50,100,150,200,300,400],
+    muV:[14.57,16.10,17.07,18.13,19.58,21.81,23.85,25.83,29.50,32.96]
+  },
+  n2:{
+    name:'Nitrógeno (N₂)', mw:28.01,
+    muT:[-50,-20,0,20,50,100,150,200,300,400],
+    muV:[14.19,15.71,16.62,17.56,18.97,21.06,23.03,24.87,28.24,31.29]
+  },
+  co2:{
+    name:'CO₂', mw:44.01,
+    muT:[0,20,50,100,150,200,300,400],
+    muV:[13.72,14.61,16.02,18.21,20.30,22.27,25.97,29.41]
+  },
+  glp:{
+    name:'GLP / Propano', mw:44.10,
+    muT:[-40,0,20,50,100,150,200,300],
+    muV:[6.17,7.41,7.97,8.83,10.35,11.79,13.16,15.69]
+  },
+  h2:{
+    name:'Hidrógeno (H₂)', mw:2.016,
+    muT:[-50,-20,0,20,50,100,200,300,400],
+    muV:[7.37,7.99,8.41,8.82,9.45,10.39,12.06,13.49,14.76]
+  },
+  ch4:{
+    name:'Metano (CH₄)', mw:16.04,
+    muT:[-50,-20,0,20,50,100,200,300,400],
+    muV:[8.54,9.44,9.82,10.30,11.64,13.29,16.61,19.58,22.23]
+  },
+  natgas:{
+    name:'Gas natural (PY típ)', mw:18.50,
+    muT:[-20,0,20,50,100,200,300],
+    muV:[8.80,9.60,10.20,11.30,12.90,16.00,18.80]
+  },
+  nh3:{
+    name:'Amoníaco (NH₃)', mw:17.03,
+    muT:[-30,0,20,50,100,150,200,300],
+    muV:[7.36,8.56,9.90,11.49,13.80,15.90,17.90,21.60]
+  },
+};
+
+// Interpolate μ (mPa·s) from NIST table at temperature T_C
+// Linear interpolation; extrapolates flat beyond table limits
+function mu_gas(g, T_C){
+  const T=T_C, tbl=g.muT, val=g.muV;
+  if(T<=tbl[0])  return val[0]/1000;
+  if(T>=tbl[tbl.length-1]) return val[tbl.length-1]/1000;
+  for(let i=0;i<tbl.length-1;i++){
+    if(T>=tbl[i]&&T<=tbl[i+1]){
+      const t=(T-tbl[i])/(tbl[i+1]-tbl[i]);
+      return (val[i]+t*(val[i+1]-val[i]))/1000;
+    }
+  }
+}
+
+
+// ── OPTIMASS data ─────────────────────────────────────────────────────────────
+
+// gas_e_base: error base en % para gases por familia
+const GAS_E_BASE  = {'1400':0.50,'5400':0.50,'6400':0.35,'7400':0.35};
+
+// ── Índice de precios por modelo (fuente: precios.md) ────────────────────────
+// Clave: "FAMILIA-DN"  p. ej. "1400-S15", "5400-S10", "VORTEX-DN15"
+// Familia VORTEX = OPTISWIRL 4200. OF = OPTIFLUX (no cargado aún).
+const PRICE_INDEX = {
+  // OPTIMASS 1400
+  '1400-S15': 1.6,
+  '1400-S25': 1.7,
+  '1400-S40': 1.9,
+  '1400-S50': 2.3,
+  // OPTIMASS 5400
+  '5400-S10': 1.6,
+  '5400-S15': 1.6,
+  '5400-S25': 1.7,
+  '5400-S40': 1.8,
+  '5400-S50': 2.0,
+  '5400-S80': 2.3,
+  // OPTIMASS 6400
+  '6400-S08': 1.9,
+  '6400-S10': 1.9,
+  '6400-S15': 2.0,
+  '6400-S25': 2.2,
+  '6400-S50': 2.6,
+  '6400-S80': 3.3,
+  '6400-S100': 4.4,
+  '6400-S150': 7.4,
+  '6400-S200': 10.0,
+  // OPTIMASS 7400
+  '7400-S06': 2.1,
+  '7400-S10': 2.2,
+  '7400-S15': 2.3,
+  '7400-S25': 2.6,
+  '7400-S40': 2.8,
+  '7400-S50': 3.4,
+  '7400-H80': 4.6,
+  // OPTISWIRL 4200 (VORTEX)
+  'VORTEX-DN15': 1.4,
+  'VORTEX-DN25': 1.4,
+  'VORTEX-DN40': 1.4,
+  'VORTEX-DN50': 1.4,
+  'VORTEX-DN80': 1.5,
+  'VORTEX-DN100': 1.6,
+  'VORTEX-DN150': 1.9,
+  'VORTEX-DN200': 2.4,
+  'VORTEX-DN250': 2.7,
+  'VORTEX-DN300': 3.4,
+  // OPTIFLUX 1050 (EMF)
+  'EMF-S2.5': 1.1,
+  'EMF-S4':   1.1,
+  'EMF-S6':   1.1,
+  'EMF-S10':  1.1,
+  'EMF-S15':  1.0,
+  'EMF-S20':  1.0,
+  'EMF-S25':  1.0,
+  'EMF-S40':  1.0,
+  'EMF-S50':  1.0,
+  'EMF-S65':  1.0,
+  'EMF-S80':  1.0,
+  'EMF-S100': 1.1,
+  'EMF-S150': 1.1,
+  'EMF-S200': 1.3,
+  'EMF-S250': 1.4,
+};
+
+// Devuelve el índice de precio para un modelo dado.
+// fam: '1400'|'5400'|'6400'|'7400'|'VORTEX'  dn: 'S15'|'DN40'|etc.
+// Si no hay dato exacto devuelve 9.9 (empuja al final sin excluir).
+function makeCost(fam, dn){
+  return PRICE_INDEX[`${fam}-${dn}`] ?? 9.9;
+}
+
+const MODELS = {
+  '1400':{ntube:2,floor:0.1500,accuracy_type:'hyp',models:[
+    {dn:'S15',qmin:48,qmax:6240,di:8.7e-3,zs:0.5,a_dp:1.775191e-7,b_dp:1.843687,a_acc:64.9918,c_acc:0.150004,a_v:2.506318e-3},
+    {dn:'S25',qmin:200,qmax:26000,di:14.96e-3,zs:2.0,a_dp:1.115322e-8,b_dp:1.864858,a_acc:270.0013,c_acc:0.149992,a_v:7.901201e-4},
+    {dn:'S40',qmin:600,qmax:78000,di:24.28e-3,zs:5.0,a_dp:1.352258e-9,b_dp:1.873303,a_acc:799.7845,c_acc:0.150027,a_v:2.999648e-4},
+    {dn:'S50',qmin:1250,qmax:162500,di:36.68e-3,zs:10.0,a_dp:2.517675e-10,b_dp:1.872694,a_acc:1699.9739,c_acc:0.150017,a_v:1.314507e-4}
+  ]},
+  '5400':{ntube:2,floor:0.1500,accuracy_type:'exp',models:[
+    {dn:'S10',qmin:9,qmax:1800,di:5.53e-3,zs:0.3,a_dp:2.442983e-6,b_dp:1.822924,A0:1.85,k_acc:7.8313e-2,q0_acc:9.0,c_acc:0.15,a_v:6.799490e-3},
+    {dn:'S15',qmin:33.75,qmax:6750,di:8.7e-3,zs:0.5,a_dp:1.805413e-7,b_dp:1.845854,A0:1.85,k_acc:2.3674e-2,q0_acc:33.75,c_acc:0.15,a_v:2.506190e-3},
+    {dn:'S25',qmin:90,qmax:18000,di:14.96e-3,zs:2.0,a_dp:2.595535e-8,b_dp:1.859830,A0:1.85,k_acc:7.8416e-3,q0_acc:90.0,c_acc:0.15,a_v:1.096478e-3},
+    {dn:'S40',qmin:187.5,qmax:37500,di:24.28e-3,zs:5.0,a_dp:6.313056e-9,b_dp:1.864348,A0:1.85,k_acc:5.6956e-3,q0_acc:187.5,c_acc:0.15,a_v:5.338332e-4},
+    {dn:'S50',qmin:375,qmax:75000,di:36.68e-3,zs:10.0,a_dp:1.629228e-9,b_dp:1.870186,A0:1.85,k_acc:2.1053e-3,q0_acc:375.0,c_acc:0.15,a_v:2.829368e-4},
+    {dn:'S80',qmin:937.5,qmax:187500,di:40.0e-3,zs:20.0,a_dp:2.723562e-10,b_dp:1.876534,A0:1.85,k_acc:8.4202e-4,q0_acc:937.5,c_acc:0.15,a_v:1.224500e-4}
+  ]},
+  '6400':{ntube:2,floor:0.1000,accuracy_type:'exp',models:[
+    {dn:'S08',qmin:3,qmax:900,di:3.95e-3,zs:0.2,a_dp:8.750861e-6,b_dp:1.804812,A0:1.0,k_acc:1.4928e-1,q0_acc:3.0,c_acc:0.10,a_v:1.133403e-2},
+    {dn:'S10',qmin:6,qmax:1800,di:5.53e-3,zs:0.3,a_dp:2.806168e-6,b_dp:1.814054,A0:1.0,k_acc:7.5687e-2,q0_acc:6.0,c_acc:0.10,a_v:5.782899e-3},
+    {dn:'S15',qmin:19,qmax:5700,di:8.50e-3,zs:0.5,a_dp:2.685269e-7,b_dp:1.837240,A0:1.0,k_acc:4.9302e-2,q0_acc:19.0,c_acc:0.10,a_v:2.447508e-3},
+    {dn:'S25',qmin:95,qmax:28500,di:14.96e-3,zs:2.0,a_dp:1.028416e-8,b_dp:1.859796,A0:0.9998,k_acc:6.6159e-3,q0_acc:94.75,c_acc:0.10,a_v:6.410304e-4},
+    {dn:'S50',qmin:175,qmax:52500,di:24.28e-3,zs:5.0,a_dp:3.589604e-9,b_dp:1.864096,A0:1.0,k_acc:5.0331e-3,q0_acc:175.0,c_acc:0.10,a_v:3.620505e-4},
+    {dn:'S80',qmin:390,qmax:117000,di:40.0e-3,zs:10.0,a_dp:7.337138e-10,b_dp:1.868745,A0:1.0,k_acc:1.3030e-3,q0_acc:390.0,c_acc:0.10,a_v:1.641746e-4},
+    {dn:'S100',qmin:875,qmax:262500,di:45.66e-3,zs:20.0,a_dp:1.448277e-10,b_dp:1.880232,A0:0.9983,k_acc:7.0216e-4,q0_acc:876.7,c_acc:0.10,a_v:8.953507e-5},
+    {dn:'S150',qmin:1625,qmax:480000,di:68.89e-3,zs:40.0,a_dp:4.702479e-11,b_dp:1.877117,A0:0.9841,k_acc:5.1935e-4,q0_acc:1626.06,c_acc:0.10,a_v:4.313294e-5},
+    {dn:'S200',qmin:2750,qmax:825000,di:100.0e-3,zs:80.0,a_dp:1.094049e-11,b_dp:1.875162,A0:1.0038,k_acc:3.8849e-4,q0_acc:2739.17,c_acc:0.10,a_v:2.232758e-5}
+  ]},
+  '7400':{ntube:1,floor:0.1150,accuracy_type:'hyp',models:[
+    {dn:'S06',qmin:9.5,qmax:1230,di:5.53e-3,zs:0.3,a_dp:3.525599e-6,b_dp:1.830466,a_acc:18.452,c_acc:0.100011,a_v:1.156683e-2},
+    {dn:'S10',qmin:27,qmax:3500,di:8.4e-3,zs:0.5,a_dp:4.742213e-7,b_dp:1.849174,a_acc:52.472,c_acc:0.100000,a_v:5.012192e-3},
+    {dn:'S15',qmin:112.5,qmax:14600,di:14.96e-3,zs:1.0,a_dp:2.475350e-8,b_dp:1.869328,a_acc:219.19,c_acc:0.100004,a_v:1.580198e-3},
+    {dn:'S25',qmin:345,qmax:44800,di:24.28e-3,zs:2.0,a_dp:2.324143e-9,b_dp:1.878695,a_acc:672.43,c_acc:0.100000,a_v:5.727143e-4},
+    {dn:'S40',qmin:915,qmax:120000,di:36.68e-3,zs:5.0,a_dp:3.891665e-10,b_dp:1.891063,a_acc:1798.9,c_acc:0.100000,a_v:2.628742e-4},
+    {dn:'H80',qmin:4300,qmax:560000,di:70.0e-3,zs:20.0,a_dp:1.963736e-11,b_dp:1.903994,a_acc:8392.0,c_acc:0.100000,a_v:7.026104e-5}
+  ]}
+};
+
+// ── Physics ───────────────────────────────────────────────────────────────────
+// di_eff: internal tube diameter derived from curve coefficient a_v (m/s per kg/h)
+// a_v = 1/(3600·ρ_agua·A·N) → A = 1/(3600·1000·N·a_v) → di_eff = sqrt(4A/π)
+function di_eff(av, ntube){
+  const A = 1.0/(C.S_PER_HOUR*C.RHO_WATER*ntube*av);
+  return Math.sqrt(4*A/Math.PI);  // metres
+}
+
+function re_calc(Q_kgh, av, mu_mpas, ntube){
+  const di = di_eff(av, ntube);
+  return 4*(Q_kgh/3600)/(Math.PI*di*(mu_mpas/1000)*ntube);
+}
+
+// ── Friction factor ──────────────────────────────────────────────────────────
+// Scheme: 64/Re (laminar) · linear blend 2300–4000 (transition) · 
+//         Blasius Re<1e5 / Filonenko-type Re≥1e5 (turbulent).
+//
+// DESIGN DECISION (audited Jul 2026): Churchill (1977) was evaluated as a
+// physically superior single-equation alternative covering all Re ranges.
+// It was NOT adopted because ALL backtests were performed against KROSS
+// (KROHNE's official sizing tool) using THIS correlation:
+//   · EMF OPTIFLUX per-model L/D coefficients fitted with this f(Re): 20/20
+//     validation points within ±5% of KROSS.
+//   · Coriolis ΔP equal-velocity corrections validated with this f(Re):
+//     CO₂/S15 < 0.01% error, liquids < 1%, gases ±5–10%.
+// Switching to Churchill would require re-deriving those coefficients against
+// the same KROSS datasets. In the 2300–4000 transition zone flow is physically
+// unstable — no correlation is reliable there; the simulator emits an alert.
+function friction(Re){
+  if(Re<1) return 64;
+  if(Re<=C.RE_LAM_MAX) return 64/Re;
+  const ft = Re<1e5 ? 0.316*Math.pow(Re,-0.25) : 0.184*Math.pow(Re,-0.20);
+  if(Re>=C.RE_TURB_MIN) return ft;
+  const fl=64/C.RE_LAM_MAX, t=(Re-C.RE_LAM_MAX)/(C.RE_TURB_MIN-C.RE_LAM_MAX);
+  return fl*(1-t)+ft*t;
+}
+
+function dp_water(m,Q){ return m.a_dp*Math.pow(Q,m.b_dp); }
+
+function dp_fluid(m, Q, rho, mu, ntube){
+  // Correct ΔP correction: same velocity basis, not same mass flow.
+  // v = a_v * Q * (1000/rho)  →  Q_equiv_water = v / a_v = Q * (1000/rho)
+  const Q_equiv = Q * (C.RHO_WATER/rho);          // kg/h of water giving same velocity
+  const Rw = re_calc(Q_equiv, m.a_v, 1.0, ntube);   // Re of water at same v
+  const Rf = re_calc(Q,       m.a_v, mu,  ntube);   // Re of real fluid
+  const dp_w = dp_water(m, Q_equiv);                // ΔP_water at same velocity
+  return dp_w * (friction(Rf)/friction(Rw)) * (rho/1000);
+}
+
+// Error for LIQUIDS: continuous Zs/Q term
+function acc_liquid(fd, m, Q){
+  return fd.floor + (m.zs/Math.max(Q,0.001))*100;
+}
+
+// Error for GASES (validated against KROSS official output)
+// Within rated range (Q >= Q_min): E_base is guaranteed flat — KROSS reports the floor exactly.
+// The Zs/Q term from the liquid formula does NOT apply in the rated gas range.
+// Shape: hyperbolic E = E_base + (Zs_gas/Q)*100
+//   • Correct 1/Q divergence at low flow (physically meaningful)
+//   • At Q_nom: Zs_gas/Q_nom ≈ 0 → converges to E_base ✓
+//   • At Q_min: small step above E_base, smooth curve ✓
+// Zs_gas = Zs_liquid * 0.1216 — ratio calibrated from KROSS N2/S10 data point
+// (KROSS shows 4.65% at absolute minimum flow; back-calculating gives this ratio)
+function acc_gas(fam, fd, m, Q){
+  const eBase  = GAS_E_BASE[fam];
+  const zsGas  = m.zs * C.ZS_GAS_RATIO;   // effective Zs for gas phase, calibrated vs KROSS
+  return eBase + (zsGas / Math.max(Q, 0.001)) * 100;
+}
+
+function regime_label(Re){
+  if(Re<2300) return ['Laminar','lam'];
+  if(Re<4000) return ['Transición','trans'];
+  return ['Turbulento','turb'];
+}
+
+// ── Gas conversion ────────────────────────────────────────────────────────────
+function rho_std(mw, normMode){
+  // density at standard conditions (Z=1, ideal)
+  const T_ref = normMode==='Nm3' ? 273.15 : 288.15; // K
+  const P_ref = C.P_REF_DIN; // Pa — DIN norm (101.3 kPa, consistent with KROSS)
+  return (mw/1000)*P_ref/(C.R_GAS*T_ref); // kg/m³
+}
+
+function rho_process(mw, T_C, P_bar, Z){
+  const T=T_C+273.15, P=P_bar*1e5;
+  return (mw/1000)*P/(Z*C.R_GAS*T);
+}
+
+function updateConversion(){
+  const mw   = parseFloat(UI['f-mw'].value)||28.97;
+  const Z    = parseFloat(UI['f-z'].value)||1.0;
+  const T    = parseFloat(UI['f-temp'].value)||20;
+  const P    = getPressBara();
+  const qStd = parseFloat(UI['f-stdq'].value);
+  const res  = UI['conv-result'];
+
+  if(!qStd || qStd<=0){ res.classList.add('hidden'); return; }
+
+  const rhoRef  = rho_std(mw, S.norm);
+  const rhoPr   = rho_process(mw,T,P,Z);
+  const qMass   = qStd * rhoRef;          // kg/h
+  const qVolPr  = qMass / rhoPr;          // m³/h process
+
+  setRhoDisplay(rhoPr); _rhoBaseCache = rhoPr;
+  UI['f-q'].value   = S.unit==='kgh' ? qMass.toFixed(3) : qVolPr.toFixed(4);
+
+  res.classList.remove('hidden');
+  res.innerHTML =
+    `ρ<sub>ref</sub> = <b>${rhoRef.toFixed(4)} kg/m³</b> &nbsp;|&nbsp; `+
+    `ρ<sub>proceso</sub> = <b>${rhoPr.toFixed(4)} kg/m³</b><br>`+
+    `Q<sub>másico</sub> = <b>${qMass.toFixed(3)} kg/h</b> &nbsp;|&nbsp; `+
+    `Q<sub>proceso</sub> = <b>${qVolPr.toFixed(4)} m³/h</b>`;
+}
+
+// ── UI controls ───────────────────────────────────────────────────────────────
+// Recalculate gas/steam density when T, P, or Z changes
+// Pure physics — returns {rho, mu} for a gas preset at given conditions. No DOM access.
+function gasProps(key, T_C, P_bara, Z){
+  const g = GAS_PRESETS[key];
+  if(!g) return null;
+  return {
+    rho: rho_process(g.mw, T_C, P_bara, Z),
+    mu:  mu_gas(g, T_C),
+  };
+}
+
+
+// ── Liquid presets — ρ(T) and μ(T) correlations ──────────────────────────────
+// Each liquid has:
+//   name:       display name
+//   conductive: boolean — auto-sets checkbox
+//   rhoT:       [T°C, ρ kg/m³] — interpolation points
+//   muT:        [T°C, μ mPa·s] — interpolation points
+//   tMin, tMax: valid temperature range (°C)
+// Pressure effect on liquids is negligible at process pressures (<100 bar).
+
+const LIQ_PRESETS = {
+  water: {
+    name: 'Agua', conductive: true,
+    tMin: 1, tMax: 99,
+    // Source: NIST WebBook / IAPWS
+    rhoT: [[1,999.9],[5,1000.0],[10,999.7],[15,999.1],[20,998.2],[25,997.0],
+           [30,995.7],[40,992.2],[50,988.1],[60,983.2],[70,977.8],[80,971.8],[90,965.3],[99,958.4]],
+    muT:  [[1,1.729],[5,1.519],[10,1.307],[15,1.138],[20,1.002],[25,0.890],
+           [30,0.798],[40,0.653],[50,0.547],[60,0.466],[70,0.404],[80,0.354],[90,0.315],[99,0.284]],
+  },
+  ethanol96: {
+    name: 'Alcohol etílico 96%', conductive: false,
+    tMin: 0, tMax: 78,
+    // Source: Perry's Chemical Engineers' Handbook, ethanol-water mixtures
+    rhoT: [[0,810.5],[10,801.0],[20,789.3],[25,785.1],[30,780.5],[40,770.2],[50,757.8],[60,744.5],[78,723.0]],
+    muT:  [[0,1.786],[10,1.466],[20,1.200],[25,1.095],[30,1.003],[40,0.834],[50,0.702],[60,0.592],[78,0.430]],
+  },
+  soybean_oil: {
+    name: 'Aceite de soja', conductive: false,
+    tMin: 10, tMax: 180,
+    // Source: Esteban et al. (2012), JAOCS correlations for refined soybean oil
+    rhoT: [[10,926],[20,920],[30,914],[40,908],[50,902],[60,895],[80,882],[100,868],[120,854],[150,833],[180,811]],
+    muT:  [[10,117.0],[20,65.4],[30,39.2],[40,25.0],[50,16.8],[60,11.8],[80,6.4],[100,3.9],[120,2.6],[150,1.6],[180,1.1]],
+  },
+  sunflower_oil: {
+    name: 'Aceite de girasol', conductive: false,
+    tMin: 10, tMax: 180,
+    // Source: Fasina & Colley (2008), high-oleic sunflower oil
+    rhoT: [[10,924],[20,918],[30,912],[40,906],[50,899],[60,893],[80,879],[100,865],[120,851],[150,830],[180,808]],
+    muT:  [[10,110.0],[20,58.5],[30,35.0],[40,22.5],[50,15.3],[60,10.8],[80,5.8],[100,3.6],[120,2.4],[150,1.5],[180,1.0]],
+  },
+  beef_tallow: {
+    name: 'Grasa vacuna (sebo)', conductive: false,
+    tMin: 45, tMax: 180,
+    // Source: Noureddini et al. (1992), Graue (1965), animal fats at T > melting point (~40-45°C)
+    rhoT: [[45,896],[50,893],[60,886],[70,880],[80,873],[90,866],[100,860],[120,846],[150,826],[180,805]],
+    muT:  [[45,51.0],[50,38.2],[60,22.5],[70,14.5],[80,10.0],[90,7.2],[100,5.4],[120,3.3],[150,1.9],[180,1.2]],
+  },
+};
+
+// Pure physics — interpolates from table, returns value at T
+function interpTable(tbl, T){
+  if(T <= tbl[0][0]) return tbl[0][1];
+  if(T >= tbl[tbl.length-1][0]) return tbl[tbl.length-1][1];
+  for(let i=0; i<tbl.length-1; i++){
+    if(T >= tbl[i][0] && T <= tbl[i+1][0]){
+      const t = (T - tbl[i][0]) / (tbl[i+1][0] - tbl[i][0]);
+      return tbl[i][1] + t * (tbl[i+1][1] - tbl[i][1]);
+    }
+  }
+  return tbl[0][1];
+}
+
+// Pure physics — returns {rho, mu} for a liquid preset at temperature T
+function liqProps(key, T_C){
+  const liq = LIQ_PRESETS[key];
+  if(!liq) return null;
+  return {
+    rho: interpTable(liq.rhoT, T_C),
+    mu:  interpTable(liq.muT, T_C),
+  };
+}
+
+function applyLiqPreset(){
+  const key = UI['liq-preset'].value;
+  if(!key){
+    // Manual mode — clear readonly, let user type
+    UI['f-rho'].readOnly = false;
+    UI['f-mu'].readOnly = false;
+    UI['f-name'].value = '';
+    UI['f-rho'].classList.remove('ro-field');
+    UI['f-mu'].classList.remove('ro-field');
+    return;
+  }
+  const liq = LIQ_PRESETS[key];
+  const T = uiNum('f-temp', 20);
+  const props = liqProps(key, T);
+  if(!props) return;
+  uiSet('f-name', liq.name);
+  setRhoDisplay(props.rho); _rhoBaseCache = props.rho;
+  setMuDisplay(props.mu);   _muBaseCache  = props.mu;
+  // Set conductivity checkbox
+  UI['f-cond'].checked = liq.conductive;
+  // Make ρ and μ readonly when preset is active (recalculated by T)
+  UI['f-rho'].readOnly = true;
+  UI['f-mu'].readOnly = true;
+  UI['f-rho'].classList.add('ro-field');
+  UI['f-mu'].classList.add('ro-field');
+  // Temperature range warning — non-blocking visual indicator
+  markLiqTempRange(liq, T);
+  updateTechOptions();
+}
+
+// Marks f-temp with a warning style if T is outside the preset's valid range
+function markLiqTempRange(liq, T){
+  const el = UI['f-temp'];
+  if(!el) return;
+  const out = T < liq.tMin || T > liq.tMax;
+  el.style.borderColor = out ? 'var(--warn)' : '';
+  el.title = out
+    ? `⚠ Fuera del rango válido para ${liq.name} (${liq.tMin}–${liq.tMax}°C) — ρ y μ extrapolados`
+    : '';
+}
+
+// ── Recalculate liquid props when T changes ──────────────────────────────────
+function onLiqConditionChange(){
+  const key = UI['liq-preset'].value;
+  if(!key) return; // manual mode — user controls ρ and μ
+  const liq = LIQ_PRESETS[key];
+  const T = uiNum('f-temp', 20);
+  const props = liqProps(key, T);
+  if(props){
+    setRhoDisplay(props.rho); _rhoBaseCache = props.rho;
+    setMuDisplay(props.mu);   _muBaseCache  = props.mu;
+  }
+  markLiqTempRange(liq, T);
+}
+
+// ── Actualiza las opciones del menú de tecnología según fase/conductividad/viscosidad ──
+// Reglas:
+//   Líquido conductivo + μ ≤ 1.5 mPa·s → todos (Coriolis, Vortex, EMF, H250)
+//   Líquido conductivo + μ > 1.5        → Coriolis, EMF (sin Vortex ni H250)
+//   Líquido no conductivo + μ ≤ 1.5     → Coriolis, Vortex, H250 (sin EMF)
+//   Líquido no conductivo + μ > 1.5     → solo Coriolis
+//   Gas / Vapor                         → Coriolis, Vortex, H250 (sin EMF)
+function updateTechOptions(){
+  const sel = UI['f-tech'];
+  if(!sel) return;
+  const phase = S.phase;
+  const isGas = phase==='gas' || phase==='steam';
+  const isCond = !isGas && UI['f-cond'] && UI['f-cond'].checked;
+  const mu = getMuBase() || 1.0;
+  const lowMu = mu <= C.MU_VORTEX_MAX;
+
+  const opts = [{value:'all', label:'Todos los compatibles'}];
+  // Coriolis siempre disponible
+  opts.push({value:'coriolis', label:'Coriolis (OPTIMASS)'});
+  // Vortex: solo si μ ≤ 1.5 (líquidos) o gas/vapor
+  if(isGas || lowMu)
+    opts.push({value:'vortex', label:'Vortex (OPTISWIRL 4200)'});
+  // EMF: solo líquidos conductivos
+  if(isCond)
+    opts.push({value:'emf', label:'Electromagnético (OPTIFLUX 1050)'});
+  // H250: solo si μ ≤ 1.5 (líquidos) o gas/vapor — misma regla que vortex
+  if(isGas || lowMu)
+    opts.push({value:'h250', label:'Área Variable (H250)'});
+
+  // Preservar selección si sigue siendo válida
+  const prev = sel.value;
+  sel.innerHTML = '';
+  opts.forEach(o => {
+    const opt = document.createElement('option');
+    opt.value = o.value;
+    opt.textContent = o.label;
+    sel.appendChild(opt);
+  });
+  // Restaurar selección previa si aún existe, sino "all"
+  if(opts.some(o => o.value === prev)) sel.value = prev;
+  else sel.value = 'all';
+}
+const updateTechOptionsDebounced = debounce(() => updateTechOptions(), 200);
+
+function onConditionChange(){
+  updateTechOptions(); // actualizar opciones del menú cuando cambian las condiciones
+  if(S.phase==='gas'){
+    const key = UI['gas-preset'].value;
+    if(key){
+      const T = uiNum('f-temp', 20);
+      const P = getPressBara();
+      const Z = uiNum('f-z', 1.0);
+      const props = gasProps(key, T, P, Z);
+      if(props){
+        setRhoDisplay(props.rho); _rhoBaseCache = props.rho;
+        setMuDisplay(props.mu);   _muBaseCache  = props.mu;
+      }
+      updateConversion();
+    }
+  } else if(S.phase==='steam'){
+    calcSteam();
+  } else {
+    // Liquid phase — recalc if preset selected
+    onLiqConditionChange();
+  }
+}
+
+function setPhase(phase){
+  S.phase = phase;
+  const isGas   = phase==='gas';
+  const isSteam = phase==='steam';
+  UI['btn-liq'].className = (!isGas&&!isSteam)?'active-liq':'';
+  UI['btn-gas'].className = isGas?'active-gas':'';
+  UI['btn-stm'].className = isSteam?'active-steam':'';
+  UI['liq-library-row'].classList.toggle('hidden', isGas || isSteam);
+  UI['gas-library-row'].classList.toggle('hidden',!isGas);
+  UI['gas-box'].classList.toggle('hidden',!isGas);
+  UI['steam-box'].classList.toggle('hidden',!isSteam);
+  const rec0=S.candidates[0];
+  UI['r-badge'].className = rec0&&rec0.isVortex?'rec-badge rec-badge-gas':rec0&&rec0.isEMF?'rec-badge rec-badge-emf':rec0&&rec0.isH250?'rec-badge rec-badge-va':
+    isGas?'rec-badge rec-badge-gas':isSteam?'rec-badge rec-badge-steam':'rec-badge';
+  if(isSteam){ calcSteam(); }
+  // Show/hide fluid condition fields based on phase
+  UI['fluid-fields'].classList.toggle('hidden', isSteam);
+  UI['cond-row'].style.display = (isGas || isSteam) ? 'none' : 'flex';
+  if(isGas || isSteam) UI['f-cond'].checked = false;
+  // Actualizar opciones del menú de tecnología según la nueva fase
+  setTimeout(() => updateTechOptions(), 50);
+  UI['lbl-fluid-cond'].classList.toggle('hidden', isSteam);
+  if(isGas || isSteam){
+    // Unlock ρ/μ fields (may be readonly from a liquid preset)
+    UI['f-rho'].readOnly = false;
+    UI['f-mu'].readOnly  = false;
+    UI['f-rho'].classList.remove('ro-field');
+    UI['f-mu'].classList.remove('ro-field');
+  }
+  if(isGas){
+    // Auto-load first gas (Air) with current T/P conditions
+    UI['gas-preset'].value='air';
+    applyGasPreset();
+  }
+  if(!isGas&&!isSteam){
+    // reset to water defaults via preset
+    UI['liq-preset'].value='water';
+    UI['f-temp'].value='20';
+    UI['f-pres'].value='1';
+    UI['gas-preset'].value='';
+    UI['conv-result'].classList.add('hidden');
+    applyLiqPreset();  // sets name, ρ, μ, conductivity, readonly
+  }
+}
+
+function setNorm(norm){
+  S.norm=norm;
+  UI['btn-nm3'].className=norm==='Nm3'?'active':'';
+  UI['btn-sm3'].className=norm==='Sm3'?'active':'';
+  UI['std-q-label'].textContent=
+    norm==='Nm3'?'Caudal en condiciones Nm³/h (0°C · 1.01325 bar)':'Caudal en condiciones Sm³/h (15°C · 1.01325 bar)';
+  updateConversion();
+}
+
+
+function setPressUnit(u){
+  S.pressUnit = u;
+  UI['btn-barg'].className = u==='g'?'active':'';
+  UI['btn-bara'].className = u==='a'?'active':'';
+  updateConversion();
+}
+
+function getPressBara(){
+  const p = parseFloat(UI['f-pres'].value)||1;
+  return S.pressUnit==='g' ? p + 1.01325 : p;
+}
+
+function setUnit(u){
+  const rho=getRhoBase();
+  const qv =parseFloat(UI['f-q'].value)||0;
+  if(u==='m3h'&&S.unit==='kgh') UI['f-q'].value=(qv/rho).toFixed(4);
+  else if(u==='kgh'&&S.unit==='m3h') UI['f-q'].value=(qv*rho).toFixed(3);
+  S.unit=u;
+  UI['btn-kgh'].className=u==='kgh'?'active':'';
+  UI['btn-m3h'].className=u==='m3h'?'active':'';
+  UI['q-label'].textContent=u==='kgh'?'Caudal másico (kg/h)':'Caudal volumétrico proceso (m³/h)';
+}
+
+function applyGasPreset(){
+  const key = UI['gas-preset'].value;
+  if(!key) return;
+  const g = GAS_PRESETS[key];
+  const T = uiNum('f-temp', 20);
+  const P = getPressBara();
+  const Z = uiNum('f-z', 1.0);
+  // Name and MW come from the preset itself
+  uiSet('f-name', g.name);
+  uiSet('f-mw',   g.mw.toFixed(3));
+  // ρ and μ from the shared pure-physics function (same path as onConditionChange)
+  const props = gasProps(key, T, P, Z);
+  if(props){
+    setRhoDisplay(props.rho); _rhoBaseCache = props.rho;
+    setMuDisplay(props.mu);   _muBaseCache  = props.mu;
+  }
+  updateConversion();
+}
+
+// ── OPTISWIRL 4200 Vortex data ──────────────────────────────────────────────
+// Validated vs KROSS 1.7P build 5003 (Water/Air/Steam, 7 DN combinations)
+// Di_eff: from velocity back-calculation | K: fluid-independent (Δ<1% water/air/steam)
+const VORTEX_FLOOR_LIQ = C.VORTEX_FLOOR_LIQ;
+const VORTEX_FLOOR_GAS = C.VORTEX_FLOOR_GAS;
+const VORTEX_FLOOR_LOW = C.VORTEX_FLOOR_LOW;
+const VORTEX_RE_MIN    = C.RE_VORTEX_MIN;
+const VORTEX_RE_RATED  = C.RE_VORTEX_RATED;
+const VORTEX_MU_MAX    = C.MU_VORTEX_MAX;
+
+const VORTEX_MODELS = [
+  {dn:'DN15',  Di:16.00e-3, K:1.83, Kv:true,  v_min_liq:0.30,v_max_liq:10.0,v_min_gas:3.0,v_max_gas:45.0},
+  {dn:'DN25',  Di:24.00e-3, K:1.77, Kv:true,  v_min_liq:0.30,v_max_liq:10.0,v_min_gas:2.0,v_max_gas:70.0},
+  {dn:'DN40',  Di:38.70e-3, K:1.85, Kv:false, v_min_liq:0.30,v_max_liq:10.0,v_min_gas:2.0,v_max_gas:80.0},
+  {dn:'DN50',  Di:49.40e-3, K:1.85, Kv:false, v_min_liq:0.30,v_max_liq:10.0,v_min_gas:2.0,v_max_gas:80.0},
+  {dn:'DN80',  Di:74.00e-3, K:2.10, Kv:true,  v_min_liq:0.30,v_max_liq:10.0,v_min_gas:2.0,v_max_gas:80.0},
+  {dn:'DN100', Di:97.00e-3, K:1.92, Kv:true,  v_min_liq:0.30,v_max_liq:10.0,v_min_gas:2.0,v_max_gas:80.0},
+  {dn:'DN150', Di:146.0e-3, K:1.34, Kv:true,  v_min_liq:0.30,v_max_liq:10.0,v_min_gas:2.0,v_max_gas:80.0},
+  {dn:'DN200', Di:200.0e-3, K:1.84, Kv:true,  v_min_liq:0.30,v_max_liq:10.0,v_min_gas:2.0,v_max_gas:80.0},
+  {dn:'DN250', Di:253.0e-3, K:2.17, Kv:true,  v_min_liq:0.30,v_max_liq:10.0,v_min_gas:2.0,v_max_gas:80.0},
+  {dn:'DN300', Di:302.0e-3, K:1.85, Kv:false, v_min_liq:0.30,v_max_liq:10.0,v_min_gas:2.0,v_max_gas:80.0},
+];
+// ── Generic pipe hydraulics — shared by Vortex and EMF (audited: deduplication) ──
+// v [m/s] from mass flow through a circular section of internal diameter Di [m]
+function v_pipe(Di, Q_kgh, rho){
+  return (Q_kgh / C.S_PER_HOUR) / (rho * Math.PI * Di**2 / 4);
+}
+// Re from the same section. μ in mPa·s (converted to Pa·s at point of use).
+function re_pipe(Di, Q_kgh, rho, mu_mpas){
+  return rho * v_pipe(Di, Q_kgh, rho) * Di / (mu_mpas / 1000);
+}
+
+// Vortex wrappers (kept for call-site clarity; delegate to generic pipe fns)
+function v_vortex(m,Q_kgh,rho){ return v_pipe(m.Di, Q_kgh, rho); }
+function re_vortex(m,Q_kgh,rho,mu){ return re_pipe(m.Di, Q_kgh, rho, mu); }
+function dp_vortex(m,Q_kgh,rho){const v=v_pipe(m.Di,Q_kgh,rho);return m.K*rho*v**2/2*1e-5;}
+function acc_vortex(Re,isGas){
+  if(Re<VORTEX_RE_MIN)   return Infinity;
+  if(Re<VORTEX_RE_RATED) return VORTEX_FLOOR_LOW;
+  return isGas?VORTEX_FLOOR_GAS:VORTEX_FLOOR_LIQ;
+}
+
+// ── OPTIFLUX 1050 Electromagnetic data ──────────────────────────────────────
+// Only for conductive liquids (≥5 μS/cm). ΔP ≈ pipe friction only (no obstruction).
+// Accuracy: ±0.5% of measured value ± 1 mm/s
+// Di values: user-measured where noted (✓), rest extrapolated from PTFE liner std.
+// Di and Ld (L/D ratio for ΔP) validated against KROSS where marked (✓).
+// Di = DN nominal for all validated sizes (no liner reduction).
+// Ld varies significantly with DN (6.8 for S10, ~2.0 for S50-S100, 1.33 for S150).
+const EMF_MODELS = [
+  {dn:'S2.5', Di:2.5e-3,  Ld:6.8},
+  {dn:'S4',   Di:4.0e-3,  Ld:6.8},
+  {dn:'S6',   Di:6.0e-3,  Ld:6.8},
+  {dn:'S10',  Di:10.0e-3, Ld:6.8},   // ✓ KROSS
+  {dn:'S15',  Di:15.0e-3, Ld:3.5},
+  {dn:'S20',  Di:20.0e-3, Ld:2.8},
+  {dn:'S25',  Di:25.0e-3, Ld:2.16},  // ✓ KROSS
+  {dn:'S40',  Di:40.0e-3, Ld:2.0},   // ✓ measured Di=38mm by user (KROSS says 40)
+  {dn:'S50',  Di:50.0e-3, Ld:1.95},  // ✓ KROSS
+  {dn:'S65',  Di:65.0e-3, Ld:1.95},
+  {dn:'S80',  Di:80.0e-3, Ld:1.95},  // ✓ measured Di=76mm by user (KROSS says 80)
+  {dn:'S100', Di:100.0e-3,Ld:1.97},  // ✓ KROSS (user measured 96mm, KROSS=100)
+  {dn:'S150', Di:150.0e-3,Ld:1.33},  // ✓ KROSS + measured
+  {dn:'S200', Di:200.0e-3,Ld:1.1},
+  {dn:'S250', Di:250.0e-3,Ld:1.0},
+];
+
+// EMF wrappers — same generic pipe hydraulics as vortex
+function v_emf(m, Q_kgh, rho){ return v_pipe(m.Di, Q_kgh, rho); }
+function re_emf(m, Q_kgh, rho, mu){ return re_pipe(m.Di, Q_kgh, rho, mu); }
+
+// ±0.5% of measured value ± 1 mm/s  →  err% = 0.5 + (0.001/v)*100 = 0.5 + 0.1/v
+function acc_emf(v){
+  if(v <= 0) return Infinity;
+  return C.EMF_FLOOR + (C.EMF_ZS_V / v) * 100;
+}
+
+// ΔP = pipe friction only (no obstruction). L/D ≈ 5 for meter body.
+function dp_emf(m, Q_kgh, rho, mu){
+  const v  = v_pipe(m.Di, Q_kgh, rho);
+  const Re = re_pipe(m.Di, Q_kgh, rho, mu);
+  const f  = friction(Re);
+  return f * m.Ld * rho * v**2 / 2 * 1e-5;  // bar — Ld per model, validated vs KROSS
+}
+
+// ── H250 M40 Variable Area (Rotameter) data ─────────────────────────────────
+// Accuracy class G=1.6, qG=50% per VDI/VDE 3513-2:2008
+// Float material: Inox 316L, ρ_float = 8000 kg/m³
+// Ranges from TD H250-M40 R07, Table 2-19
+
+const H250_RHO_FLOAT = 8000; // kg/m³ — 316L simplified (real 7950, impact <0.6%)
+
+// Each entry: {dn, cone, flt, fs_liq (l/h water), dp_liq (mbar), fs_gas (Nm³/h air), dp_gas (mbar)}
+// flt: 'TIV-Alu' (gas only), 'TIV', 'CIV', 'DIV'
+// NOTA: los valores provienen de la tabla 8-19 del manual R07 (KROHNE 10/2022).
+// KroVasel (herramienta interna de KROHNE) puede diferir ±10–12% porque usa datos
+// de calibración reales por variante de tubo (V251, V252), no valores nominales.
+// Para dimensionamiento definitivo, consultar KroVasel o al ingeniero de aplicación KROHNE.
+const H250_TBL = [
+  // DN15
+  {dn:'DN15',cone:'K15.1',flt:'TIV',    fs_liq:18,   dp_liq:21,  fs_gas:0.65, dp_gas:21},
+  {dn:'DN15',cone:'K15.1',flt:'CIV',    fs_liq:25,   dp_liq:26,  fs_gas:null, dp_gas:null},
+  {dn:'DN15',cone:'K15.1',flt:'TIV-Alu',fs_liq:null,  dp_liq:null,fs_gas:0.42, dp_gas:12},
+  {dn:'DN15',cone:'K15.2',flt:'TIV',    fs_liq:30,   dp_liq:21,  fs_gas:1.0,  dp_gas:21},
+  {dn:'DN15',cone:'K15.2',flt:'CIV',    fs_liq:40,   dp_liq:26,  fs_gas:null, dp_gas:null},
+  {dn:'DN15',cone:'K15.2',flt:'TIV-Alu',fs_liq:null,  dp_liq:null,fs_gas:0.7,  dp_gas:12},
+  {dn:'DN15',cone:'K15.3',flt:'TIV',    fs_liq:55,   dp_liq:21,  fs_gas:1.5,  dp_gas:21},
+  {dn:'DN15',cone:'K15.3',flt:'CIV',    fs_liq:63,   dp_liq:26,  fs_gas:null, dp_gas:null},
+  {dn:'DN15',cone:'K15.3',flt:'TIV-Alu',fs_liq:null,  dp_liq:null,fs_gas:1.0,  dp_gas:12},
+  {dn:'DN15',cone:'K15.4',flt:'TIV',    fs_liq:80,   dp_liq:21,  fs_gas:2.2,  dp_gas:21},
+  {dn:'DN15',cone:'K15.4',flt:'CIV',    fs_liq:100,  dp_liq:26,  fs_gas:null, dp_gas:null},
+  {dn:'DN15',cone:'K15.4',flt:'TIV-Alu',fs_liq:null,  dp_liq:null,fs_gas:1.7,  dp_gas:12},
+  {dn:'DN15',cone:'K15.5',flt:'TIV',    fs_liq:120,  dp_liq:21,  fs_gas:3.6,  dp_gas:21},
+  {dn:'DN15',cone:'K15.5',flt:'CIV',    fs_liq:160,  dp_liq:26,  fs_gas:null, dp_gas:null},
+  {dn:'DN15',cone:'K15.5',flt:'TIV-Alu',fs_liq:null,  dp_liq:null,fs_gas:2.5,  dp_gas:12},
+  {dn:'DN15',cone:'K15.6',flt:'TIV',    fs_liq:200,  dp_liq:21,  fs_gas:5.5,  dp_gas:21},
+  {dn:'DN15',cone:'K15.6',flt:'CIV',    fs_liq:250,  dp_liq:26,  fs_gas:null, dp_gas:null},
+  {dn:'DN15',cone:'K15.6',flt:'TIV-Alu',fs_liq:null,  dp_liq:null,fs_gas:4.2,  dp_gas:12},
+  {dn:'DN15',cone:'K15.7',flt:'TIV',    fs_liq:350,  dp_liq:21,  fs_gas:10,   dp_gas:21},
+  {dn:'DN15',cone:'K15.7',flt:'CIV',    fs_liq:400,  dp_liq:28,  fs_gas:null, dp_gas:null},
+  {dn:'DN15',cone:'K15.7',flt:'DIV',    fs_liq:700,  dp_liq:38,  fs_gas:18,   dp_gas:38},
+  {dn:'DN15',cone:'K15.7',flt:'TIV-Alu',fs_liq:null,  dp_liq:null,fs_gas:6.7,  dp_gas:12},
+  {dn:'DN15',cone:'K15.8',flt:'TIV',    fs_liq:500,  dp_liq:22,  fs_gas:14,   dp_gas:22},
+  {dn:'DN15',cone:'K15.8',flt:'CIV',    fs_liq:630,  dp_liq:32,  fs_gas:null, dp_gas:null},
+  {dn:'DN15',cone:'K15.8',flt:'DIV',    fs_liq:1000, dp_liq:50,  fs_gas:28,   dp_gas:50},
+  {dn:'DN15',cone:'K15.8',flt:'TIV-Alu',fs_liq:null,  dp_liq:null,fs_gas:10,   dp_gas:13},
+  {dn:'DN15',cone:'K15.8',flt:'DIV-TR', fs_liq:1600,  dp_liq:85,  fs_gas:50,   dp_gas:85},  // nota ② manual: con flotador TR (anillo tantalio)
+  // DN25
+  {dn:'DN25',cone:'K25.1',flt:'TIV',    fs_liq:480,  dp_liq:24,  fs_gas:14,   dp_gas:24},
+  {dn:'DN25',cone:'K25.1',flt:'CIV',    fs_liq:630,  dp_liq:32,  fs_gas:null, dp_gas:null},
+  {dn:'DN25',cone:'K25.1',flt:'DIV',    fs_liq:1000, dp_liq:72,  fs_gas:null, dp_gas:null},
+  {dn:'DN25',cone:'K25.1',flt:'TIV-Alu',fs_liq:null,  dp_liq:null,fs_gas:9.5,  dp_gas:11},
+  {dn:'DN25',cone:'K25.2',flt:'TIV',    fs_liq:820,  dp_liq:24,  fs_gas:23,   dp_gas:24},
+  {dn:'DN25',cone:'K25.2',flt:'CIV',    fs_liq:1000, dp_liq:33,  fs_gas:null, dp_gas:null},
+  {dn:'DN25',cone:'K25.2',flt:'DIV',    fs_liq:1600, dp_liq:74,  fs_gas:null, dp_gas:null},
+  {dn:'DN25',cone:'K25.2',flt:'TIV-Alu',fs_liq:null,  dp_liq:null,fs_gas:15,   dp_gas:11},
+  {dn:'DN25',cone:'K25.3',flt:'TIV',    fs_liq:1200, dp_liq:25,  fs_gas:35,   dp_gas:25},
+  {dn:'DN25',cone:'K25.3',flt:'CIV',    fs_liq:1600, dp_liq:34,  fs_gas:null, dp_gas:null},
+  {dn:'DN25',cone:'K25.3',flt:'DIV',    fs_liq:2500, dp_liq:75,  fs_gas:null, dp_gas:null},
+  {dn:'DN25',cone:'K25.3',flt:'TIV-Alu',fs_liq:null,  dp_liq:null,fs_gas:22,   dp_gas:11},
+  {dn:'DN25',cone:'K25.4',flt:'TIV',    fs_liq:1700, dp_liq:26,  fs_gas:50,   dp_gas:26},
+  {dn:'DN25',cone:'K25.4',flt:'CIV',    fs_liq:2500, dp_liq:38,  fs_gas:null, dp_gas:null},
+  {dn:'DN25',cone:'K25.4',flt:'DIV',    fs_liq:4000, dp_liq:78,  fs_gas:110,  dp_gas:78},
+  {dn:'DN25',cone:'K25.4',flt:'TIV-Alu',fs_liq:null,  dp_liq:null,fs_gas:37,   dp_gas:12},
+  {dn:'DN25',cone:'K25.5',flt:'TIV',    fs_liq:3200, dp_liq:30,  fs_gas:95,   dp_gas:30},
+  {dn:'DN25',cone:'K25.5',flt:'CIV',    fs_liq:4000, dp_liq:45,  fs_gas:null, dp_gas:null},
+  {dn:'DN25',cone:'K25.5',flt:'DIV',    fs_liq:6300, dp_liq:103, fs_gas:180,  dp_gas:103},
+  {dn:'DN25',cone:'K25.5',flt:'TIV-Alu',fs_liq:null,  dp_liq:null,fs_gas:62,   dp_gas:13},
+  // DN50
+  {dn:'DN50',cone:'K55.1',flt:'TIV',    fs_liq:2700, dp_liq:13,  fs_gas:80,   dp_gas:13},
+  {dn:'DN50',cone:'K55.1',flt:'CIV',    fs_liq:6300, dp_liq:74,  fs_gas:null, dp_gas:null},
+  {dn:'DN50',cone:'K55.1',flt:'DIV',    fs_liq:8400, dp_liq:60,  fs_gas:230,  dp_gas:60},
+  {dn:'DN50',cone:'K55.1',flt:'TIV-Alu',fs_liq:null,  dp_liq:null,fs_gas:58,   dp_gas:8},
+  {dn:'DN50',cone:'K55.2',flt:'TIV',    fs_liq:3600, dp_liq:13,  fs_gas:110,  dp_gas:13},
+  {dn:'DN50',cone:'K55.2',flt:'CIV',    fs_liq:10000,dp_liq:77,  fs_gas:null, dp_gas:null},
+  {dn:'DN50',cone:'K55.2',flt:'DIV',    fs_liq:14000,dp_liq:69,  fs_gas:350,  dp_gas:69},
+  {dn:'DN50',cone:'K55.2',flt:'TIV-Alu',fs_liq:null,  dp_liq:null,fs_gas:77,   dp_gas:8},
+  {dn:'DN50',cone:'K55.3',flt:'TIV',    fs_liq:5100, dp_liq:13,  fs_gas:150,  dp_gas:13},
+  {dn:'DN50',cone:'K55.3',flt:'CIV',    fs_liq:16000,dp_liq:84,  fs_gas:null, dp_gas:null},
+  {dn:'DN50',cone:'K55.3',flt:'DIV',    fs_liq:25000,dp_liq:104, fs_gas:700,  dp_gas:104},
+  {dn:'DN50',cone:'K55.3',flt:'TIV-Alu',fs_liq:null,  dp_liq:null,fs_gas:110,  dp_gas:9},
+  // DN80
+  {dn:'DN80',cone:'K85.1',flt:'TIV',    fs_liq:12000,dp_liq:16,  fs_gas:350,  dp_gas:16},
+  {dn:'DN80',cone:'K85.1',flt:'CIV',    fs_liq:25000,dp_liq:68,  fs_gas:null, dp_gas:null},
+  {dn:'DN80',cone:'K85.1',flt:'DIV',    fs_liq:37000,dp_liq:95,  fs_gas:1000, dp_gas:95},
+  {dn:'DN80',cone:'K85.1',flt:'TIV-Alu',fs_liq:null,  dp_liq:null,fs_gas:245,  dp_gas:8},
+  {dn:'DN80',cone:'K85.2',flt:'TIV',    fs_liq:16000,dp_liq:16,  fs_gas:400,  dp_gas:16},
+  {dn:'DN80',cone:'K85.2',flt:'CIV',    fs_liq:40000,dp_liq:89,  fs_gas:null, dp_gas:null},
+  {dn:'DN80',cone:'K85.2',flt:'DIV',    fs_liq:64000,dp_liq:125, fs_gas:1800, dp_gas:125},
+  {dn:'DN80',cone:'K85.2',flt:'TIV-Alu',fs_liq:null,  dp_liq:null,fs_gas:280,  dp_gas:9},
+  // DN100
+  // K105.1 TIV: manual R07 indica 19000 l/h agua y 550 Nm³/h aire,
+  // pero ΔP = "–" (no especificada). Sin ΔP no se puede filtrar → no incluido.
+  {dn:'DN100',cone:'K105.1',flt:'CIV',  fs_liq:63000,dp_liq:120, fs_gas:null, dp_gas:null},
+  {dn:'DN100',cone:'K105.1',flt:'DIV',  fs_liq:100000,dp_liq:220,fs_gas:2800, dp_gas:220},
+];
+
+// H250 prices: 0.85 × OF 1050 of same DN
+const H250_PRICES = {'DN15':0.85,'DN25':0.85,'DN50':0.85,'DN80':0.85,'DN100':0.935};
+
+// ── H250 physics ─────────────────────────────────────────────────────────────
+
+// Convert full-scale range to kg/h for actual fluid
+// Liquid: density correction from water calibration
+// Gas/Steam: density correction from air calibration (20°C, 1.013 bar)
+function va_fs_kgh(entry, rho, isGasMode){
+  if(isGasMode){
+    if(entry.fs_gas === null) return null; // this float has no gas data
+    // fs_gas is in Nm³/h of air. Convert to kg/h of actual gas.
+    // Q_FS[kg/h] = fs_aire[Nm³/h] × ρ_N_aire × √(ρ_op / ρ_aire_20C)
+    return entry.fs_gas * 1.2925 * Math.sqrt(rho / 1.2043);
+  } else {
+    if(entry.fs_liq === null) return null; // this float has no liquid data
+    // fs_liq is in l/h of water. Convert to kg/h of actual liquid.
+    const rf = H250_RHO_FLOAT;
+    if(rho >= rf) return null; // float would sink — can't measure
+    const factor = Math.sqrt((rf - rho) * 1000 / ((rf - 1000) * rho));
+    return (entry.fs_liq / 1000) * factor * rho;
+  }
+}
+
+// ΔP in bar — constant across entire span
+function va_dp_bar(entry, rho, isGasMode){
+  if(isGasMode){
+    if(entry.dp_gas === null) return null;
+    return entry.dp_gas / 1000; // mbar → bar
+  } else {
+    if(entry.dp_liq === null) return null;
+    const rf = H250_RHO_FLOAT;
+    const dp_water = entry.dp_liq / 1000; // mbar → bar
+    return dp_water * (rf - rho) / (rf - 1000);
+  }
+}
+
+// Error per VDI/VDE 3513-2: constant 1.6% above 50% of FS, increases below
+function va_error(q_pct){
+  if(q_pct <= 0) return Infinity;
+  if(q_pct >= 50) return 1.6;
+  return 1.6 * 50 / q_pct;
+}
+
+
+// ── Fluid context helper — centralises repeated checks ────────────────────────
+// Returns a consistent set of flags used across simulate(), renderResults(), buildChart()
+function getFluidContext(rho, mu, phase){
+  const isGas   = phase==='gas' || phase==='steam';
+  const isSteam = phase==='steam';
+  const isWater = !isGas && Math.abs(rho-1000)<5 && Math.abs(mu-1.0)<0.05;
+  const isLowDens   = isGas || rho < C.RHO_LOW_DENS;
+  const isHighVisc  = !isGas && mu >= C.MU_HIGH_VISC;
+  const isGasLowMu  = isLowDens && mu <= C.MU_VORTEX_MAX;
+  const isLiqLowDens = !isGas && rho < C.RHO_LOW_DENS && mu > C.MU_VORTEX_MAX;
+  // Liquid + low viscosity (≤1.5 mPa·s): vortex eligible even if not gas
+  const isLiqLowMu = !isGas && !isLowDens && mu <= C.MU_VORTEX_MAX;
+  // Conductivity: checked from UI (only relevant for liquid phase → EMF eligibility)
+  const isConductive = !isGas && UI['f-cond'] && UI['f-cond'].checked;
+  return {isGas, isSteam, isWater, isLowDens, isHighVisc, isGasLowMu, isLiqLowDens, isLiqLowMu, isConductive};
+}
+
+// ── Main simulation ───────────────────────────────────────────────────────────
+// Public entry point — wraps the core so an unexpected error in physics,
+// sorting or rendering shows a friendly message instead of dying silently
+// in the console (auditor part 3: exception handling).
+function simulate(){
+  try {
+    _simulateCore();
+  } catch(err){
+    console.error('Simulate error:', err);
+    alert('⚠ Ocurrió un error inesperado durante el cálculo.\n\n' +
+          'Detalle técnico: ' + (err && err.message ? err.message : err) + '\n\n' +
+          'Verificá los datos de entrada. Si el problema persiste, contactá al autor.');
+  }
+}
+
+function _simulateCore(){
+  // ── Input validation ──────────────────────────────────────────────────────
+  const rhoRaw = getRhoBase();
+  const muRaw  = getMuBase();
+  const qInRaw = parseFloat(UI['f-q'].value);
+  const errors = [];
+  if(!isFinite(rhoRaw) || rhoRaw <= 0)
+    errors.push('Densidad (ρ) debe ser un número positivo.');
+  if(!isFinite(muRaw)  || muRaw  <= 0)
+    errors.push('Viscosidad (μ) debe ser un número positivo.');
+  if(!isFinite(qInRaw) || qInRaw <= 0)
+    errors.push('Caudal debe ser un número positivo.');
+  if(errors.length){ alert('Por favor corregí los siguientes campos:\n\n• ' + errors.join('\n• ')); return; }
+
+  const rho = rhoRaw;
+  const mu  = muRaw;
+  const qIn = qInRaw;
+  const Q   = S.unit==='m3h' ? qIn*rho : qIn;
+  const {isGas, isSteam, isWater, isLowDens, isHighVisc, isGasLowMu, isLiqLowDens, isLiqLowMu, isConductive} = getFluidContext(rho, mu, S.phase);
+
+  S.Q=Q; S.rho=rho; S.mu=mu;
+  S.simCtx = {isGas, isSteam, isWater};
+
+  // ── Tipo de caudalímetro seleccionado en el menú ──────────────────────────
+  const techSel = UI['f-tech'] ? UI['f-tech'].value : 'all';
+
+  let candidates=[];
+  if(techSel!=='vortex' && techSel!=='emf' && techSel!=='h250')
+  for(const [fam,fd] of Object.entries(MODELS)){
+    fd.models.forEach((m,dnIdx)=>{
+      if(Q>=m.qmin && Q<=m.qmax){
+        const costN = makeCost(fam, m.dn);
+        // v = Q_m / (ρ·A·N_tubos). Since a_v = 1/(ρ_agua·A·N_tubos) with ρ_agua=1000:
+        const v     = m.a_v * Q * (C.RHO_WATER / rho);
+        const Re    = re_calc(Q,m.a_v,mu,fd.ntube);
+        const dp    = isWater ? dp_water(m,Q) : dp_fluid(m,Q,rho,mu,fd.ntube);
+        const err   = isGas
+          ? acc_gas(fam,fd,m,Q)
+          : acc_liquid(fd,m,Q);
+        // effective floor for sorting: gas uses GAS_E_BASE, liquid uses fd.floor
+        const effFloor = isGas ? GAS_E_BASE[fam] : fd.floor;
+        // Liquids/steam: v>=0.33 m/s (1/3 of 1 m/s best-practice minimum — soft limit)
+        // Gases: no velocity limit (50–150+ m/s is normal for low-density gases)
+        const vOk    = isGas ? true : (v >= C.V_LIQ_MIN);
+        // ΔP must not exceed absolute inlet pressure — hard physical limit, all fluids
+        const pInlet  = getPressBara();
+        const dpRatio = dp / pInlet;
+        const dpOk    = dp <= pInlet;
+        // Hard exclusion filters — don't add to list at all:
+        // 1. ΔP > P_inlet: physically impossible operation (all fluids)
+        if(!dpOk) return;
+        // 2. Liquid/steam velocity > 12 m/s: above max recommended sensor velocity
+        if(!isGas && v > C.V_LIQ_MAX) return;
+        const hasAlert = !vOk || dpRatio>0.30 || dp>2.0 || (Re>=C.RE_LAM_MAX && Re<C.RE_TURB_MIN) || (!isGas && Q/m.qmax<0.1);
+        candidates.push({fam,dn:m.dn,m,fd,v,Re,dp,err,costN,vOk,effFloor,dpOk,dpRatio,hasAlert});
+      }
+    });
+  }
+
+  // ── Add VORTEX candidates (low-viscosity fluids only: μ ≤ 1.5 mPa·s) ──────
+  if((techSel==='all'||techSel==='vortex') && mu <= VORTEX_MU_MAX){
+    VORTEX_MODELS.forEach((m,dnIdx)=>{
+      const A      = Math.PI*m.Di**2/4;
+      const vMin   = isGas ? m.v_min_gas : m.v_min_liq;
+      const vMax   = isGas ? m.v_max_gas : m.v_max_liq;
+      const qmaxV  = vMax * rho * A * 3600;   // kg/h
+      const qminV  = vMin * rho * A * 3600;   // kg/h from velocity
+      // Rangeability: Q_op must be in upper third of instrument range
+      if(Q < qmaxV/3) return;
+      if(Q > qmaxV)   return;
+      const v      = v_vortex(m, Q, rho);
+      if(v < vMin || v > vMax) return;
+      const Re     = re_vortex(m, Q, rho, mu);
+      if(Re < VORTEX_RE_MIN) return;
+      const dp     = dp_vortex(m, Q, rho);
+      const pInlet = getPressBara();
+      if(dp > pInlet) return;
+      const err    = acc_vortex(Re, isGas);
+      if(err === Infinity) return;
+      const dpRatio  = dp/pInlet;
+      const dpOk     = true;  // already checked dp<=pInlet above
+      const vOk      = v >= (isGas ? vMin : C.V_LIQ_MIN) && v <= vMax;
+      const effFloor = isGas ? VORTEX_FLOOR_GAS : VORTEX_FLOOR_LIQ;
+      const costN    = makeCost('VORTEX', m.dn);
+      // Create a synthetic model object compatible with renderResults/buildChart
+      const synthM   = {...m, qmin:qminV, qmax:qmaxV, zs:0,
+                         a_v:1/(C.S_PER_HOUR*rho*A), a_dp:null};
+      const hasAlert = !vOk || dpRatio>0.30 || dp>2.0 || Re<VORTEX_RE_RATED || !m.Kv;
+      candidates.push({
+        fam:'VORTEX', dn:m.dn, m:synthM,
+        fd:{floor:effFloor, ntube:1},
+        v, Re, dp, err, costN, vOk, effFloor, dpOk, dpRatio,
+        isVortex:true, KvalidatedDp:m.Kv, hasAlert
+      });
+    });
+  }
+
+  // ── H250 Área Variable ────────────────────────────────────────────────────
+  if(techSel === 'h250' || techSel === 'all'){
+    if(techSel === 'h250') candidates = []; // modo exclusivo
+    // isGas incluye vapor saturado — el vapor a ρ≈5 kg/m³ se comporta como gas en el flotador
+    const isGasMode = isGas;
+    // H250 excluido para líquidos con μ > 1.5 mPa·s (riesgo de obstrucción + sin corrección Ruppel)
+    if(!isGasMode && mu > C.MU_VORTEX_MAX){
+      // No agregar candidatos H250
+    } else {
+    H250_TBL.forEach(entry => {
+      const fs_kgh = va_fs_kgh(entry, rho, isGasMode);
+      if(fs_kgh === null) return; // no data for this phase
+      const qmin = fs_kgh * 0.10; // span 10:1
+      const qmax = fs_kgh;
+      if(Q < qmin || Q > qmax) return;
+      const q_pct = (Q / qmax) * 100;
+      const err   = va_error(q_pct);
+      // Descartar equipos con error > 1.6% en el caudal de trabajo.
+      // Esto equivale a q% < 50% (zona donde el error crece por encima de la clase 1.6).
+      // Solo se muestran conos/flotadores donde el punto de operación está en la
+      // mitad superior de la escala — zona de precisión garantizada.
+      if(err > 1.6) return;
+      const dp    = va_dp_bar(entry, rho, isGasMode);
+      if(dp === null) return;
+      const pInlet  = getPressBara();
+      const dpRatio = dp / pInlet;
+      // Pressure minimum: P ≥ 2·ΔP (liq) or P ≥ 5·ΔP (gas/steam)
+      const pMinFactor = isGasMode ? 5 : 2;
+      if(pInlet < pMinFactor * dp) return;
+      const costN   = H250_PRICES[entry.dn] || 0.85;
+      const vOk     = q_pct >= 50; // in-range for rated accuracy
+      const effFloor = 1.6;
+      // Nota: la cláusula μ>1.5 fue removida de hasAlert — el filtro duro previo
+      // (líquido + μ > MU_VORTEX_MAX → sin candidatos H250) la volvió inalcanzable.
+      const hasAlert = !vOk || dpRatio > 0.30;
+      candidates.push({
+        fam:'H250', dn:entry.cone, m:{qmin,qmax,dn:entry.cone},
+        fd:{floor:effFloor,ntube:1},
+        v:0, Re:0, dp, err, costN, vOk, effFloor, dpOk:true, dpRatio,
+        isH250:true, h250entry:entry, q_pct,
+        // For display
+        h250label: `${entry.cone} ${entry.flt}`
+      });
+    });
+    // Sort H250 candidates: menor error primero (mayor q%), desempate por MAYOR ΔP
+    if(techSel === 'h250'){
+      candidates.sort((a,b) => {
+        if(a.err !== b.err) return a.err - b.err;
+        return b.dp - a.dp;  // mayor ΔP primero (desempate, solo H250)
+      });
+    }
+    } // end else (viscosity filter)
+  }
+
+  // ── Add EMF candidates (conductive liquids only, if tech allows)
+  if(techSel !== 'h250') // skip other techs if H250 exclusive ────────────────────────────
+  if((techSel==='all'||techSel==='emf') && isConductive && !isGas){
+    EMF_MODELS.forEach(m => {
+      const A     = Math.PI * m.Di**2 / 4;
+      const qminE = C.EMF_V_MIN * rho * A * C.S_PER_HOUR;
+      const qmaxE = C.EMF_V_MAX * rho * A * C.S_PER_HOUR;
+      if(Q < qminE || Q > qmaxE) return;
+      const v     = v_emf(m, Q, rho);
+      if(v < C.EMF_V_MIN || v > C.EMF_V_MAX) return;
+      const Re    = re_emf(m, Q, rho, mu);
+      const dp    = dp_emf(m, Q, rho, mu);
+      const pInlet = getPressBara();
+      if(dp > pInlet) return;
+      const err    = acc_emf(v);
+      if(err === Infinity) return;
+      const dpRatio  = dp / pInlet;
+      const dpOk     = true;
+      const vOk      = v >= C.EMF_V_OPT_LO && v <= C.EMF_V_OPT_HI;
+      const effFloor = C.EMF_FLOOR;
+      const costN    = makeCost('EMF', m.dn);
+      const synthM   = {...m, qmin:qminE, qmax:qmaxE, zs:0,
+                         a_v:1/(C.S_PER_HOUR*rho*A), a_dp:null};
+      const hasAlert = !vOk || v < C.EMF_V_RATED || dpRatio>0.30;
+      candidates.push({
+        fam:'EMF', dn:m.dn, m:synthM,
+        fd:{floor:effFloor, ntube:1},
+        v, Re, dp, err, costN, vOk, effFloor, dpOk, dpRatio,
+        isEMF:true, hasAlert
+      });
+    });
+  }
+
+  if(!candidates.length){
+    alert('No se encontró modelo compatible con el caudal ingresado.');
+    return;
+  }
+
+  // ── Family preference rules ────────────────────────────────────────────────
+  // Rule A — Gas / vapor / baja densidad (ρ<400) + μ ≤ 1.5 mPa·s:
+  //   VORTEX (OS4200) primero por precio, luego 6400 (mejor error gas 0.35%)
+  // Rule B — Líquido baja densidad (ρ<400) + μ > 1.5 mPa·s:
+  //   6400 → 5400 → 1400 → 7400
+  // Rule C — Líquido viscoso (μ ≥ 50 mPa·s):
+  //   7400 (tubo recto único, min ΔP) → 1400 → 5400 → 6400
+  // Rule D — Líquido normal:
+  //   Conductivo + μ≤1.5: EMF → 1400/5400 → 6400 → VORTEX → 7400
+  //   Conductivo + μ>1.5: EMF → 1400/5400 → 6400 → 7400
+  //   No conductivo + μ≤1.5: 1400/5400 → 6400 → VORTEX → 7400
+  //   No conductivo + μ>1.5: 1400/5400 → 6400 → 7400
+  function famPriority(fam){
+    if(fam==='H250') return -1; // always first when present (exclusive mode)
+    if(isGasLowMu){
+      // Gas/vapor/baja densidad + baja viscosidad: VORTEX → 6400 → resto Coriolis
+      return {VORTEX:0, '6400':1, '5400':2, '1400':3, '7400':4}[fam] ?? 5;
+    }
+    if(isLiqLowDens){
+      // Líquido ligero + viscosidad >1.5 mPa·s: 6400 → 5400 → 1400 → 7400
+      return {'6400':0, '5400':1, '1400':2, '7400':3}[fam] ?? 4;
+    }
+    if(isHighVisc){
+      // Líquido viscoso (μ≥50 mPa·s): EMF si conductivo, luego 7400 → 1400 → 5400 → 6400
+      if(isConductive) return {EMF:0, '7400':1, '1400':2, '5400':3, '6400':4}[fam] ?? 5;
+      return {'7400':0, '1400':1, '5400':2, '6400':3}[fam] ?? 4;
+    }
+    // Líquido normal: EMF si conductivo, luego Coriolis; vortex si baja viscosidad
+    if(isConductive && isLiqLowMu)
+      return {EMF:0, '1400':1, '5400':1, '6400':2, VORTEX:3, '7400':4}[fam] ?? 5;
+    if(isConductive)
+      return {EMF:0, '1400':1, '5400':1, '6400':2, '7400':3}[fam] ?? 4;
+    if(isLiqLowMu)
+      return {VORTEX:0, '1400':1, '5400':1, '6400':2, '7400':3}[fam] ?? 4;
+    return {'1400':0, '5400':0, '6400':1, '7400':2}[fam] ?? 3;
+  }
+
+  candidates.sort((a,b)=>{
+    // 1. Familia según tipo de fluido
+    const fpA=famPriority(a.fam), fpB=famPriority(b.fam);
+    if(fpA!==fpB) return fpA-fpB;
+    // 2. Sin alertas primero (dentro de la misma familia)
+    if(a.hasAlert!==b.hasAlert) return a.hasAlert?1:-1;
+    // 3. Velocidad ≥ 0.33 m/s (solo líquidos)
+    if(a.vOk!==b.vOk) return a.vOk?-1:1;
+    // 4. Proximidad al error de piso (ratio err/floor más cercano a 1.0)
+    const aR=a.err/a.effFloor, bR=b.err/b.effFloor;
+    if(Math.abs(aR-bR)>C.SORT_ERR_TOL) return aR-bR;
+    // 5. Precio (índice de costo relativo)
+    if(Math.abs(a.costN-b.costN)>C.SORT_PRICE_TOL) return a.costN-b.costN;
+    // 6. ΔP mínima absoluta
+    if(Math.abs(a.dp-b.dp)>C.SORT_DP_TOL) return a.dp-b.dp;
+    // 7. ΔP/P ratio (menor margen de impacto en proceso)
+    return a.dpRatio-b.dpRatio;
+  });
+
+  S.candidates=candidates;
+  S.selIdx=0;
+  renderResults(0,true);
+  UI['results'].classList.remove('hidden');
+}
+
+// ── Render results ────────────────────────────────────────────────────────────
+// Formatea un rango de caudal (almacenado internamente en kg/h) a la unidad de display.
+// Líquidos: kg/h o m³/h proceso (÷ ρ proceso).
+// Gases: kg/h, m³/h proceso, o Nm³/h / Sm³/h (÷ ρ_std del gas).
+function fmtRange(qmin_kgh, qmax_kgh){
+  const rho = S.rho || 1000;
+  const isGas = S.phase === 'gas' || S.phase === 'steam';
+  // Para gases: si el usuario ingresó en Nm³/h, mostrar rango en Nm³/h
+  const mw = parseFloat(UI['f-mw']?.value) || 28.97;
+  const rhoStd = isGas ? rho_std(mw, S.norm) : null;
+  const hasStdQ = isGas && parseFloat(UI['f-stdq']?.value) > 0;
+
+  let lo, hi, decimals;
+  if(hasStdQ && S.unit === 'kgh'){
+    // Gas con entrada en Nm³/h: convertir rango a Nm³/h
+    lo = qmin_kgh / rhoStd;
+    hi = qmax_kgh / rhoStd;
+    decimals = 2;
+  } else if(S.unit === 'm3h'){
+    lo = qmin_kgh / rho;
+    hi = qmax_kgh / rho;
+    decimals = 2;
+  } else {
+    lo = qmin_kgh;
+    hi = qmax_kgh;
+    decimals = 0;
+  }
+  const fmt = v => decimals > 0
+    ? v.toLocaleString('es-PY',{maximumFractionDigits:decimals})
+    : Math.round(v).toLocaleString('es-PY');
+  return `${fmt(lo)}–${fmt(hi)}`;
+}
+
+function renderResults(selIdx, isFirstRender){
+  const Q=S.Q, rho=S.rho, mu=S.mu;
+  const {isGas, isSteam, isWater} = S.simCtx || {isGas:false,isSteam:false,isWater:true};
+  const thVel=UI['th-vel'];
+  if(thVel) thVel.textContent=isGas?'Vel. op. (m/s)':'Vel. op. ✓1–4 (m/s)';
+  const thRange=UI['th-range'];
+  if(thRange){
+    const isGas = S.phase==='gas'||S.phase==='steam';
+    const hasStdQ = isGas && parseFloat(UI['f-stdq']?.value) > 0;
+    const normLabel = S.norm==='Nm3' ? 'Nm³/h' : 'Sm³/h';
+    thRange.textContent = hasStdQ && S.unit==='kgh'
+      ? `Rango (${normLabel})`
+      : S.unit==='m3h' ? 'Rango (m³/h)' : 'Rango (kg/h)';
+  }
+  const rec=S.candidates[0], sel=S.candidates[selIdx];
+
+  // ── KPIs — update for the selected model (not just the recommended) ──────
+  const selModelLabel=sel.fam==='VORTEX'
+    ?`OS 4200 · ${sel.dn}`
+    : sel.fam==='EMF'
+    ?`OF 1050 · ${sel.dn}`
+    : sel.fam==='H250'
+    ?`H250 ${sel.h250label}`
+    :`OM ${sel.fam} · ${sel.dn}`;
+  UI['r-model'].textContent=selModelLabel;
+
+  const errEl=UI['r-err'];
+  errEl.textContent=sel.err.toFixed(3)+'%';
+  errEl.className='stat-val '+(sel.err<=(isGas?GAS_E_BASE[sel.fam]*1.5:0.20)?'ok':'warn');
+
+  const dpEl=UI['r-dp'];
+  dpEl.textContent=sel.dp.toFixed(4)+' bar';
+  dpEl.className='stat-val '+(sel.dp>2.0?'danger':sel.dp>1.5?'warn':'ok');
+
+  // H250: v y Re no son relevantes (el principio es equilibrio de flotador)
+  if(sel.isH250){
+    UI['r-vel'].textContent = 'N/A (área variable)';
+    UI['r-re'].innerHTML = 'N/A — <span class="regime lam">equil. flotador</span>';
+  } else {
+    UI['r-vel'].textContent=sel.v.toFixed(3)+' m/s';
+    const [regL,regC]=regime_label(sel.Re);
+    UI['r-re'].innerHTML=
+      Math.round(sel.Re).toLocaleString('es-PY')+
+      ` <span class="regime ${regC}">${regL}</span>`;
+  }
+
+  // ── Alerts — only on first render (for the recommended model) ──────────
+  if(isFirstRender){
+    const alerts=UI['r-alerts'];
+    alerts.innerHTML='';
+
+    if(isGas){
+      const gasErrNote = Q >= rec.m.qmin ? `Error base garantizado: ${GAS_E_BASE[rec.fam]}%` : `⚠ Q < Q_mín (${rec.m.qmin} kg/h) — fuera de rango nominal, error aumentado`;
+      alerts.innerHTML+=`<div class="alert alert-gas">⚡ Modo ${isSteam?'vapor':'gas'} — ${gasErrNote}.</div>`;
+      if(rho<400) alerts.innerHTML+=`<div class="alert alert-warn">⚠ ρ &lt; 400 kg/m³: error densidad ±8 kg/m³ (OM1400/5400/7400) | ±5 kg/m³ si ρ &lt; 100 kg/m³ (OM6400).</div>`;
+      if(Q/rec.m.qmax*100<5) alerts.innerHTML+=`<div class="alert alert-danger">⚠ Q &lt; 5% Q_nom en gas: penalización absoluta activa ±${(rec.m.zs*2.5).toFixed(2)} kg/h.</div>`;
+    } else {
+      if(Q/rec.m.qmax<0.1) alerts.innerHTML+=`<div class="alert alert-warn">⚠ Operando bajo 10% del Q_nom. Error aumentado por estabilidad de cero.</div>`;
+      if(rho<400) alerts.innerHTML+=`<div class="alert alert-danger">⚠ Densidad &lt; 400 kg/m³ — verificar modo de operación.</div>`;
+    }
+    if(rec.dp>2.0) alerts.innerHTML+=`<div class="alert alert-danger">⚠ ΔP supera 2 bar. Verificar límite diferencial del proceso.</div>`;
+    const pInletA=getPressBara(), dpRatioRec=rec.dp/pInletA;
+    if(!rec.dpOk) alerts.innerHTML+=`<div class="alert alert-danger">⚠ ΔP = ${rec.dp.toFixed(3)} bar supera la presión absoluta de entrada (${pInletA.toFixed(2)} bara). Operación físicamente inviable — seleccionar DN mayor.</div>`;
+    else if(dpRatioRec>0.30) alerts.innerHTML+=`<div class="alert alert-warn">⚠ ΔP/P_entrada = ${(dpRatioRec*100).toFixed(1)}% — elevada (>30%). Verificar impacto en proceso.</div>`;
+    else if(dpRatioRec>0.15) alerts.innerHTML+=`<div class="alert alert-info">ℹ ΔP/P_entrada = ${(dpRatioRec*100).toFixed(1)}% — moderada. Dentro de límites aceptables.</div>`;
+    if(isGas && rec.v>C.V_GAS_WARN){
+      alerts.innerHTML+=`<div class="alert alert-warn">⚠ Velocidad en sensor ${rec.v.toFixed(0)} m/s (alta para gas). La ΔP calculada es una estimación con incertidumbre ±5–10% — la curva de referencia agua se extrapola fuera de su rango calibrado. Verificar con KROSS o i4smart.com.py.</div>`;
+    }
+    if(!isWater) alerts.innerHTML+=`<div class="alert alert-info">ΔP calculado con corrección Darcy-Weisbach para fluido real.</div>`;
+    if(rec.Re>=2300&&rec.Re<4000) alerts.innerHTML+=`<div class="alert alert-warn">⚠ Régimen de transición (Re ${Math.round(rec.Re).toLocaleString()}): flujo inestable.</div>`;
+    if(!isGas && !rec.vOk) alerts.innerHTML+=`<div class="alert alert-warn">⚠ Velocidad sensor ${rec.v.toFixed(2)} m/s por debajo del mínimo operativo (0.33 m/s). Señal débil — considerar DN menor.</div>`;
+    if(!isGas && rec.vOk && rec.v<1.0) alerts.innerHTML+=`<div class="alert alert-info">ℹ Velocidad ${rec.v.toFixed(2)} m/s — sobre el mínimo operativo (0.33 m/s) pero bajo el rango óptimo (1–4 m/s).</div>`;
+    // Vortex-specific alerts
+    if(rec.isVortex){
+      const kNote=rec.KvalidatedDp?'':' · ⚠ K no validado para este DN — ΔP ±30%';
+      const reNote=rec.Re<VORTEX_RE_RATED?` · ⚠ Re=${Math.round(rec.Re).toLocaleString()} < 20,000 — precisión reducida a ±2%`:'';
+      alerts.innerHTML+=`<div class="alert alert-info">⚡ OS 4200 Vortex${kNote}${reNote} · Requiere ≥15 DN tramo recto aguas arriba.</div>`;
+    }
+    // H250-specific alerts
+    if(rec.isH250){
+      const qp = rec.q_pct;
+      let notes = [];
+      if(qp < 50) notes.push(`q% = ${qp.toFixed(1)}% < 50% → error = ${rec.err.toFixed(1)}% (clase 1.6 solo arriba del 50%)`);
+      if(qp > 90) notes.push(`q% = ${qp.toFixed(1)}% > 90% → poco margen para aumento de caudal`);
+      if(!isGas && mu > C.MU_VORTEX_MAX)
+        notes.push(`μ = ${mu.toFixed(2)} mPa·s > 1.5 — corrección por viscosidad (Ruppel) no disponible, error adicional estimado 2–3%`);
+      alerts.innerHTML += `<div class="alert alert-info">📐 H250 Área Variable — ΔP constante (${(rec.dp*1000).toFixed(0)} mbar), indicación mecánica local, sin alimentación eléctrica.${notes.length ? '<br>⚠ ' + notes.join('<br>⚠ ') : ''}</div>`;
+    }
+    // EMF-specific alerts
+    if(rec.isEMF){
+      const vNote = rec.v < C.EMF_V_RATED
+        ? ` · ⚠ v=${rec.v.toFixed(3)} m/s < ${C.EMF_V_RATED} m/s — error aumentado por estabilidad de cero`
+        : '';
+      alerts.innerHTML+=`<div class="alert alert-info">⚡ OF 1050 Electromagnético — ΔP ≈ 0 (solo fricción de tubería). Requiere conductividad ≥ 5 μS/cm${vNote}.</div>`;
+    }
+    // Family selection rationale alerts
+    const {isGasLowMu:_gLM, isLiqLowDens:_lLD, isConductive:_cond} = getFluidContext(rho, mu, S.phase);
+    if(_gLM){
+      if(rec.isVortex)
+        alerts.innerHTML+=`<div class="alert alert-gas">ℹ Gas/vapor de baja densidad + baja viscosidad: OS 4200 (vortex) prioritizado por precio. OPTIMASS 6400 disponible como alternativa másica directa.</div>`;
+      else
+        alerts.innerHTML+=`<div class="alert alert-gas">ℹ Gas/vapor de baja densidad: OPTIMASS 6400 prioritizado (error base 0.35% vs 0.50% en 1400/5400).</div>`;
+    } else if(_cond && !rec.isEMF){
+      alerts.innerHTML+=`<div class="alert alert-info">ℹ Líquido conductivo: OF 1050 también disponible (ΔP ≈ 0, precio mín.). Seleccionado un Coriolis por mayor precisión (±0.15% vs ±0.5%).</div>`;
+    }
+    if(_lLD){
+      alerts.innerHTML+=`<div class="alert alert-info">ℹ Líquido de baja densidad (ρ < 400 kg/m³, μ > 1.5 mPa·s): OPTIMASS 6400 prioritizado (tubo en V, mejor adaptado a fluidos ligeros viscosos).</div>`;
+    } else if(!rec.isVortex && mu>=50){
+      alerts.innerHTML+=`<div class="alert alert-info">ℹ Viscosidad alta (${mu} mPa·s): OPTIMASS 7400 prioritizado (tubo recto único, mínima caída de presión en fluidos viscosos), seguido de 1400.</div>`;
+    }
+    // Update toggle button: count alerts and show/hide
+    const alertCount = alerts.querySelectorAll('.alert').length;
+    const toggle = UI['alerts-toggle'];
+    const body   = UI['alerts-body'];
+    if(alertCount > 0){
+      toggle.style.display = 'flex';
+      toggle.className = 'alerts-toggle';  // collapsed by default
+      body.className   = 'hidden-body';
+      body.style.display = 'none';
+      UI['alerts-label'].textContent = `${alertCount} aviso${alertCount>1?'s':''}  (toca para ver)`;
+    } else {
+      toggle.style.display = 'none';
+      body.style.display = 'none';
+    }
+  }
+
+  const tbody=UI['r-table'];
+  tbody.innerHTML='';
+  // Build display list: guarantee 1 model per family (in rank order), then fill to 10
+  const seenFam=new Set(), guaranteed=[], rest=[];
+  S.candidates.forEach(c=>{
+    if(!seenFam.has(c.fam)){seenFam.add(c.fam);guaranteed.push(c);}
+    else rest.push(c);
+  });
+  const display10=[...guaranteed,...rest].slice(0,10);
+  const rankMap=new Map(S.candidates.map((c,i)=>[c.fam+c.dn,i]));
+  display10.sort((a,b)=>rankMap.get(a.fam+a.dn)-rankMap.get(b.fam+b.dn));
+
+  display10.forEach((c)=>{
+    const cIdx=S.candidates.indexOf(c);   // true rank index in S.candidates
+    const isRec=cIdx===0;
+    const isSel=cIdx===S.selIdx;
+    const tr=document.createElement('tr');
+    tr.className='model-row'+(isSel?' is-selected':'');
+    const recB=isRec?'<span class="rec-star">★</span>':'';
+    const famLabel=c.fam==='VORTEX'?'OS':c.fam==='EMF'?'OF':c.fam==='H250'?'H250':'OM';
+    const dnLabel =c.fam==='VORTEX'?`4200 ${c.dn}`:c.fam==='EMF'?`1050 ${c.dn}`:c.fam==='H250'?c.h250label:`${c.fam} ${c.dn}`;
+    const selB=isSel?'<span class="sel-badge">✓</span>':'';
+    const dpPct=(c.dpRatio*100).toFixed(1);
+    const dpPC=!c.dpOk             ?'color:var(--danger);font-weight:600'
+             :c.dpRatio>0.30        ?'color:var(--warn);font-weight:600'
+             :'color:var(--ok)';
+    const vC=isGas
+      ?'color:var(--text2)'
+      :(c.vOk?'color:var(--ok);font-weight:600':(c.v<0.5||c.v>8?'color:var(--danger)':'color:var(--warn)'));
+    // H250: velocidad y Re no aplican (equilibrio de flotador, no velocidad en sensor)
+    const isH250row = !!c.isH250;
+    const vI=isH250row?'':isGas?'':(c.vOk?'✓':'⚠');
+    tr.innerHTML=`
+      <td>${famLabel} ${dnLabel}${recB}${selB}</td>
+      <td>${c.err.toFixed(3)}</td>
+      <td>${c.dp.toFixed(4)}</td>
+      <td style="${dpPC}">${dpPct}%</td>
+      <td style="${vC}">${isH250row ? "—" : vI+" "+c.v.toFixed(2)}</td>
+      <td style="white-space:nowrap">${fmtRange(c.m.qmin, c.m.qmax)}</td>`;
+    tr.onclick=()=>{ if(cIdx===S.selIdx) return; S.selIdx=cIdx; renderResults(cIdx,false); };
+    tbody.appendChild(tr);
+  });
+
+  const qm3=(Q/rho).toFixed(4);
+  const opModelLabel=sel.fam==='VORTEX'?`OS 4200 · ${sel.dn}`:sel.fam==='EMF'?`OF 1050 · ${sel.dn}`:sel.fam==='H250'?`H250 ${sel.h250label}`:`OM ${sel.fam} · ${sel.dn}`;
+  UI['op-label'].textContent=
+    `Modelo: ${opModelLabel} — Q = ${Q.toFixed(2)} kg/h (${qm3} m³/h proceso)`;
+
+  buildChart(sel,Q,rho,mu,isGas,isWater);
+}
+
+// ── Chart ─────────────────────────────────────────────────────────────────────
+function buildChart(sel,Q_op,rho,mu,isGas,isWater){
+  try { _buildChartCore(sel,Q_op,rho,mu,isGas,isWater); }
+  catch(err){
+    console.error('Chart error:', err);
+    // Chart failure must not break the rest of the results view
+    const wrap = UI['myChart']?.parentElement;
+    if(wrap) wrap.innerHTML = '<div class="alert alert-warn">⚠ No se pudo generar el gráfico. Los resultados de la tabla siguen siendo válidos.</div>';
+  }
+}
+
+function _buildChartCore(sel,Q_op,rho,mu,isGas,isWater){
+  const m=sel.m, fd=sel.fd, fam=sel.fam;
+
+  // ── Unit label for X axis — match user selection ──────────────────────────
+  const useM3h = S.unit==='m3h';
+  const xUnit  = useM3h ? 'm³/h' : 'kg/h';
+  // Convert Q from kg/h to display unit for labels and tooltip
+  const toDisplay = q => useM3h ? q/rho : q;
+  const fromDisplay = v => useM3h ? v*rho : v;
+
+  // ── Per-point calc — vortex/EMF use their own functions ─────────────────────
+  const isVortex = !!sel.isVortex;
+  const isEMF    = !!sel.isEMF;
+  const isH250   = !!sel.isH250;
+  // ── Rango del gráfico ─────────────────────────────────────────────────────
+  // Eje X siempre empieza en 0. Las curvas de error y ΔP empiezan en qmin
+  // (definido por la rangeabilidad de cada tecnología):
+  //   Coriolis: 130–300:1 (qmin del datasheet)
+  //   Vortex:   15–40:1 (v_min × ρ × A)
+  //   EMF:      1200:1 (v_min = 0.01 m/s)
+  //   H250:     10:1 (FS/10, norma VDI/VDE 3513)
+  // Por debajo de qmin: null (gap visible en la curva).
+  const npts = 120;
+  const qStart = 0;                         // eje X empieza aquí
+  const qEnd = isH250 ? m.qmax : Math.min(m.qmax, Math.max(Q_op*3, m.qmin*3));
+
+  // Error y ΔP: solo válidos a partir de qmin del instrumento
+  function calcErr(q){
+    if(q < m.qmin || q <= 0) return null;   // fuera del rango operativo
+    if(isH250){ const q_pct=(q/m.qmax)*100; const e=va_error(q_pct); return isFinite(e)?e:null; }
+    if(isEMF){ const v=v_emf(m,q,rho); return v>0 ? acc_emf(v) : null; }
+    if(isVortex){ const Re=re_vortex(m,q,rho,mu); const e=acc_vortex(Re,isGas); return isFinite(e)?e:null; }
+    return isGas ? acc_gas(fam,fd,m,q) : acc_liquid(fd,m,q);
+  }
+  function calcDp(q){
+    if(q < m.qmin || q <= 0) return null;   // fuera del rango operativo
+    if(isH250) return sel.dp;
+    if(isEMF) return dp_emf(m,q,rho,mu);
+    if(isVortex) return dp_vortex(m,q,rho);
+    return isWater ? dp_water(m,q) : dp_fluid(m,q,rho,mu,fd.ntube);
+  }
+
+  const qArr=[],errArr=[],dpArr=[];
+  for(let i=0;i<=npts;i++){
+    const q = qStart + (qEnd - qStart) * i / npts;
+    qArr.push(q);
+    const e = calcErr(q);
+    errArr.push(e != null && isFinite(e) ? parseFloat(e.toFixed(4)) : null);
+    const d = calcDp(q);
+    dpArr.push(d != null && isFinite(d) ? parseFloat(d.toPrecision(6)) : null);
+  }
+
+  const opE=calcErr(Q_op);
+  const opD=calcDp(Q_op);
+  let bi=0; let bd=Infinity;
+  qArr.forEach((q,i)=>{const d=Math.abs(q-Q_op);if(d<bd){bd=d;bi=i;}});
+  const opEA=qArr.map((_,i)=>i===bi?parseFloat(opE.toFixed(4)):null);
+  const opDA=qArr.map((_,i)=>i===bi?parseFloat(opD.toFixed(4)):null);
+
+  // Labels in display unit
+  const labels=qArr.map(q=>{
+    const v=toDisplay(q);
+    if(v>=1e6)  return (v/1e6).toFixed(1)+'M';
+    if(v>=1e3)  return (v/1e3).toFixed(1)+'k';
+    if(v>=100)  return v.toFixed(0);
+    if(v>=10)   return v.toFixed(1);
+    return v.toFixed(2);
+  });
+
+  // Smart ΔP formatter: enough decimals to show meaningful digits, not excessive
+  const dpFmt = v => {
+    if(v===null||v===undefined) return '';
+    if(v>=10)   return v.toFixed(1);
+    if(v>=1)    return v.toFixed(2);
+    if(v>=0.01) return v.toFixed(3);
+    return v.toFixed(4);
+  };
+
+  if(S.chartInst){S.chartInst.destroy();S.chartInst=null;}
+  const ctx=UI['myChart'].getContext('2d');
+  S.chartInst=new Chart(ctx,{
+    type:'line',
+    data:{labels,datasets:[
+      {label:'Error (%)',data:errArr,borderColor:'#2a78d6',backgroundColor:'rgba(42,120,214,0.07)',borderWidth:2,tension:0,pointRadius:0,yAxisID:'y1'},
+      {label:'ΔP (bar)',data:dpArr,borderColor:'#e34948',backgroundColor:'rgba(227,73,72,0.06)',borderWidth:2,borderDash:[5,4],tension:0,pointRadius:0,yAxisID:'y2'},
+      {label:'Op.Err',data:opEA,borderColor:'#2a78d6',backgroundColor:'#2a78d6',borderWidth:0,pointRadius:7,showLine:false,yAxisID:'y1'},
+      {label:'Op.ΔP',data:opDA,borderColor:'#e34948',backgroundColor:'#e34948',borderWidth:0,pointRadius:7,showLine:false,yAxisID:'y2'}
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{
+          title:its=>{
+            const q=qArr[its[0].dataIndex];
+            const v=toDisplay(q);
+            const vStr=v>=100?v.toFixed(1):v.toFixed(2);
+            return `Q = ${vStr} ${xUnit}`;
+          },
+          label:it=>{
+            if(it.datasetIndex===0) return `Error: ${it.parsed.y?.toFixed(2)||''}%`;
+            if(it.datasetIndex===1) return `ΔP: ${dpFmt(it.parsed.y)} bar`;
+            if(it.datasetIndex===2&&it.parsed.y!=null) return `▶ Op. Error: ${it.parsed.y.toFixed(2)}%`;
+            if(it.datasetIndex===3&&it.parsed.y!=null) return `▶ Op. ΔP: ${dpFmt(it.parsed.y)} bar`;
+            return null;
+          },
+          filter:it=>it.parsed.y!=null||(it.datasetIndex<2)
+        }}
+      },
+      scales:{
+        x:{
+          ticks:{maxTicksLimit:7,font:{size:10},color:'#898781',maxRotation:0},
+          grid:{color:'rgba(150,150,140,0.12)'},
+          title:{display:true,text:`Caudal (${xUnit})`,font:{size:11},color:'#898781'}
+        },
+        y1:{
+          position:'left',
+          ticks:{font:{size:10},color:'#2a78d6',callback:v=>v.toFixed(2)},
+          grid:{color:'rgba(42,120,214,0.08)'},
+          title:{display:true,text:'Error (%)',font:{size:10},color:'#2a78d6'}
+        },
+        y2:{
+          position:'right',
+          ticks:{font:{size:10},color:'#e34948',callback:v=>{
+            if(v>=10)  return v.toFixed(0);
+            if(v>=1)   return v.toFixed(1);
+            return v.toFixed(2);
+          }},
+          grid:{display:false},
+          title:{display:true,text:'ΔP (bar)',font:{size:10},color:'#e34948'}
+        }
+      }
+    }
+  });
+}
+
+// ── Alerts collapsible ───────────────────────────────────────────────────────────
+function toggleAlerts(){
+  const toggle = UI['alerts-toggle'];
+  const body   = UI['alerts-body'];
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  toggle.className   = isOpen ? 'alerts-toggle' : 'alerts-toggle open';
+  UI['alerts-label'].textContent =
+    isOpen
+    ? `${UI['r-alerts'].querySelectorAll('.alert').length} aviso${UI['r-alerts'].querySelectorAll('.alert').length>1?'s':''} (toca para ver)`
+    : 'Ocultar avisos';}
+function toggleDisc(){
+  const toggle = UI['disc-toggle'];
+  const body   = UI['disc-body'];
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  toggle.className   = isOpen ? 'alerts-toggle' : 'alerts-toggle open';
+}
+
+
+
+// ═════════════════════════════════════════════════════════════════════════════
+// SELF-TESTS — run with ?test=1 in the URL. Results in browser console.
+// Protects core physics & data against regressions when adding new families
+// (e.g. OPTIFLUX). No framework needed.
+// ═════════════════════════════════════════════════════════════════════════════
+function runSelfTests(){
+  const results = [];
+  const approx = (a, b, tol) => Math.abs(a - b) <= tol;
+  function t(name, cond){ results.push({name, pass: !!cond}); }
+
+  // ── IAPWS steam ────────────────────────────────────────────────────────────
+  t('tSatFromP(1.01325) ≈ 100°C',        approx(tSatFromP(1.01325), 100.0, 0.05));
+  t('tSatFromP(10) ≈ 179.9°C',           approx(tSatFromP(10), 179.88, 0.1));
+  t('pSatWagner(100) ≈ 1.014 bar',       approx(pSatWagner(100), 1.0142, 0.002));
+  t('rhoSatVapor(179.88) ≈ 5.15 kg/m³',  approx(rhoSatVapor(179.88), 5.145, 0.05));
+  t('muSatVapor(179.88) ≈ 0.0158 mPa·s', approx(muSatVapor(179.88), 0.01581, 0.0002));
+  t('muSatVapor units: < 0.1 mPa·s',     muSatVapor(150) < 0.1);  // regression: μPa·s bug
+  t('steamProps(10) returns object',      steamProps(10) !== null && 'rho' in steamProps(10));
+  t('steamProps(-1) returns null',        steamProps(-1) === null);
+  t('steamProps(300) returns null',       steamProps(300) === null);
+
+  // ── Gas physics ────────────────────────────────────────────────────────────
+  t('rho_process aire 20°C 1bar ≈ 1.19', approx(rho_process(28.97, 20, 1.01325, 1), 1.204, 0.02));
+  t('mu_gas aire 20°C ≈ 0.0181 mPa·s',   approx(mu_gas(GAS_PRESETS.air, 20), 0.01813, 0.0005));
+  t('mu_gas interpolation monotone',      mu_gas(GAS_PRESETS.air, 100) > mu_gas(GAS_PRESETS.air, 20));
+  t('gasProps returns rho & mu',          (() => { const p = gasProps('air', 20, 1, 1); return p && p.rho > 0 && p.mu > 0; })());
+  t('gasProps invalid key → null',        gasProps('nope', 20, 1, 1) === null);
+
+  // ── Reynolds & friction ────────────────────────────────────────────────────
+  // End-to-end unit chain test: water 20°C in a 50mm pipe at 2 m/s
+  // Re = ρ·v·D/μ = 998.2 · 2 · 0.05 / 1.002e-3 = 99,620 — if μ were mixed up
+  // (mPa·s vs Pa·s) this would be off by ×1000 and fail loudly.
+  t('Re chain: water 2m/s 50mm ≈ 99,620', (() => {
+    const rho=998.2, v=2.0, D=0.05, mu_mpas=1.002;
+    const Re = rho * v * D / (mu_mpas/1000);
+    return approx(Re, 99620, 200);
+  })());
+  t('Re chain via re_emf S50 matches',    (() => {
+    const m = EMF_MODELS.find(x => x.dn === 'S50');
+    // Q for v=2 m/s in S50: Q = v·ρ·A·3600
+    const A = Math.PI*m.Di**2/4;
+    const Q = 2.0 * 998.2 * A * 3600;
+    const Re = re_emf(m, Q, 998.2, 1.002);
+    return approx(Re, 99620, 300);
+  })());
+  t('friction laminar Re=1000 = 0.064',   approx(friction(1000), 0.064, 1e-6));
+  t('friction turbulent Re=1e5 ≈ 0.018',  friction(1e5) > 0.015 && friction(1e5) < 0.022);
+  t('friction continuous at Re=2300',     approx(friction(2299), friction(2301), 0.01));
+
+  // ── Price index ────────────────────────────────────────────────────────────
+  t('makeCost 5400-S15 = 1.6',            makeCost('5400','S15') === 1.6);
+  t('makeCost VORTEX-DN100 = 1.6',        makeCost('VORTEX','DN100') === 1.6);
+  t('makeCost unknown → 9.9 fallback',    makeCost('9999','SXX') === 9.9);
+
+  // ── Vortex physics ─────────────────────────────────────────────────────────
+  t('v_vortex DN100 10t/h vapor ≈ 73.0',   (() => { const m = VORTEX_MODELS.find(x => x.dn === 'DN100');
+                                                    return approx(v_vortex(m, 10000, 5.15), 72.99, 0.5); })());
+  t('acc_vortex Re<10k → Infinity',        acc_vortex(5000, true) === Infinity);
+  t('acc_vortex Re 15k → 2.0 (low)',       acc_vortex(15000, true) === C.VORTEX_FLOOR_LOW);
+  t('acc_vortex Re 25k gas → 1.0',         acc_vortex(25000, true) === C.VORTEX_FLOOR_GAS);
+  t('acc_vortex Re 25k liq → 0.75',        acc_vortex(25000, false) === C.VORTEX_FLOOR_LIQ);
+
+  // ── Fluid context rules ────────────────────────────────────────────────────
+  t('ctx: agua → líquido normal',          (() => { const c = getFluidContext(1000, 1.0, 'liquid');
+                                                    return !c.isGas && !c.isLowDens && !c.isHighVisc; })());
+  t('ctx: vapor → isGasLowMu',             (() => { const c = getFluidContext(5.15, 0.0158, 'steam');
+                                                    return c.isGas && c.isGasLowMu; })());
+  t('ctx: aceite μ=100 → isHighVisc',      getFluidContext(900, 100, 'liquid').isHighVisc);
+  t('ctx: liq ρ=300 μ=5 → isLiqLowDens',   getFluidContext(300, 5, 'liquid').isLiqLowDens);
+
+  // ── Accuracy Coriolis ──────────────────────────────────────────────────────
+  t('acc_liquid ≥ floor always',           (() => { const fd = MODELS['5400'], m = fd.models[0];
+                                                    return acc_liquid(fd, m, m.qmax) >= fd.floor; })());
+  t('acc_gas → E_base at high Q',          (() => { const fd = MODELS['6400'], m = fd.models[2];
+                                                    return approx(acc_gas('6400', fd, m, m.qmax), GAS_E_BASE['6400'], 0.02); })());
+
+  // ── EMF (OPTIFLUX 1050) ──────────────────────────────────────────────────────
+  t('v_emf S40 1000kg/h water ≈ 0.221',  (() => { const m = EMF_MODELS.find(x => x.dn === 'S40');
+                                                    return approx(v_emf(m, 1000, 1000), 0.221, 0.01); })());
+  t('acc_emf at 1 m/s = 0.6%',            approx(acc_emf(1.0), 0.60, 0.001));
+  t('acc_emf at 0.1 m/s = 1.5%',          approx(acc_emf(0.1), 1.50, 0.001));
+  t('acc_emf at 10 m/s ≈ 0.51%',          approx(acc_emf(10.0), 0.51, 0.001));
+  t('dp_emf ≈ 0 (negligible)',            (() => { const m = EMF_MODELS.find(x => x.dn === 'S80');
+                                                    return dp_emf(m, 50000, 1000, 1.0) < 0.01; })());
+  t('makeCost EMF-S40 = 1.0',             makeCost('EMF','S40') === 1.0);
+  t('makeCost EMF-S250 = 1.4',            makeCost('EMF','S250') === 1.4);
+
+  // ── H250 Variable Area ────────────────────────────────────────────────────
+  t('va_error at 100% = 1.6',             va_error(100) === 1.6);
+  t('va_error at 50% = 1.6',              va_error(50) === 1.6);
+  t('va_error at 25% = 3.2',              va_error(25) === 3.2);
+  t('va_error at 10% = 8.0',              va_error(10) === 8.0);
+  // K15.1 corregido: TIV=18, CIV=25 (manual R07). K15.8 DIV-TR agregado.
+  t('va_fs_kgh water = nominal',          (() => {
+    const e = H250_TBL.find(x => x.cone==='K25.3' && x.flt==='CIV');
+    return approx(va_fs_kgh(e, 1000, false), 1600, 1); // 1600 l/h × 1.0 × 1000/1000 = 1600 kg/h
+  })());
+  t('va_dp_bar water K25.3 CIV = 0.034',  (() => {
+    const e = H250_TBL.find(x => x.cone==='K25.3' && x.flt==='CIV');
+    return approx(va_dp_bar(e, 1000, false), 0.034, 0.001);
+  })());
+  t('H250 price DN25 = 0.85',             H250_PRICES['DN25'] === 0.85);
+
+  // ── Unit conversion (ρ / μ selectors) ─────────────────────────────────────
+  t('RHO_CONV g/cm³: 1.0 → 1000',         RHO_CONV.gcm3.toBase(1.0) === 1000);
+  t('RHO_CONV lb/ft³: 62.428 → ≈1000',    approx(RHO_CONV.lbft3.toBase(62.428), 1000, 0.1));
+  t('MU_CONV P: 0.01 → 1.0 mPa·s',        MU_CONV.p.toBase(0.01) === 1.0);
+  t('MU_CONV cSt round-trip (ρ=850)',     (() => {
+    const base = MU_CONV.cst.toBase(2.0, 850);        // 2.0 cSt · 850/1000 = 1.7 mPa·s
+    return approx(base, 1.7, 1e-9) && approx(MU_CONV.cst.fromBase(base, 850), 2.0, 1e-9);
+  })());
+
+  // ── H250 viscosity exclusion (bug fix jul-2026: dulce de leche μ=20000) ───
+  // Ejercita updateTechOptions() real: con μ>1.5 el menú NO debe ofrecer H250.
+  t('H250 menu excluded @ μ=20000',       (() => {
+    if(!UI['f-mu'] || !UI['u-mu'] || !UI['f-tech']) return false;
+    const sMu = UI['f-mu'].value, sU = UI['u-mu'].value, sPh = S.phase;
+    UI['u-mu'].value = 'mpas'; UI['f-mu'].value = '20000'; S.phase = 'liquid';
+    updateTechOptions();
+    const excluded = ![...UI['f-tech'].options].some(o => o.value === 'h250');
+    UI['f-mu'].value = sMu; UI['u-mu'].value = sU; S.phase = sPh;
+    updateTechOptions();  // restaurar menú
+    return excluded;
+  })());
+  t('H250 menu present @ μ=1.0',          (() => {
+    if(!UI['f-mu'] || !UI['u-mu'] || !UI['f-tech']) return false;
+    const sMu = UI['f-mu'].value, sU = UI['u-mu'].value, sPh = S.phase;
+    UI['u-mu'].value = 'mpas'; UI['f-mu'].value = '1.0'; S.phase = 'liquid';
+    updateTechOptions();
+    const present = [...UI['f-tech'].options].some(o => o.value === 'h250');
+    UI['f-mu'].value = sMu; UI['u-mu'].value = sU; S.phase = sPh;
+    updateTechOptions();
+    return present;
+  })());
+
+  // ── Report ─────  // ── Report ─────────────────────────────────────────────────────────────────
+  const passed = results.filter(r => r.pass).length;
+  const failed = results.length - passed;
+  console.group(`%cSELF-TESTS: ${passed}/${results.length} passed${failed ? ' — ' + failed + ' FAILED' : ' ✓'}`,
+                failed ? 'color:#c0392b;font-weight:bold' : 'color:#27ae60;font-weight:bold');
+  results.forEach(r => console.log(`${r.pass ? '✓' : '✗ FAIL'}  ${r.name}`));
+  console.groupEnd();
+  if(failed) alert(`⚠ SELF-TESTS: ${failed} de ${results.length} pruebas fallaron. Ver consola (F12).`);
+  return failed === 0;
+}
+
+// Auto-run if ?test=1 present in URL
+document.addEventListener('DOMContentLoaded', () => {
+  if(new URLSearchParams(location.search).get('test') === '1'){
+    setTimeout(runSelfTests, 100);  // let UI cache populate first
+  }
+});
+</script>
+</body>
+</html>
