@@ -31,7 +31,6 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* ── Header band ── */
   .hero {
     background: var(--navy);
     padding: 2.5rem 1.5rem 2rem;
@@ -61,7 +60,6 @@
     border-radius: 2px;
   }
 
-  /* ── Content area ── */
   .content {
     max-width: 500px;
     margin: 0 auto;
@@ -78,7 +76,6 @@
     padding-left: 4px;
   }
 
-  /* ── Card style B ── */
   .modules {
     display: flex;
     flex-direction: column;
@@ -151,7 +148,6 @@
     margin-left: 4px;
   }
 
-  /* ── Footer ── */
   footer {
     background: var(--navy);
     text-align: center;
@@ -159,9 +155,15 @@
     margin-top: 2rem;
   }
 
-  footer span {
-    font-size: 0.72rem;
-    color: rgba(255,255,255,0.35);
+  footer .name {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.45);
+  }
+
+  footer .year {
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.25);
+    margin-top: 0.25rem;
   }
 </style>
 </head>
@@ -222,8 +224,9 @@
 </div>
 
 <footer>
-  <span>Josmar Angulo</span>  
+  <div class="name">Josmar Angulo</div>
+  <div class="year">© 2025</div>
 </footer>
- 
+
 </body>
 </html>
