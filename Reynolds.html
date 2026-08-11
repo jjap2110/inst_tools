@@ -5,39 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Reynolds — Loop Agua Purificada | OAPSA</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap');
 
-  /* ── Paleta OAPSA ──────────────────────────────────────────────────────
-     Azul marino principal : #1b2d5b
-     Azul oscuro deep      : #111d3c
-     Rojo corporativo      : #b91d47
-     Rojo hover            : #9a1739
-     Blanco                : #ffffff
-     Gris claro fondo      : #f0f2f7
-     Gris borde            : #ced4e0
-     Gris texto secundario : #6b7a9a
-     Acento cian           : #0096c7  (instrumentación)
-     Verde OK              : #1a8a4a
-     Amarillo warn         : #c98a00
-     Naranja               : #d06030
-     ─────────────────────────────────────────────────────────────────── */
+  /* ── Paleta JARVIS ─────────────────────────────────────────────── */
   :root {
-    --navy:    #1b2d5b;
-    --deep:    #111d3c;
-    --red:     #b91d47;
-    --red-h:   #9a1739;
-    --white:   #ffffff;
-    --bg:      #eef0f6;
-    --surface: #ffffff;
-    --border:  #ced4e0;
-    --muted:   #6b7a9a;
-    --text:    #1b2d5b;
-    --accent:  #0096c7;
-    --green:   #1a8a4a;
-    --yellow:  #c98a00;
-    --orange:  #d06030;
-    --mono:    'Share Tech Mono', monospace;
-    --sans:    'Montserrat', sans-serif;
+    --navy:    #E8ECF0;
+    --deep:    #020B1F;
+    --red:     #FF5252;
+    --red-h:   #FF8A80;
+    --white:   #E8ECF0;
+    --bg:      #020B1F;
+    --surface: #08132D;
+    --border:  rgba(0,242,255,0.15);
+    --muted:   #6B8299;
+    --text:    #B0BEC5;
+    --accent:  #00CFFF;
+    --green:   #00E676;
+    --yellow:  #FFB300;
+    --orange:  #FF9100;
+    --mono:    'Roboto Mono', monospace;
+    --sans:    'Inter', sans-serif;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -47,122 +34,26 @@
     color: var(--text);
     font-family: var(--sans);
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0 0 2rem;
+    font-size: 15px;
+    line-height: 1.5;
   }
-
-  /* ── Top bar OAPSA ─────────────────────────────────────────────── */
-  .topbar {
-    width: 100%;
-    background: var(--deep);
-    padding: 0.5rem 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 0;
-  }
-  .topbar-brand {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-  }
-  .topbar-logo {
-    width: 110px;
-    height: auto;
-  }
-  .topbar-divider {
-    width: 1px; height: 28px;
-    background: rgba(255,255,255,0.2);
-  }
-  .topbar-label {
-    font-family: var(--sans);
-    font-size: 0.62rem;
-    color: rgba(255,255,255,0.55);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    line-height: 1.3;
-  }
-  .topbar-label b { color: rgba(255,255,255,0.85); font-weight: 600; }
-
-  /* ── Header principal ──────────────────────────────────────────── */
-  header {
-    width: 100%;
-    background: var(--navy);
-    padding: 1rem 1.5rem 0.9rem;
-    margin-bottom: 1.25rem;
-    border-bottom: 3px solid var(--red);
-  }
-  .header-inner {
-    max-width: 800px;
-    margin: 0 auto;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-  }
-  .header-left {}
-  .eyebrow {
-    font-family: var(--mono);
-    font-size: 0.6rem;
-    color: rgba(255,255,255,0.5);
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    margin-bottom: 0.3rem;
-  }
-  h1 {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--white);
-    letter-spacing: -0.01em;
-    line-height: 1.25;
-  }
-  h1 span { color: #5bc8f0; }
-  .subtitle {
-    font-size: 0.62rem;
-    color: rgba(255,255,255,0.45);
-    margin-top: 0.3rem;
-    font-family: var(--mono);
-    letter-spacing: 0.05em;
-  }
-  .author-badge {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.15rem;
-    flex-shrink: 0;
-  }
-  .author-name {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--white);
-    letter-spacing: 0.02em;
-  }
-  .author-role {
-    font-family: var(--mono);
-    font-size: 0.58rem;
-    color: rgba(255,255,255,0.45);
-    text-align: right;
-  }
-  .author-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--red);
-    margin-left: auto;
-    margin-top: 0.2rem;
-  }
+  .app{max-width:480px;margin:0 auto;padding:16px 14px 40px}
+  h1{font-size:18px;font-weight:600;margin-bottom:2px;color:#E8ECF0}
+  .subtitle-line{font-size:12px;color:var(--muted);margin-bottom:16px}
+  .author-line{font-size:11px;color:var(--muted);margin:-12px 0 16px;opacity:0.7}
+  .author-line b{color:var(--text)}
+  .author-line a{color:var(--accent);text-decoration:none}
 
   /* ── Cards ─────────────────────────────────────────────────────── */
-  .wrap { width: 100%; max-width: 800px; padding: 0 1rem; }
+  .wrap { width: 100%; max-width: 480px; margin: 0 auto; padding: 0; }
 
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 1.1rem 1.2rem;
-    margin-bottom: 0.9rem;
-    box-shadow: 0 1px 4px rgba(27,45,91,0.07);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 14px;
+    box-shadow: none;
   }
   .card-title {
     font-family: var(--sans);
@@ -209,10 +100,10 @@
 
   input[type="number"] {
     width: 100%;
-    background: #f7f8fb;
+    background: #0D1B3A;
     border: 1px solid var(--border);
     border-radius: 4px;
-    color: var(--text);
+    color: #E8ECF0;
     font-family: var(--mono);
     font-size: 0.88rem;
     padding: 0.32rem 0.5rem;
@@ -228,13 +119,13 @@
 
   input[type="range"] {
     -webkit-appearance: none; flex: 1; height: 3px;
-    background: var(--border); border-radius: 2px; outline: none; cursor: pointer;
+    background: #0A2E5B; border-radius: 2px; outline: none; cursor: pointer;
   }
   input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none; width: 11px; height: 11px; border-radius: 50%;
-    background: var(--navy); cursor: pointer;
-    border: 2px solid var(--white);
-    box-shadow: 0 0 0 1px var(--navy), 0 1px 4px rgba(27,45,91,0.3);
+    background: #00CFFF; cursor: pointer;
+    border: 2px solid #020B1F;
+    box-shadow: 0 0 8px rgba(0,207,255,0.4);
   }
   #diametro_idx::-webkit-slider-thumb { border-radius: 3px; width: 8px; }
 
@@ -250,16 +141,16 @@
 
   /* ── Resultado Re ───────────────────────────────────────────────── */
   #resultado {
-    width: 100%; border-radius: 6px;
-    border: 2px solid var(--border);
-    padding: 1.1rem 1.2rem; margin-bottom: 0.9rem;
+    width: 100%; border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 14px; margin-bottom: 14px;
     background: var(--surface);
-    box-shadow: 0 1px 4px rgba(27,45,91,0.07);
+    box-shadow: none;
     transition: border-color 0.3s, background 0.3s;
   }
-  #resultado.ok   { border-color: var(--green);  background: #f0faf4; }
-  #resultado.warn { border-color: var(--yellow); background: #fdf8ec; }
-  #resultado.fail { border-color: #c0392b;       background: #fdf2f2; }
+  #resultado.ok   { border-color: var(--accent);  background: var(--surface); }
+  #resultado.warn { border-color: var(--yellow); background: #2A1F00; }
+  #resultado.fail { border-color: #FF5252;       background: #2D0A0A; }
   #resultado.idle { background: var(--surface); }
 
   .res-grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 0.75rem; margin-bottom: 0.8rem; }
@@ -271,7 +162,7 @@
     font-family: var(--sans); font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.08em;
   }
-  .res-value { font-family: var(--mono); font-size: 1.3rem; font-weight: 700; line-height: 1.1; color: var(--navy); }
+  .res-value { font-family: var(--mono); font-size: 1.3rem; font-weight: 700; line-height: 1.1; color: #E8ECF0; }
   .res-unit  { font-size: 0.58rem; color: var(--muted); }
 
   /* ── Gauges ─────────────────────────────────────────────────────── */
@@ -288,25 +179,25 @@
   }
   .norm-pill {
     font-family: var(--mono); font-size: 0.52rem;
-    color: var(--white); background: var(--red);
+    color: #020B1F; background: #00CFFF;
     padding: 0.1rem 0.45rem; border-radius: 10px;
     letter-spacing: 0.04em; white-space: nowrap;
   }
 
-  .gauge-track { height: 8px; background: #e0e4ef; border-radius: 4px; overflow: hidden; }
+  .gauge-track { height: 8px; background: #0A2E5B; border-radius: 4px; overflow: hidden; }
   .gauge-fill  { height: 100%; border-radius: 4px; transition: width 0.35s ease, background 0.3s; min-width: 2px; }
 
   .vband-track {
     height: 8px; border-radius: 4px; position: relative;
     background: linear-gradient(to right,
-      #c0392b 0% 12.5%, #c98a00 12.5% 25%,
-      #1a8a4a 25% 62.5%, #d06030 62.5% 75%,
-      #c0392b 75% 100%);
+      #FF5252 0% 12.5%, #FFB300 12.5% 25%,
+      #00E676 25% 62.5%, #FF9100 62.5% 75%,
+      #FF5252 75% 100%);
   }
   .vband-needle {
     position: absolute; top: -4px; width: 3px; height: 16px;
-    background: var(--navy); border-radius: 2px; transform: translateX(-50%);
-    transition: left 0.3s ease; box-shadow: 0 1px 4px rgba(27,45,91,0.5);
+    background: #00F2FF; border-radius: 2px; transform: translateX(-50%);
+    transition: left 0.3s ease; box-shadow: 0 0 8px rgba(0,242,255,0.5);
   }
 
   .gauge-markers, .vband-markers {
@@ -344,12 +235,12 @@
   }
   .badge.ok   { background: var(--green); }
   .badge.warn { background: var(--yellow); }
-  .badge.fail { background: #c0392b; }
+  .badge.fail { background: #FF5252; }
 
   /* ── Separador de sección ────────────────────────────────────────── */
   .section-divider {
     width: 100%; height: 3px;
-    background: linear-gradient(to right, var(--navy), var(--accent), var(--navy));
+    background: linear-gradient(to right, transparent, #00CFFF, transparent);
     border-radius: 2px;
     margin-bottom: 0.9rem;
     opacity: 0.2;
@@ -357,54 +248,33 @@
 
   /* ── Footer ─────────────────────────────────────────────────────── */
   footer {
-    width: 100%; max-width: 800px;
-    padding: 0 1rem;
-    margin-top: 0.5rem;
-    font-size: 0.55rem; color: var(--muted);
+    width: 100%; max-width: 480px;
+    margin: 0 auto;
+    padding: 14px;
+    font-size: 11px; color: var(--muted);
     font-family: var(--mono); text-align: center;
-    opacity: 0.7; line-height: 1.7;
-    border-top: 1px solid var(--border);
-    padding-top: 0.7rem;
+    line-height: 1.7;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
   }
+
+  /* ── Disclaimer desplegable ──────────────────────────────────── */
+  .alerts-toggle{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer;padding:4px 0;margin-top:6px;user-select:none;background:none;border:none;font-family:inherit;width:100%;text-align:left}
+  .alerts-toggle:hover{color:var(--text)}
+  .alerts-toggle .toggle-icon{font-size:10px;transition:transform .2s}
+  .alerts-toggle.open .toggle-icon{transform:rotate(90deg)}
+  .disclaimer{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:14px;font-size:11px;color:var(--muted);line-height:1.6}
+  .disclaimer b{color:var(--text)}
+  .eq-block{margin-top:8px;padding:8px 10px;background:#0D1B3A;border-radius:8px;font-family:var(--mono);font-size:11px;line-height:1.8;color:var(--text)}
+  .warn-block{margin-top:8px;padding:8px 10px;background:#2D0A0A;border-radius:8px;color:#FF8A80;font-size:11px;line-height:1.5}
 </style>
 </head>
 <body>
-
-<!-- Top bar corporativa -->
-<div class="topbar">
-  <div class="topbar-brand">
-    <img src="https://www.oaparaguay.com/images/logo.svg" alt="OAPSA" class="topbar-logo"
-         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
-    <div style="display:none; align-items:center; gap:0.4rem;">
-      <div style="font-family:'Montserrat',sans-serif; font-weight:700; color:#fff; font-size:1rem; letter-spacing:0.1em;">OA<span style="color:#b91d47;">P</span>SA</div>
-    </div>
-    <div class="topbar-divider"></div>
-    <div class="topbar-label">
-      <b>Instrumentación Industrial</b><br>
-      Garantía de Calidad · OQ
-    </div>
-  </div>
-  <div style="font-family:'Share Tech Mono',monospace; font-size:0.58rem; color:rgba(255,255,255,0.35); text-align:right;">
-    ASME BPE · USP &lt;1231&gt; · ISPE<br>
-    Loop Agua Purificada
-  </div>
-</div>
-
-<!-- Header -->
-<header>
-  <div class="header-inner">
-    <div class="header-left">
-      <div class="eyebrow">Calificación OQ — Loop de Agua Purificada (PW)</div>
-      <h1>Reynolds — <span>Loop Agua Purificada · Tubing ASME BPE</span></h1>
-      <div class="subtitle">Diámetros reales BPE · Propiedades interpoladas 15–80 °C</div>
-    </div>
-    <div class="author-badge">
-      <div class="author-name">Josmar Angulo</div>
-      <div class="author-role">Gte. Instrumentación Industrial<br>OA Paraguay S.A.</div>
-      <div class="author-dot"></div>
-    </div>
-  </div>
-</header>
+<div class="app">
+  <h1>Reynolds — Loop Agua Purificada</h1>
+  <p class="subtitle-line">Tubing ASME BPE · Propiedades interpoladas 15–80 °C · Calificación OQ</p>
+  <p class="author-line">por <b>Josmar Angulo</b> · <a href="https://wa.me/59599131290">Contacto</a></p>
 
 <!-- Contenido -->
 <div class="wrap">
@@ -530,15 +400,64 @@
 </div>
 
 
-<footer>
-  V = Q/S &nbsp;·&nbsp; Re = V·d/ν<br>
-  Diámetros ASME BPE-2022 Tubing SS 316L · OD nominal · pared 1,65 mm (14 BWG) · Propiedades agua CRC Handbook 15–80 °C<br>
-  Criterio Re: USP &lt;1231&gt; Water for Pharmaceutical Purposes / EP 7.0 · Velocidad: ISPE Purified Water Guide 3ª Ed.
-</footer>
+<!-- Disclaimer collapsible -->
+<div style="margin-top:12px">
+  <button class="alerts-toggle" onclick="toggleDisc()" id="disc-toggle" style="width:100%;margin-top:0">
+    <span class="toggle-icon">▶</span>
+    <span>ℹ Información y ecuaciones</span>
+  </button>
+  <div id="disc-body" style="display:none">
+  <div class="disclaimer" style="margin-top:6px">
+
+    <div style="font-size:12px;color:var(--text);line-height:1.7;margin-bottom:10px">
+      Esta calculadora es un <b>desarrollo personal</b> realizado de forma independiente por Josmar Angulo. Su objetivo es exclusivamente <b>educativo e informativo</b>, orientado a facilitar el cálculo del número de Reynolds en loops de agua purificada durante calificaciones OQ.
+    </div>
+
+    <div style="font-size:12px;color:var(--text);line-height:1.7;margin-bottom:10px">
+      Los diámetros internos corresponden a <b>ASME BPE-2022</b> Tubing SS 316L con pared de 1,65 mm (14 BWG). Las propiedades del agua (viscosidad cinemática y densidad) se interpolan linealmente a partir de valores del <b>CRC Handbook</b> entre 15 y 80 °C.
+    </div>
+
+    <div class="eq-block">
+— Ecuaciones fundamentales —<br>
+S = π·(ID/2)²  [sección transversal, m²]<br>
+V = Q / S  [velocidad, m/s]<br>
+Re = V·ID / ν  [número de Reynolds, adimensional]<br><br>
+— Criterios de aceptación —<br>
+Re ≥ 4.000: flujo turbulento (USP &lt;1231&gt; / EP 7.0)<br>
+2.300 ≤ Re &lt; 4.000: zona de transición — no recomendado<br>
+Re &lt; 2.300: flujo laminar — no conforme<br><br>
+— Velocidad recomendada —<br>
+1,0 – 2,5 m/s (ISPE Purified Water Guide 3ª Ed. / WHO TRS 970)<br>
+&lt;0,5 m/s: riesgo de biofilm · &gt;3,0 m/s: erosión potencial<br><br>
+— Propiedades del agua —<br>
+ν(T): interpolación lineal CRC Handbook 15–80 °C, 14 puntos<br>
+ρ(T): interpolación lineal CRC Handbook 15–80 °C, 14 puntos<br>
+    </div>
+
+    <div style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.6">
+      <b>Normas de referencia:</b> ASME BPE-2022 · USP &lt;1231&gt; Water for Pharmaceutical Purposes · EP 7.0 · ISPE Baseline Guide: Water and Steam Systems (3ª Ed.) · WHO TRS 970 Annex 2.
+    </div>
+
+    <div class="warn-block" style="margin-top:12px">
+      ⚠ <b>Solo para fines educativos e informativos. Sin validez legal.</b> Los resultados son aproximaciones y no constituyen especificación técnica vinculante, protocolo de calificación ni documento con validez legal de ningún tipo. Para calificaciones OQ oficiales, contacte a <b>OA Paraguay S.A. (OAPSA)</b> — <a href="https://wa.me/59599131290" style="color:#FF8A80">Contacto</a>. Los protocolos definitivos deben ser realizados por personal calificado según las normativas aplicables.
+    </div>
+  </div><!-- /disclaimer -->
+  </div><!-- /disc-body -->
+</div><!-- /disc-wrap -->
 
 </div><!-- /wrap -->
+</div><!-- /app -->
 
 <script>
+// ── Disclaimer toggle ──
+function toggleDisc(){
+  const toggle = document.getElementById('disc-toggle');
+  const body   = document.getElementById('disc-body');
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  toggle.className   = isOpen ? 'alerts-toggle' : 'alerts-toggle open';
+}
+
 // ── Tubing ASME BPE-2022 SS 316L – OD nominal, pared 1,65 mm (14 BWG) ──
 const bpePipes = [
   { nom: '½"',   od: 12.70,  wall: 1.65, get id() { return this.od - 2*this.wall; } },
