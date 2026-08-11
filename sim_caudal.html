@@ -235,8 +235,8 @@ tr.model-row:hover td{background:var(--surface2)}
         <div style="display:flex;gap:6px;align-items:center">
           <input type="number" id="f-pstm" value="10" step="0.1" min="0.01" oninput="calcSteamDebounced()" style="flex:1">
           <div class="norm-toggle" style="margin:0;flex-shrink:0;width:88px">
-            <button id="btn-stm-barg" onclick="setSteamPUnit('g')" style="font-size:11px;padding:5px 5px">barg</button>
-            <button id="btn-stm-bara" class="active" onclick="setSteamPUnit('a')" style="font-size:11px;padding:5px 5px">bara</button>
+            <button id="btn-stm-barg" class="active" onclick="setSteamPUnit('g')" style="font-size:11px;padding:5px 5px">barg</button>
+            <button id="btn-stm-bara" onclick="setSteamPUnit('a')" style="font-size:11px;padding:5px 5px">bara</button>
           </div>
         </div>
       </div>
@@ -555,7 +555,7 @@ const S = {
   phase:      'liquid',   // 'liquid' | 'gas' | 'steam'
   norm:       'Nm3',      // 'Nm3' | 'Sm3'
   pressUnit:  'a',        // 'a'=bara | 'g'=barg
-  steamPUnit: 'a',        // 'a'=bara | 'g'=barg (steam box)
+  steamPUnit: 'g',        // 'a'=bara | 'g'=barg (steam box)
   chartInst:  null,
   candidates: [],
   selIdx:     0,
