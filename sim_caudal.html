@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="description" content="Simulador de caudalímetros KROHNE — Coriolis, Vortex, EMF, Área Variable">
 <title>Simulador de Caudal — KROHNE</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
@@ -31,7 +32,7 @@ h1{font-size:18px;font-weight:600;color:#E8ECF0;margin-bottom:2px}
 .field input:focus,.field select:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(0,207,255,0.15)}
 .field input:disabled{opacity:.45;cursor:not-allowed}
 .field input.invalid{border-color:var(--danger-border,#d9534f);box-shadow:0 0 0 3px rgba(217,83,79,0.15)}
-.field .field-err{display:none;font-size:11px;color:var(--danger-text,#c0392b);margin-top:3px}
+.field .field-err{display:none;font-size:11px;color:var(--danger-text);margin-top:3px}
 .field input.invalid + .field-err,.field input.invalid ~ .field-err{display:block}
 .calc-btn:disabled{opacity:.5;cursor:not-allowed}
 .phase-toggle{display:flex;border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden;margin-bottom:12px}
@@ -112,10 +113,11 @@ tr.model-row:hover td{background:var(--surface2)}
 </style>
 </head>
 <body>
+<noscript><div style="padding:20px;text-align:center;color:#E8ECF0;font-family:sans-serif">Esta herramienta requiere JavaScript habilitado para funcionar.</div></noscript>
 <div class="app">
   <h1>Simulador de Caudalimetros</h1>
   <p class="subtitle">Coriolis · Vortex · EMF · Área Variable · Líquidos, gases y vapor</p>
-  <p style="font-size:11px;color:var(--text3);margin:-12px 0 16px;opacity:0.7">por <b>Josmar Angulo</b> · <a href="https://wa.me/59599131290" style="color:var(--acc);text-decoration:none">Contacto</a></p>
+  <p style="font-size:11px;color:var(--text3);margin:-12px 0 16px;opacity:0.7">por <b>Josmar Angulo</b> · <a href="https://wa.me/595991312920" style="color:var(--acc);text-decoration:none">Contacto</a></p>
 
   <!-- PHASE SELECTOR -->
   <div class="section-label">Fase del fluido</div>
@@ -2377,7 +2379,7 @@ function runSelfTests(){
   const passed = results.filter(r => r.pass).length;
   const failed = results.length - passed;
   console.group(`%cSELF-TESTS: ${passed}/${results.length} passed${failed ? ' — ' + failed + ' FAILED' : ' ✓'}`,
-                failed ? 'color:#c0392b;font-weight:bold' : 'color:#27ae60;font-weight:bold');
+                failed ? 'color:var(--danger);font-weight:bold' : 'color:var(--ok);font-weight:bold');
   results.forEach(r => console.log(`${r.pass ? '✓' : '✗ FAIL'}  ${r.name}`));
   console.groupEnd();
   if(failed) alert(`⚠ SELF-TESTS: ${failed} de ${results.length} pruebas fallaron. Ver consola (F12).`);
