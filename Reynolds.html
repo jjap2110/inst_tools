@@ -5,279 +5,111 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Reynolds — Loop Agua Purificada | OAPSA</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#020B1F;--surface:#08132D;--surface2:#0D1B3A;
+  --text:#E8ECF0;--text2:#B0BEC5;--text3:#6B8299;
+  --border:rgba(0,242,255,0.10);--border2:rgba(0,242,255,0.20);
+  --radius:8px;
+  --acc:#00CFFF;--acc-bg:#061E3F;--acc-text:#00CFFF;
+  --ok:#00E676;--ok-bg:#062E1A;--ok-text:#00E676;
+  --warn:#FFB300;--warn-bg:#2A1F00;--warn-text:#FFD54F;
+  --danger:#FF5252;--danger-bg:#2D0A0A;--danger-text:#FF8A80;
+}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-height:100vh}
+.app{max-width:480px;margin:0 auto;padding:16px 14px 40px}
+h1{font-size:18px;font-weight:600;color:var(--text);margin-bottom:2px}
+.subtitle{font-size:12px;color:var(--text3);margin-bottom:16px}
+.section-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin:14px 0 8px}
 
-  /* ── Paleta JARVIS ─────────────────────────────────────────────── */
-  :root {
-    --navy:    #E8ECF0;
-    --deep:    #020B1F;
-    --red:     #FF5252;
-    --red-h:   #FF8A80;
-    --white:   #E8ECF0;
-    --bg:      #020B1F;
-    --surface: #08132D;
-    --border:  rgba(0,242,255,0.15);
-    --muted:   #6B8299;
-    --text:    #B0BEC5;
-    --accent:  #00CFFF;
-    --green:   #00E676;
-    --yellow:  #FFB300;
-    --orange:  #FF9100;
-    --mono:    'Roboto Mono', monospace;
-    --sans:    'Inter', sans-serif;
-  }
+/* ── Cards ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px}
+.card-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:6px;display:flex;align-items:center;gap:8px;justify-content:space-between}
+.card-title .norm-tag{font-family:'Roboto Mono',monospace;font-size:10px;color:var(--text);background:var(--acc-bg);padding:2px 6px;border-radius:var(--radius);letter-spacing:.04em;white-space:nowrap;flex-shrink:0}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:480px){.grid2{grid-template-columns:1fr}.grid3{grid-template-columns:1fr 1fr}}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    min-height: 100vh;
-    font-size: 15px;
-    line-height: 1.5;
-  }
-  .app{max-width:480px;margin:0 auto;padding:16px 14px 40px}
-  h1{font-size:18px;font-weight:600;margin-bottom:2px;color:#E8ECF0}
-  .subtitle-line{font-size:12px;color:var(--muted);margin-bottom:16px}
-  .author-line{font-size:11px;color:var(--muted);margin:-12px 0 16px;opacity:0.7}
-  .author-line b{color:var(--text)}
-  .author-line a{color:var(--accent);text-decoration:none}
+label{display:block;font-size:12px;color:var(--text2);margin-bottom:3px}
+label b{color:var(--text);font-family:'Roboto Mono',monospace;font-weight:400;font-size:13px}
 
-  /* ── Cards ─────────────────────────────────────────────────────── */
-  .wrap { width: 100%; max-width: 480px; margin: 0 auto; padding: 0; }
+input[type="number"]{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:'Roboto Mono',monospace;font-size:14px;padding:6px 8px;outline:none;transition:border-color .2s}
+input[type="number"]:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(0,207,255,0.15)}
+.unit-note{font-size:11px;color:var(--text3);margin-top:3px;font-family:'Roboto Mono',monospace}
 
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 14px;
-    box-shadow: none;
-  }
-  .card-title {
-    font-family: var(--sans);
-    font-size: 0.6rem;
-    font-weight: 700;
-    color: var(--muted);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    margin-bottom: 0.85rem;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 0.4rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    justify-content: space-between;
-  }
-  .card-title .norm-tag {
-    font-family: var(--mono);
-    font-size: 0.56rem;
-    color: var(--white);
-    background: var(--navy);
-    padding: 0.1rem 0.4rem;
-    border-radius: 3px;
-    letter-spacing: 0.06em;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
+/* ── Sliders ── */
+.slider-wrap{display:flex;flex-direction:column;gap:2px}
+.slider-row{display:flex;align-items:center;gap:6px}
+input[type="range"]{-webkit-appearance:none;flex:1;height:3px;background:var(--surface2);border-radius:2px;outline:none;cursor:pointer}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--acc);cursor:pointer;border:2px solid var(--bg);box-shadow:0 0 8px rgba(0,207,255,0.4)}
+#diametro_idx::-webkit-slider-thumb{border-radius:3px;width:10px}
+.slider-val{font-family:'Roboto Mono',monospace;font-size:13px;color:var(--text);font-weight:700;min-width:72px;text-align:right}
+.slider-range{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);font-family:'Roboto Mono',monospace}
 
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.4rem; }
-  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; }
-  @media (max-width: 560px) {
-    .grid2 { grid-template-columns: 1fr; }
-    .grid3 { grid-template-columns: 1fr 1fr; }
-  }
+/* ── Resultado Re ── */
+#resultado{width:100%;border-radius:12px;border:1px solid var(--border);padding:14px;margin-bottom:14px;background:var(--surface);transition:border-color .3s,background .3s}
+#resultado.ok{border-color:var(--acc);background:var(--surface)}
+#resultado.warn{border-color:var(--warn);background:var(--warn-bg)}
+#resultado.fail{border-color:var(--danger);background:var(--danger-bg)}
+#resultado.idle{background:var(--surface)}
 
-  label {
-    display: block;
-    font-size: 0.63rem;
-    font-weight: 600;
-    color: var(--muted);
-    margin-bottom: 0.18rem;
-  }
-  label b { color: var(--navy); font-family: var(--mono); font-weight: 400; font-size: 0.8rem; }
+.res-grid4{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px}
+.res-item{display:flex;flex-direction:column;gap:1px}
+.res-label{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.res-value{font-family:'Roboto Mono',monospace;font-size:20px;font-weight:700;line-height:1.1;color:var(--text)}
+.res-unit{font-size:11px;color:var(--text3)}
 
-  input[type="number"] {
-    width: 100%;
-    background: #0D1B3A;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    color: #E8ECF0;
-    font-family: var(--mono);
-    font-size: 0.88rem;
-    padding: 0.32rem 0.5rem;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  input[type="number"]:focus { border-color: var(--accent); }
-  .unit-note { font-size: 0.58rem; color: var(--muted); margin-top: 0.18rem; font-family: var(--mono); }
+/* ── Gauges ── */
+.gauge-section{margin-top:12px}
+.gauge-block{margin-bottom:10px}
+.gauge-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.gauge-label{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.norm-pill{font-family:'Roboto Mono',monospace;font-size:10px;color:var(--bg);background:var(--acc);padding:2px 7px;border-radius:10px;letter-spacing:.04em;white-space:nowrap}
+.gauge-track{height:8px;background:var(--surface2);border-radius:var(--radius);overflow:hidden}
+.gauge-fill{height:100%;border-radius:var(--radius);transition:width .35s ease,background .3s;min-width:2px}
+.vband-track{height:8px;border-radius:var(--radius);position:relative;background:linear-gradient(to right,var(--danger) 0% 12.5%,var(--warn) 12.5% 25%,var(--ok) 25% 62.5%,#FF9100 62.5% 75%,var(--danger) 75% 100%)}
+.vband-needle{position:absolute;top:-4px;width:3px;height:16px;background:var(--text);border-radius:2px;transform:translateX(-50%);transition:left .3s ease;box-shadow:0 0 8px rgba(0,242,255,0.5)}
+.gauge-markers,.vband-markers{position:relative;height:13px;margin-top:4px;font-family:'Roboto Mono',monospace;font-size:10px;color:var(--text3)}
+.gauge-markers span,.vband-markers span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}
+.gauge-markers span:first-child,.vband-markers span:first-child{left:0%;transform:none}
+.gauge-markers span:last-child,.vband-markers span:last-child{left:100%;transform:translateX(-100%)}
+.gauge-markers span:nth-child(2){left:19.17%}
+.gauge-markers span:nth-child(3){left:33.33%;color:var(--ok);font-weight:700}
+.gauge-markers span:nth-child(4){left:66.67%}
+.vband-markers span:nth-child(2){left:12.5%}
+.vband-markers span:nth-child(3){left:25%;color:var(--ok);font-weight:700}
+.vband-markers span:nth-child(4){left:62.5%;color:var(--ok);font-weight:700}
+.vband-markers span:nth-child(5){left:75%;color:#FF9100}
+.v-status{font-family:'Roboto Mono',monospace;font-size:11px;margin-top:6px}
 
-  /* ── Sliders ────────────────────────────────────────────────────── */
-  .slider-wrap { display: flex; flex-direction: column; gap: 0.08rem; }
-  .slider-row  { display: flex; align-items: center; gap: 0.35rem; }
+/* ── Veredicto ── */
+.veredicto{display:flex;align-items:flex-start;gap:8px;font-size:13px;padding-top:10px;border-top:1px solid var(--border);margin-top:10px;color:var(--text)}
+.badge{font-size:11px;font-weight:600;padding:3px 8px;border-radius:var(--radius);white-space:nowrap;letter-spacing:.04em;color:var(--bg)}
+.badge.ok{background:var(--ok)}
+.badge.warn{background:var(--warn)}
+.badge.fail{background:var(--danger)}
 
-  input[type="range"] {
-    -webkit-appearance: none; flex: 1; height: 3px;
-    background: #0A2E5B; border-radius: 2px; outline: none; cursor: pointer;
-  }
-  input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none; width: 11px; height: 11px; border-radius: 50%;
-    background: #00CFFF; cursor: pointer;
-    border: 2px solid #020B1F;
-    box-shadow: 0 0 8px rgba(0,207,255,0.4);
-  }
-  #diametro_idx::-webkit-slider-thumb { border-radius: 3px; width: 8px; }
-
-  .slider-val {
-    font-family: var(--mono); font-size: 0.75rem;
-    color: var(--navy); font-weight: 700;
-    min-width: 72px; text-align: right;
-  }
-  .slider-range {
-    display: flex; justify-content: space-between;
-    font-size: 0.5rem; color: var(--muted); font-family: var(--mono);
-  }
-
-  /* ── Resultado Re ───────────────────────────────────────────────── */
-  #resultado {
-    width: 100%; border-radius: 12px;
-    border: 1px solid var(--border);
-    padding: 14px; margin-bottom: 14px;
-    background: var(--surface);
-    box-shadow: none;
-    transition: border-color 0.3s, background 0.3s;
-  }
-  #resultado.ok   { border-color: var(--accent);  background: var(--surface); }
-  #resultado.warn { border-color: var(--yellow); background: #2A1F00; }
-  #resultado.fail { border-color: #FF5252;       background: #2D0A0A; }
-  #resultado.idle { background: var(--surface); }
-
-  .res-grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 0.75rem; margin-bottom: 0.8rem; }
-  @media (max-width: 520px) { .res-grid4 { grid-template-columns: 1fr 1fr; } }
-
-  .res-item { display: flex; flex-direction: column; gap: 0.06rem; }
-  .res-label {
-    font-size: 0.56rem; color: var(--muted);
-    font-family: var(--sans); font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.08em;
-  }
-  .res-value { font-family: var(--mono); font-size: 1.3rem; font-weight: 700; line-height: 1.1; color: #E8ECF0; }
-  .res-unit  { font-size: 0.58rem; color: var(--muted); }
-
-  /* ── Gauges ─────────────────────────────────────────────────────── */
-  .gauge-section { margin-top: 0.85rem; }
-  .gauge-block { margin-bottom: 0.7rem; }
-  .gauge-head {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 0.28rem;
-  }
-  .gauge-label {
-    font-size: 0.58rem; color: var(--muted);
-    font-family: var(--sans); font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.08em;
-  }
-  .norm-pill {
-    font-family: var(--mono); font-size: 0.52rem;
-    color: #020B1F; background: #00CFFF;
-    padding: 0.1rem 0.45rem; border-radius: 10px;
-    letter-spacing: 0.04em; white-space: nowrap;
-  }
-
-  .gauge-track { height: 8px; background: #0A2E5B; border-radius: 4px; overflow: hidden; }
-  .gauge-fill  { height: 100%; border-radius: 4px; transition: width 0.35s ease, background 0.3s; min-width: 2px; }
-
-  .vband-track {
-    height: 8px; border-radius: 4px; position: relative;
-    background: linear-gradient(to right,
-      #FF5252 0% 12.5%, #FFB300 12.5% 25%,
-      #00E676 25% 62.5%, #FF9100 62.5% 75%,
-      #FF5252 75% 100%);
-  }
-  .vband-needle {
-    position: absolute; top: -4px; width: 3px; height: 16px;
-    background: #00F2FF; border-radius: 2px; transform: translateX(-50%);
-    transition: left 0.3s ease; box-shadow: 0 0 8px rgba(0,242,255,0.5);
-  }
-
-  .gauge-markers, .vband-markers {
-    position: relative; height: 13px; margin-top: 0.25rem;
-    font-family: var(--mono); font-size: 0.52rem; color: var(--muted);
-  }
-  .gauge-markers span, .vband-markers span {
-    position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap;
-  }
-  .gauge-markers span:first-child, .vband-markers span:first-child { left: 0%; transform: none; }
-  .gauge-markers span:last-child,  .vband-markers span:last-child  { left: 100%; transform: translateX(-100%); }
-  .gauge-markers span:nth-child(2) { left: 19.17%; }
-  .gauge-markers span:nth-child(3) { left: 33.33%; color: var(--green); font-weight: 700; }
-  .gauge-markers span:nth-child(4) { left: 66.67%; }
-  .vband-markers span:nth-child(2) { left: 12.5%; }
-  .vband-markers span:nth-child(3) { left: 25%;   color: var(--green); font-weight: 700; }
-  .vband-markers span:nth-child(4) { left: 62.5%; color: var(--green); font-weight: 700; }
-  .vband-markers span:nth-child(5) { left: 75%;   color: var(--orange); }
-
-  .v-status { font-family: var(--mono); font-size: 0.65rem; margin-top: 0.45rem; }
-
-  /* ── Veredicto ──────────────────────────────────────────────────── */
-  .veredicto {
-    display: flex; align-items: flex-start; gap: 0.6rem;
-    font-size: 0.77rem; padding-top: 0.75rem;
-    border-top: 1px solid var(--border); margin-top: 0.7rem;
-    color: var(--text);
-  }
-  .badge {
-    font-family: var(--sans); font-weight: 700;
-    font-size: 0.58rem; padding: 0.2rem 0.5rem;
-    border-radius: 3px; white-space: nowrap;
-    margin-top: 0.05rem; letter-spacing: 0.06em;
-    color: var(--white);
-  }
-  .badge.ok   { background: var(--green); }
-  .badge.warn { background: var(--yellow); }
-  .badge.fail { background: #FF5252; }
-
-  /* ── Separador de sección ────────────────────────────────────────── */
-  .section-divider {
-    width: 100%; height: 3px;
-    background: linear-gradient(to right, transparent, #00CFFF, transparent);
-    border-radius: 2px;
-    margin-bottom: 0.9rem;
-    opacity: 0.2;
-  }
-
-  /* ── Footer ─────────────────────────────────────────────────────── */
-  footer {
-    width: 100%; max-width: 480px;
-    margin: 0 auto;
-    padding: 14px;
-    font-size: 11px; color: var(--muted);
-    font-family: var(--mono); text-align: center;
-    line-height: 1.7;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-  }
-
-  /* ── Disclaimer desplegable ──────────────────────────────────── */
-  .alerts-toggle{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer;padding:4px 0;margin-top:6px;user-select:none;background:none;border:none;font-family:inherit;width:100%;text-align:left}
-  .alerts-toggle:hover{color:var(--text)}
-  .alerts-toggle .toggle-icon{font-size:10px;transition:transform .2s}
-  .alerts-toggle.open .toggle-icon{transform:rotate(90deg)}
-  .disclaimer{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:14px;font-size:11px;color:var(--muted);line-height:1.6}
-  .disclaimer b{color:var(--text)}
-  .eq-block{margin-top:8px;padding:8px 10px;background:#0D1B3A;border-radius:8px;font-family:var(--mono);font-size:11px;line-height:1.8;color:var(--text)}
-  .warn-block{margin-top:8px;padding:8px 10px;background:#2D0A0A;border-radius:8px;color:#FF8A80;font-size:11px;line-height:1.5}
+/* ── Disclaimer desplegable ── */
+.alerts-toggle{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);cursor:pointer;padding:4px 0;margin-top:6px;user-select:none;background:none;border:none;font-family:inherit;width:100%;text-align:left}
+.alerts-toggle:hover{color:var(--text2)}
+.alerts-toggle .toggle-icon{font-size:10px;transition:transform .2s}
+.alerts-toggle.open .toggle-icon{transform:rotate(90deg)}
+.disclaimer{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:14px;font-size:11px;color:var(--text3);line-height:1.6}
+.disclaimer b{color:var(--text2)}
+.eq-block{margin-top:8px;padding:8px 10px;background:var(--surface2);border-radius:var(--radius);font-family:'Roboto Mono',monospace;font-size:11px;line-height:1.8;color:var(--text2)}
+.warn-block{margin-top:8px;padding:8px 10px;background:var(--danger-bg);border-radius:var(--radius);color:var(--danger-text);font-size:11px;line-height:1.5}
 </style>
 </head>
 <body>
 <div class="app">
   <h1>Reynolds — Loop Agua Purificada</h1>
-  <p class="subtitle-line">Tubing ASME BPE · Propiedades interpoladas 15–80 °C · Calificación OQ</p>
-  <p class="author-line">por <b>Josmar Angulo</b> · <a href="https://wa.me/59599131290">Contacto</a></p>
+  <p class="subtitle">Tubing ASME BPE · Propiedades interpoladas 15–80 °C · Calificación OQ</p>
+  <p style="font-size:11px;color:var(--text3);margin:-12px 0 16px;opacity:0.7">por <b>Josmar Angulo</b> · <a href="https://wa.me/59599131290" style="color:var(--acc);text-decoration:none">Contacto</a></p>
 
 <!-- Contenido -->
-<div class="wrap">
+
 
 <!-- Panel de control -->
 <div class="card">
@@ -291,9 +123,9 @@
         <span class="slider-val" id="diametro_val">1"</span>
       </div>
       <div class="unit-note">
-        OD: <b id="diametro_od_val" style="color:var(--navy)">—</b> mm &nbsp;·&nbsp;
-        ID real BPE: <b id="diametro_id_val" style="color:var(--accent)">—</b> mm &nbsp;·&nbsp;
-        Pared: <b id="diametro_wall_val" style="color:var(--navy)">—</b> mm
+        OD: <b id="diametro_od_val" style="color:var(--text)">—</b> mm &nbsp;·&nbsp;
+        ID real BPE: <b id="diametro_id_val" style="color:var(--acc)">—</b> mm &nbsp;·&nbsp;
+        Pared: <b id="diametro_wall_val" style="color:var(--text)">—</b> mm
       </div>
     </div>
 
@@ -317,9 +149,9 @@
         <span class="slider-val" id="temp_val">25 °C</span>
       </div>
       <div class="slider-range"><span>15 °C</span><span>47 °C</span><span>80 °C</span></div>
-      <div class="unit-note" style="margin-top:0.28rem">
-        ν = <span id="nu_val" style="color:var(--accent); font-weight:700">—</span> × 10⁻⁶ m²/s &nbsp;·&nbsp;
-        ρ = <span id="rho_val" style="color:var(--accent); font-weight:700">—</span> kg/m³
+      <div class="unit-note" style="margin-top:4px">
+        ν = <span id="nu_val" style="color:var(--acc); font-weight:700">—</span> × 10⁻⁶ m²/s &nbsp;·&nbsp;
+        ρ = <span id="rho_val" style="color:var(--acc); font-weight:700">—</span> kg/m³
       </div>
     </div>
 
@@ -335,12 +167,12 @@
   <div class="res-grid4">
     <div class="res-item">
       <span class="res-label">Velocidad V</span>
-      <span class="res-value" id="res_v" style="color:var(--accent)">—</span>
+      <span class="res-value" id="res_v" style="color:var(--acc)">—</span>
       <span class="res-unit">m/s</span>
     </div>
     <div class="res-item">
       <span class="res-label">Sección S</span>
-      <span class="res-value" id="res_s" style="font-size:1.05rem;padding-top:0.25rem;color:var(--muted)">—</span>
+      <span class="res-value" id="res_s" style="font-size:16px;padding-top:4px;color:var(--text3)">—</span>
       <span class="res-unit">m²</span>
     </div>
     <div class="res-item">
@@ -350,7 +182,7 @@
     </div>
     <div class="res-item">
       <span class="res-label">Régimen</span>
-      <span class="res-value" id="res_regimen" style="font-size:0.88rem;padding-top:0.3rem">—</span>
+      <span class="res-value" id="res_regimen" style="font-size:14px;padding-top:5px">—</span>
     </div>
   </div>
 
@@ -434,7 +266,7 @@ Re &lt; 2.300: flujo laminar — no conforme<br><br>
 ρ(T): interpolación lineal CRC Handbook 15–80 °C, 14 puntos<br>
     </div>
 
-    <div style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.6">
+    <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.6">
       <b>Normas de referencia:</b> ASME BPE-2022 · USP &lt;1231&gt; Water for Pharmaceutical Purposes · EP 7.0 · ISPE Baseline Guide: Water and Steam Systems (3ª Ed.) · WHO TRS 970 Annex 2.
     </div>
 
@@ -445,7 +277,7 @@ Re &lt; 2.300: flujo laminar — no conforme<br><br>
   </div><!-- /disc-body -->
 </div><!-- /disc-wrap -->
 
-</div><!-- /wrap -->
+
 </div><!-- /app -->
 
 <script>
@@ -573,9 +405,9 @@ function calcular() {
     // Estado velocidad
     const vSt = document.getElementById('v_status');
     if      (V<0.5)  { vSt.style.color='#c0392b'; vSt.textContent=`▸ V = ${fmt(V,3)} m/s — Muy baja. Mayor probabilidad de formación de biofilm.`; }
-    else if (V<1.0)  { vSt.style.color='var(--yellow)'; vSt.textContent=`▸ V = ${fmt(V,3)} m/s — Por debajo de banda recomendada (< 1,0 m/s).`; }
-    else if (V<=2.5) { vSt.style.color='var(--green)';  vSt.textContent=`▸ V = ${fmt(V,3)} m/s — Óptima. Dentro de banda ISPE (1,0–2,5 m/s).`; }
-    else if (V<=3.0) { vSt.style.color='var(--orange)'; vSt.textContent=`▸ V = ${fmt(V,3)} m/s — Precaución: zona de erosión en codos (2,5–3,0 m/s).`; }
+    else if (V<1.0)  { vSt.style.color='var(--warn)'; vSt.textContent=`▸ V = ${fmt(V,3)} m/s — Por debajo de banda recomendada (< 1,0 m/s).`; }
+    else if (V<=2.5) { vSt.style.color='var(--ok)';  vSt.textContent=`▸ V = ${fmt(V,3)} m/s — Óptima. Dentro de banda ISPE (1,0–2,5 m/s).`; }
+    else if (V<=3.0) { vSt.style.color='#FF9100'; vSt.textContent=`▸ V = ${fmt(V,3)} m/s — Precaución: zona de erosión en codos (2,5–3,0 m/s).`; }
     else             { vSt.style.color='#c0392b'; vSt.textContent=`▸ V = ${fmt(V,3)} m/s — Excede límite práctico (> 3,0 m/s). Revisar diseño.`; }
 
     // Veredicto Re
@@ -587,13 +419,13 @@ function calcular() {
     res.className='';
 
     if (Re>=4000) {
-      res.classList.add('ok'); gRe.style.background='var(--green)';
-      reEl.style.color='var(--green)'; regEl.textContent='Turbulento'; regEl.style.color='var(--green)';
+      res.classList.add('ok'); gRe.style.background='var(--ok)';
+      reEl.style.color='var(--ok)'; regEl.textContent='Turbulento'; regEl.style.color='var(--ok)';
       badge.className='badge ok'; badge.textContent='APROBADO';
       txt.textContent=`Re = ${fmt(Re,0)} ≥ 4.000 — Flujo turbulento confirmado. Cumple criterio USP <1231> / EP 7.0.`;
     } else if (Re>=2300) {
-      res.classList.add('warn'); gRe.style.background='var(--yellow)';
-      reEl.style.color='var(--yellow)'; regEl.textContent='Transición'; regEl.style.color='var(--yellow)';
+      res.classList.add('warn'); gRe.style.background='var(--warn)';
+      reEl.style.color='var(--warn)'; regEl.textContent='Transición'; regEl.style.color='var(--warn)';
       badge.className='badge warn'; badge.textContent='NO CUMPLE';
       txt.textContent=`Re = ${fmt(Re,0)} — Zona de transición (2.300–4.000). No cumple criterio. Aumentar Q o reducir diámetro.`;
     } else {
