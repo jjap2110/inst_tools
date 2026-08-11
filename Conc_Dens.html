@@ -5,56 +5,128 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Densidad → Concentración · MFC 400</title>
 <style>
-  :root{--navy:#13315C;--blue:#1F5FA6;--teal:#0E9AA7;--light:#EEF3F8;--ink:#2B2B2B;--grey:#6B7280;--line:#D5DEE8;--amber:#B45309;}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap');
+  :root{--navy:#00F2FF;--blue:#00CFFF;--teal:#00CFFF;--light:#0D1B3A;--ink:#E8ECF0;--grey:#6B8299;--line:rgba(0,242,255,0.15);--amber:#FFB300;}
   *{box-sizing:border-box;margin:0;}
-  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#F6F8FB;color:var(--ink);padding:12px;display:flex;justify-content:center;}
-  .card{background:#fff;border:1px solid var(--line);border-radius:14px;max-width:680px;width:100%;padding:18px 18px 22px;box-shadow:0 6px 24px rgba(19,49,92,.07);}
-  h1{font-size:19px;color:var(--navy);margin-bottom:2px;}
-  .sub{color:var(--grey);font-size:12px;margin-bottom:12px;}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#020B1F;color:var(--ink);font-size:15px;line-height:1.5;min-height:100vh;}
+  .app{max-width:480px;margin:0 auto;padding:16px 14px 40px}
+  h1{font-size:18px;font-weight:600;color:#E8ECF0;margin-bottom:2px;}
+  .subtitle{font-size:12px;color:var(--grey);margin-bottom:16px;}
+  .author-line{font-size:11px;color:var(--grey);margin:-12px 0 16px;opacity:0.7}
+  .author-line b{color:var(--ink)}
+  .author-line a{color:#00CFFF;text-decoration:none}
+  .content-card{background:#08132D;border:1px solid var(--line);border-radius:12px;padding:14px;}
   .tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px;border-bottom:2px solid var(--line);padding-bottom:0;}
   .tab{background:none;border:none;padding:7px 12px;font-size:13px;font-weight:600;color:var(--grey);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;border-radius:6px 6px 0 0;transition:all .15s;}
-  .tab:hover{color:var(--navy);background:var(--light);}
-  .tab.active{color:var(--navy);border-bottom-color:var(--teal);background:var(--light);}
-  .tab.placeholder{color:#B0B8C4;font-style:italic;cursor:default;}
+  .tab:hover{color:#E8ECF0;background:#0D1B3A;}
+  .tab.active{color:#E8ECF0;border-bottom-color:#00CFFF;background:#0D1B3A;}
+  .tab.placeholder{color:#2A4060;font-style:italic;cursor:default;}
   .panel{display:none;}.panel.active{display:block;}
   .togglerow{display:flex;gap:6px;margin-bottom:10px;}
-  .tbtn{padding:5px 14px;font-size:12px;font-weight:600;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--grey);cursor:pointer;transition:all .15s;}
-  .tbtn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
-  .hero{background:linear-gradient(135deg,#0a6e6e,var(--teal));border-radius:14px;padding:16px 18px;color:#fff;text-align:center;margin-bottom:10px;}
+  .tbtn{padding:5px 14px;font-size:12px;font-weight:600;border:1px solid var(--line);border-radius:8px;background:#0D1B3A;color:var(--grey);cursor:pointer;transition:all .15s;}
+  .tbtn.active{background:#061E3F;color:#00CFFF;border-color:#00CFFF;}
+  .hero{background:linear-gradient(135deg,#061E3F,#0A2E5B);border:1px solid rgba(0,207,255,0.2);border-radius:14px;padding:16px 18px;color:#00F2FF;text-align:center;margin-bottom:10px;}
   .hero .lbl{font-size:11px;text-transform:uppercase;letter-spacing:1px;opacity:.9;font-weight:600;}
   .hero .big{font-size:38px;font-weight:800;line-height:1.1;margin-top:3px;}
   .hero .big .u{font-size:16px;font-weight:600;opacity:.9;}
   .hero .sub2{font-size:13px;opacity:.85;margin-top:3px;}
-  .oor{background:#FEF3E2;border:1px solid #F3D9A8;color:var(--amber);font-size:12px;border-radius:8px;padding:8px 11px;margin-bottom:8px;display:none;}
+  .oor{background:#2A1F00;border:1px solid rgba(255,179,0,0.3);color:#FFD54F;font-size:12px;border-radius:8px;padding:8px 11px;margin-bottom:8px;display:none;}
   .oor.show{display:block;}
   .grid{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
   .box{flex:1 1 0;min-width:100px;background:var(--light);border-radius:10px;padding:10px 12px;text-align:center;}
   .box .bl{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--grey);font-weight:600;}
-  .box .bv{font-size:22px;font-weight:700;color:var(--navy);line-height:1.1;margin-top:2px;}
+  .box .bv{font-size:22px;font-weight:700;color:#E8ECF0;line-height:1.1;margin-top:2px;}
   .box .bu{font-size:11px;color:var(--grey);}
   .srow{margin-bottom:8px;}
   .srow .sl{font-size:11px;color:var(--grey);font-weight:600;margin-bottom:3px;display:flex;justify-content:space-between;}
   .srow .si{display:flex;align-items:center;gap:10px;}
   input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:7px;border-radius:5px;outline:none;margin:6px 0;}
-  .srow.dens input[type=range]{background:linear-gradient(90deg,var(--teal),var(--navy));}
-  .srow.temp input[type=range]{background:linear-gradient(90deg,#3B82F6,#EF4444);}
-  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;border:3px solid var(--navy);cursor:pointer;box-shadow:0 2px 5px rgba(0,0,0,.2);}
-  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#fff;border:3px solid var(--navy);cursor:pointer;}
-  input[type=number]{width:80px;font-size:14px;padding:5px 6px;border:1px solid var(--line);border-radius:7px;text-align:center;color:var(--navy);font-weight:700;}
+  .srow.dens input[type=range]{background:linear-gradient(90deg,#00CFFF,#0A2E5B);}
+  .srow.temp input[type=range]{background:linear-gradient(90deg,#00CFFF,#FF5252);}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#020B1F;border:3px solid #00CFFF;cursor:pointer;box-shadow:0 0 8px rgba(0,207,255,.4);}
+  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#020B1F;border:3px solid #00CFFF;cursor:pointer;}
+  input[type=number]{width:80px;font-size:14px;padding:5px 6px;border:1px solid var(--line);border-radius:7px;text-align:center;color:#E8ECF0;font-weight:700;background:#0D1B3A;}
   .ticks{display:flex;justify-content:space-between;font-size:10px;color:var(--grey);margin-top:1px;}
   svg.chart{width:100%;height:auto;display:block;margin:10px 0 4px;}
-  .derived{font-size:12px;color:var(--ink);margin-top:6px;}.derived b{color:var(--navy);}
+  .derived{font-size:12px;color:var(--ink);margin-top:6px;}.derived b{color:#E8ECF0;}
   .note{font-size:11px;color:var(--grey);font-style:italic;margin-top:12px;line-height:1.4;border-top:1px solid var(--line);padding-top:10px;}
+  /* ── Disclaimer desplegable ── */
+  .alerts-toggle{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--grey);cursor:pointer;padding:4px 0;margin-top:6px;user-select:none;background:none;border:none;font-family:inherit;width:100%;text-align:left}
+  .alerts-toggle:hover{color:var(--ink)}
+  .alerts-toggle .toggle-icon{font-size:10px;transition:transform .2s}
+  .alerts-toggle.open .toggle-icon{transform:rotate(90deg)}
+  .disclaimer{background:#08132D;border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:14px;font-size:11px;color:var(--grey);line-height:1.6}
+  .disclaimer b{color:var(--ink)}
+  .eq-block{margin-top:8px;padding:8px 10px;background:#0D1B3A;border-radius:8px;font-family:'Roboto Mono',monospace;font-size:11px;line-height:1.8;color:var(--ink)}
+  .warn-block{margin-top:8px;padding:8px 10px;background:#2D0A0A;border-radius:8px;color:#FF8A80;font-size:11px;line-height:1.5}
 </style>
 </head>
 <body>
-<div class="card">
-  <h1>Densidad + Temperatura → Concentración</h1>
-  <div class="sub">KROHNE OPTIMASS MFC 400 · Ingresá lo que lee el instrumento</div>
-  <div class="tabs" id="tabs"></div>
-  <div id="panels"></div>
+<div class="app">
+  <h1>Densidad → Concentración</h1>
+  <p class="subtitle">KROHNE OPTIMASS MFC 400 · Conversión densidad-concentración con corrección térmica</p>
+  <p class="author-line">por <b>Josmar Angulo</b> · <a href="https://wa.me/59599131290">Contacto</a></p>
+
+  <div class="content-card">
+    <div class="tabs" id="tabs"></div>
+    <div id="panels"></div>
+  </div>
+
+  <!-- Disclaimer collapsible -->
+  <div style="margin-top:12px">
+    <button class="alerts-toggle" onclick="toggleDisc()" id="disc-toggle" style="width:100%;margin-top:0">
+      <span class="toggle-icon">▶</span>
+      <span>ℹ Información y ecuaciones</span>
+    </button>
+    <div id="disc-body" style="display:none">
+    <div class="disclaimer" style="margin-top:6px">
+
+      <div style="font-size:12px;color:var(--ink);line-height:1.7;margin-bottom:10px">
+        Esta herramienta es un <b>desarrollo personal</b> realizado de forma independiente, sin colaboración, patrocinio ni vinculación contractual con KROHNE Group ni ninguna otra empresa. Su objetivo es exclusivamente <b>educativo e informativo</b>, orientado a facilitar la conversión densidad-concentración como complemento al caudalímetro Coriolis <b>KROHNE OPTIMASS MFC 400</b>.
+      </div>
+
+      <div style="font-size:12px;color:var(--ink);line-height:1.7;margin-bottom:10px">
+        Las curvas densidad-concentración provienen de fuentes públicas (USDA/AOAC, ICUMSA, ASBC, Perry's, CRC Handbook, OIML R 22, ASTM D1250). Se utiliza <b>interpolación por spline cúbico natural</b> para obtener valores intermedios. La corrección térmica es aproximada (lineal a primer orden); el MFC 400 usa tablas internas de mayor precisión.
+      </div>
+
+      <div class="eq-block">
+— Interpolación —<br>
+Spline cúbico natural: S(x) = aᵢ + bᵢ·(x-xᵢ) + cᵢ·(x-xᵢ)² + dᵢ·(x-xᵢ)³<br>
+Inversión: búsqueda binaria sobre la spline para ρ → concentración<br><br>
+— Corrección térmica —<br>
+ρ_ref(T) = ρ_medida / (1 − α·ΔT − β·ΔT²)<br>
+donde ΔT = T − T_ref, α y β dependen del producto<br><br>
+— Escalas soportadas —<br>
+Brix (°Bx): USDA/AOAC 20/20 (0–80) + ICUMSA (80–100)<br>
+Baumé (°Bé): ASTM E100 (mod. 145) / europeo (mod. 144)<br>
+Plato (°P): ASBC, industria cervecera<br>
+Alcohol (%m/m): OIML R 22 / Perry's 7ª ed.<br>
+NaOH (%m/m): Perry's 7ª / CRC a 20 °C<br>
+API (°API): ASTM D1250-08, ρ_agua=999,016<br>
+      </div>
+
+      <div style="font-size:11px;color:var(--grey);margin-top:10px;line-height:1.6">
+        <b>Fuentes:</b> USDA/AOAC · ICUMSA · ASBC · Perry's Chemical Engineers' Handbook 7ª ed. · CRC Handbook of Chemistry and Physics · OIML R 22 · ASTM D1250-08 · ASTM E100.
+      </div>
+
+      <div class="warn-block" style="margin-top:12px">
+        ⚠ <b>Solo para fines educativos e informativos. Sin validez legal.</b> Los resultados son aproximaciones y no constituyen especificación técnica vinculante ni documento con validez legal de ningún tipo. Para aplicaciones de custody transfer o control de calidad oficial, utilice las tablas internas del <b>KROHNE OPTIMASS MFC 400</b> o consulte directamente al fabricante en <b>krohne.com</b>. Para selección y cotización, contacte a <b>i4smart.com.py</b> (representante autorizado KROHNE en Paraguay).
+      </div>
+    </div><!-- /disclaimer -->
+    </div><!-- /disc-body -->
+  </div><!-- /disc-wrap -->
+
 </div>
 <script>
+// ── Disclaimer toggle ──
+function toggleDisc(){
+  const toggle = document.getElementById('disc-toggle');
+  const body   = document.getElementById('disc-body');
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  toggle.className   = isOpen ? 'alerts-toggle' : 'alerts-toggle open';
+}
+
 // ═══════════════════════════════════════════
 // SPLINE
 // ═══════════════════════════════════════════
