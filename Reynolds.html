@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Calculadora Reynolds — Loops de agua purificada ASME BPE">
 <title>Reynolds — Loop Agua Purificada | OAPSA</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap');
@@ -16,6 +17,7 @@
   --ok:#00E676;--ok-bg:#062E1A;--ok-text:#00E676;
   --warn:#FFB300;--warn-bg:#2A1F00;--warn-text:#FFD54F;
   --danger:#FF5252;--danger-bg:#2D0A0A;--danger-text:#FF8A80;
+  --caution:#FF9100;
 }
 body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-height:100vh}
 .app{max-width:480px;margin:0 auto;padding:16px 14px 40px}
@@ -30,7 +32,6 @@ h1{font-size:18px;font-weight:600;color:var(--text);margin-bottom:2px}
 
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-@media(max-width:480px){.grid2{grid-template-columns:1fr}.grid3{grid-template-columns:1fr 1fr}}
 
 label{display:block;font-size:12px;color:var(--text2);margin-bottom:3px}
 label b{color:var(--text);font-family:'Roboto Mono',monospace;font-weight:400;font-size:13px}
@@ -69,7 +70,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
 .norm-pill{font-family:'Roboto Mono',monospace;font-size:10px;color:var(--bg);background:var(--acc);padding:2px 7px;border-radius:10px;letter-spacing:.04em;white-space:nowrap}
 .gauge-track{height:8px;background:var(--surface2);border-radius:var(--radius);overflow:hidden}
 .gauge-fill{height:100%;border-radius:var(--radius);transition:width .35s ease,background .3s;min-width:2px}
-.vband-track{height:8px;border-radius:var(--radius);position:relative;background:linear-gradient(to right,var(--danger) 0% 12.5%,var(--warn) 12.5% 25%,var(--ok) 25% 62.5%,#FF9100 62.5% 75%,var(--danger) 75% 100%)}
+.vband-track{height:8px;border-radius:var(--radius);position:relative;background:linear-gradient(to right,var(--danger) 0% 12.5%,var(--warn) 12.5% 25%,var(--ok) 25% 62.5%,var(--caution) 62.5% 75%,var(--danger) 75% 100%)}
 .vband-needle{position:absolute;top:-4px;width:3px;height:16px;background:var(--text);border-radius:2px;transform:translateX(-50%);transition:left .3s ease;box-shadow:0 0 8px rgba(0,242,255,0.5)}
 .gauge-markers,.vband-markers{position:relative;height:13px;margin-top:4px;font-family:'Roboto Mono',monospace;font-size:10px;color:var(--text3)}
 .gauge-markers span,.vband-markers span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}
@@ -81,7 +82,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
 .vband-markers span:nth-child(2){left:12.5%}
 .vband-markers span:nth-child(3){left:25%;color:var(--ok);font-weight:700}
 .vband-markers span:nth-child(4){left:62.5%;color:var(--ok);font-weight:700}
-.vband-markers span:nth-child(5){left:75%;color:#FF9100}
+.vband-markers span:nth-child(5){left:75%;color:var(--caution)}
 .v-status{font-family:'Roboto Mono',monospace;font-size:11px;margin-top:6px}
 
 /* ── Veredicto ── */
@@ -103,10 +104,11 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
 </style>
 </head>
 <body>
+<noscript><div style="padding:20px;text-align:center;color:#E8ECF0;font-family:sans-serif">Esta herramienta requiere JavaScript habilitado para funcionar.</div></noscript>
 <div class="app">
   <h1>Reynolds — Loop Agua Purificada</h1>
   <p class="subtitle">Tubing ASME BPE · Propiedades interpoladas 15–80 °C · Calificación OQ</p>
-  <p style="font-size:11px;color:var(--text3);margin:-12px 0 16px;opacity:0.7">por <b>Josmar Angulo</b> · <a href="https://wa.me/59599131290" style="color:var(--acc);text-decoration:none">Contacto</a></p>
+  <p style="font-size:11px;color:var(--text3);margin:-12px 0 16px;opacity:0.7">por <b>Josmar Angulo</b> · <a href="https://wa.me/595991312920" style="color:var(--acc);text-decoration:none">Contacto</a></p>
 
 <!-- Contenido -->
 
@@ -132,7 +134,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
     <div class="slider-wrap">
       <label><b>Q</b> — Caudal volumétrico</label>
       <div class="slider-row">
-        <input type="range" id="caudal" min="0.1" max="5.5" step="0.1" value="2.0" oninput="syncInputs()">
+        <input type="range" id="caudal" min="0.1" max="5.5" step="0.1" value="2.0" oninput="syncDebounced()">
         <span class="slider-val" id="caudal_val">2,00 m³/h</span>
       </div>
       <div class="slider-range">
@@ -145,7 +147,7 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
     <div class="slider-wrap">
       <label><b>T</b> — Temperatura del agua</label>
       <div class="slider-row">
-        <input type="range" id="temp" min="15" max="80" step="1" value="25" oninput="syncInputs()">
+        <input type="range" id="temp" min="15" max="80" step="1" value="25" oninput="syncDebounced()">
         <span class="slider-val" id="temp_val">25 °C</span>
       </div>
       <div class="slider-range"><span>15 °C</span><span>47 °C</span><span>80 °C</span></div>
@@ -271,7 +273,7 @@ Re &lt; 2.300: flujo laminar — no conforme<br><br>
     </div>
 
     <div class="warn-block" style="margin-top:12px">
-      ⚠ <b>Solo para fines educativos e informativos. Sin validez legal.</b> Los resultados son aproximaciones y no constituyen especificación técnica vinculante, protocolo de calificación ni documento con validez legal de ningún tipo. Para calificaciones OQ oficiales, contacte a <b>OA Paraguay S.A. (OAPSA)</b> — <a href="https://wa.me/59599131290" style="color:#FF8A80">Contacto</a>. Los protocolos definitivos deben ser realizados por personal calificado según las normativas aplicables.
+      ⚠ <b>Solo para fines educativos e informativos. Sin validez legal.</b> Los resultados son aproximaciones y no constituyen especificación técnica vinculante, protocolo de calificación ni documento con validez legal de ningún tipo. Para calificaciones OQ oficiales, contacte a <b>OA Paraguay S.A. (OAPSA)</b> — <a href="https://wa.me/595991312920" style="color:#FF8A80">Contacto</a>. Los protocolos definitivos deben ser realizados por personal calificado según las normativas aplicables.
     </div>
   </div><!-- /disclaimer -->
   </div><!-- /disc-body -->
@@ -290,16 +292,34 @@ function toggleDisc(){
   toggle.className   = isOpen ? 'alerts-toggle' : 'alerts-toggle open';
 }
 
+// ── DOM cache (sim_caudal pattern) ──
+const UI = {};
+document.addEventListener('DOMContentLoaded', () => {
+  ['diametro_idx','caudal','temp','diametro_val','diametro_od_val',
+   'diametro_id_val','diametro_wall_val','caudal_val','temp_val',
+   'q_min_lbl','q_mid_lbl','q_max_lbl','nu_val','rho_val',
+   'res_v','res_s','res_re','res_regimen','gauge_re','vband_needle',
+   'v_status','resultado','badge','veredicto_txt'
+  ].forEach(id => { UI[id] = document.getElementById(id); });
+  onDiameterChange();
+});
+
+// ── Debounce (sim_caudal pattern) ──
+function debounce(fn, ms=80){
+  let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
+}
+const syncDebounced = debounce(syncInputs, 60);
+
 // ── Tubing ASME BPE-2022 SS 316L – OD nominal, pared 1,65 mm (14 BWG) ──
 const bpePipes = [
-  { nom: '½"',   od: 12.70,  wall: 1.65, get id() { return this.od - 2*this.wall; } },
-  { nom: '¾"',   od: 19.05,  wall: 1.65, get id() { return this.od - 2*this.wall; } },
-  { nom: '1"',   od: 25.40,  wall: 1.65, get id() { return this.od - 2*this.wall; } },
-  { nom: '1½"',  od: 38.10,  wall: 1.65, get id() { return this.od - 2*this.wall; } },
-  { nom: '2"',   od: 50.80,  wall: 1.65, get id() { return this.od - 2*this.wall; } },
-  { nom: '2½"',  od: 63.50,  wall: 1.65, get id() { return this.od - 2*this.wall; } },
-  { nom: '3"',   od: 76.20,  wall: 1.65, get id() { return this.od - 2*this.wall; } },
-  { nom: '4"',   od: 101.60, wall: 1.65, get id() { return this.od - 2*this.wall; } }
+  { nom: '½"',   od: 12.70,  wall: 1.65, id: 12.70  - 2*1.65 },
+  { nom: '¾"',   od: 19.05,  wall: 1.65, id: 19.05  - 2*1.65 },
+  { nom: '1"',   od: 25.40,  wall: 1.65, id: 25.40  - 2*1.65 },
+  { nom: '1½"',  od: 38.10,  wall: 1.65, id: 38.10  - 2*1.65 },
+  { nom: '2"',   od: 50.80,  wall: 1.65, id: 50.80  - 2*1.65 },
+  { nom: '2½"',  od: 63.50,  wall: 1.65, id: 63.50  - 2*1.65 },
+  { nom: '3"',   od: 76.20,  wall: 1.65, id: 76.20  - 2*1.65 },
+  { nom: '4"',   od: 101.60, wall: 1.65, id: 101.60 - 2*1.65 }
 ];
 
 // ── Propiedades agua – CRC Handbook ─────────────────────────────────────
@@ -332,7 +352,7 @@ function fmt(n, dec) {
 
 // ── onDiameterChange ─────────────────────────────────────────────────────
 function onDiameterChange() {
-  const idx  = parseInt(document.getElementById('diametro_idx').value);
+  const idx  = parseInt(UI['diametro_idx'].value);
   const pipe = bpePipes[idx];
   const d_m  = pipe.id/1000;
   const S    = Math.PI*d_m*d_m/4;
@@ -341,104 +361,96 @@ function onDiameterChange() {
   const qMax = +(4.00*S*3600).toFixed(2);
   const step = qMax>15?0.5:qMax>5?0.1:0.05;
 
-  const sl = document.getElementById('caudal');
+  const sl = UI['caudal'];
   sl.min=qMin; sl.max=qMax; sl.step=step;
   if (+sl.value>qMax) sl.value=qMax;
   if (+sl.value<qMin) sl.value=qMin;
 
-  document.getElementById('q_min_lbl').textContent     = fmt(qMin,2);
-  document.getElementById('q_mid_lbl').textContent     = fmt((qMin+qMax)/2,2);
-  document.getElementById('q_max_lbl').textContent     = fmt(qMax,2)+' m³/h';
-  document.getElementById('diametro_val').textContent  = pipe.nom;
-  document.getElementById('diametro_od_val').textContent   = fmt(pipe.od,2);
-  document.getElementById('diametro_id_val').textContent   = fmt(pipe.id,2);
-  document.getElementById('diametro_wall_val').textContent = fmt(pipe.wall,2);
+  UI['q_min_lbl'].textContent     = fmt(qMin,2);
+  UI['q_mid_lbl'].textContent     = fmt((qMin+qMax)/2,2);
+  UI['q_max_lbl'].textContent     = fmt(qMax,2)+' m³/h';
+  UI['diametro_val'].textContent  = pipe.nom;
+  UI['diametro_od_val'].textContent   = fmt(pipe.od,2);
+  UI['diametro_id_val'].textContent   = fmt(pipe.id,2);
+  UI['diametro_wall_val'].textContent = fmt(pipe.wall,2);
 
   syncInputs();
 }
 
 // ── syncInputs ───────────────────────────────────────────────────────────
 function syncInputs() {
-  const q = parseFloat(document.getElementById('caudal').value)||0.1;
-  document.getElementById('caudal_val').textContent = fmt(q,2)+' m³/h';
-  const T = parseInt(document.getElementById('temp').value)||25;
-  document.getElementById('temp_val').textContent = T+' °C';
+  const q = parseFloat(UI['caudal'].value)||0.1;
+  UI['caudal_val'].textContent = fmt(q,2)+' m³/h';
+  const T = parseInt(UI['temp'].value)||25;
+  UI['temp_val'].textContent = T+' °C';
   calcular();
 }
 
 // ── calcular ─────────────────────────────────────────────────────────────
 function calcular() {
   try {
-    const idx   = parseInt(document.getElementById('diametro_idx').value)||0;
+    const idx   = parseInt(UI['diametro_idx'].value)||0;
     const pipe  = bpePipes[idx];
     const d     = pipe.id/1000;
-    const q_m3h = parseFloat(document.getElementById('caudal').value)||0.1;
+    const q_m3h = parseFloat(UI['caudal'].value)||0.1;
     const q     = q_m3h/3600;
-    const T     = parseInt(document.getElementById('temp').value)||25;
+    const T     = parseInt(UI['temp'].value)||25;
 
     const wp  = interpWater(T);
     const nu  = wp.nu*1e-6;
-    const rho = wp.rho;
 
-    document.getElementById('nu_val').textContent  = wp.nu.toFixed(3).replace('.',',');
-    document.getElementById('rho_val').textContent = wp.rho.toFixed(1).replace('.',',');
-
+    UI['nu_val'].textContent  = wp.nu.toFixed(3).replace('.',',');
+    UI['rho_val'].textContent = wp.rho.toFixed(1).replace('.',',');
 
     const S     = Math.PI*d*d/4;
     const V     = q/S;
     const Re    = (V*d)/nu;
 
-    // Resultados Re
-    document.getElementById('res_v').textContent       = fmt(V,3);
-    document.getElementById('res_s').textContent       = S.toExponential(2);
-    document.getElementById('res_re').textContent      = fmt(Re,0);
-
-
+    UI['res_v'].textContent  = fmt(V,3);
+    UI['res_s'].textContent  = S.toExponential(2);
+    UI['res_re'].textContent = fmt(Re,0);
 
     // Gauge Re
-    const gRe = document.getElementById('gauge_re');
-    gRe.style.width = Math.min((Re/12000)*100,100)+'%';
+    UI['gauge_re'].style.width = Math.min((Re/12000)*100,100)+'%';
 
     // Needle V
-    document.getElementById('vband_needle').style.left = Math.min((V/4.0)*100,100)+'%';
+    UI['vband_needle'].style.left = Math.min((V/4.0)*100,100)+'%';
 
     // Estado velocidad
-    const vSt = document.getElementById('v_status');
-    if      (V<0.5)  { vSt.style.color='#c0392b'; vSt.textContent=`▸ V = ${fmt(V,3)} m/s — Muy baja. Mayor probabilidad de formación de biofilm.`; }
+    const vSt = UI['v_status'];
+    if      (V<0.5)  { vSt.style.color='var(--danger)'; vSt.textContent=`▸ V = ${fmt(V,3)} m/s — Muy baja. Mayor probabilidad de formación de biofilm.`; }
     else if (V<1.0)  { vSt.style.color='var(--warn)'; vSt.textContent=`▸ V = ${fmt(V,3)} m/s — Por debajo de banda recomendada (< 1,0 m/s).`; }
     else if (V<=2.5) { vSt.style.color='var(--ok)';  vSt.textContent=`▸ V = ${fmt(V,3)} m/s — Óptima. Dentro de banda ISPE (1,0–2,5 m/s).`; }
-    else if (V<=3.0) { vSt.style.color='#FF9100'; vSt.textContent=`▸ V = ${fmt(V,3)} m/s — Precaución: zona de erosión en codos (2,5–3,0 m/s).`; }
-    else             { vSt.style.color='#c0392b'; vSt.textContent=`▸ V = ${fmt(V,3)} m/s — Excede límite práctico (> 3,0 m/s). Revisar diseño.`; }
+    else if (V<=3.0) { vSt.style.color='var(--caution)'; vSt.textContent=`▸ V = ${fmt(V,3)} m/s — Precaución: zona de erosión en codos (2,5–3,0 m/s).`; }
+    else             { vSt.style.color='var(--danger)'; vSt.textContent=`▸ V = ${fmt(V,3)} m/s — Excede límite práctico (> 3,0 m/s). Revisar diseño.`; }
 
     // Veredicto Re
-    const res   = document.getElementById('resultado');
-    const badge = document.getElementById('badge');
-    const txt   = document.getElementById('veredicto_txt');
-    const reEl  = document.getElementById('res_re');
-    const regEl = document.getElementById('res_regimen');
-    res.className='';
+    const res   = UI['resultado'];
+    const badge = UI['badge'];
+    const txt   = UI['veredicto_txt'];
+    const reEl  = UI['res_re'];
+    const regEl = UI['res_regimen'];
+    res.classList.remove('ok','warn','fail');
 
     if (Re>=4000) {
-      res.classList.add('ok'); gRe.style.background='var(--ok)';
+      res.classList.add('ok'); UI['gauge_re'].style.background='var(--ok)';
       reEl.style.color='var(--ok)'; regEl.textContent='Turbulento'; regEl.style.color='var(--ok)';
       badge.className='badge ok'; badge.textContent='APROBADO';
       txt.textContent=`Re = ${fmt(Re,0)} ≥ 4.000 — Flujo turbulento confirmado. Cumple criterio USP <1231> / EP 7.0.`;
     } else if (Re>=2300) {
-      res.classList.add('warn'); gRe.style.background='var(--warn)';
+      res.classList.add('warn'); UI['gauge_re'].style.background='var(--warn)';
       reEl.style.color='var(--warn)'; regEl.textContent='Transición'; regEl.style.color='var(--warn)';
       badge.className='badge warn'; badge.textContent='NO CUMPLE';
       txt.textContent=`Re = ${fmt(Re,0)} — Zona de transición (2.300–4.000). No cumple criterio. Aumentar Q o reducir diámetro.`;
     } else {
-      res.classList.add('fail'); gRe.style.background='#c0392b';
-      reEl.style.color='#c0392b'; regEl.textContent='Laminar'; regEl.style.color='#c0392b';
+      res.classList.add('fail'); UI['gauge_re'].style.background='var(--danger)';
+      reEl.style.color='var(--danger)'; regEl.textContent='Laminar'; regEl.style.color='var(--danger)';
       badge.className='badge fail'; badge.textContent='RECHAZADO';
       txt.textContent=`Re = ${fmt(Re,0)} < 2.300 — Flujo laminar. Riesgo crítico de biofilm. Revisar diseño del loop.`;
     }
 
-  } catch(err) { console.error(err); }
+  } catch(err) { console.error('Reynolds calc error:', err); }
 }
-
-window.onload = () => onDiameterChange();
 </script>
 </body>
 </html>
