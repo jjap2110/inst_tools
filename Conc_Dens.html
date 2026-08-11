@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Conversión densidad-concentración — KROHNE OPTIMASS MFC 400">
 <title>Densidad → Concentración · MFC 400</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap');
@@ -84,10 +85,11 @@ svg.chart{width:100%;height:auto;display:block;margin:10px 0 4px}
 </style>
 </head>
 <body>
+<noscript><div style="padding:20px;text-align:center;color:#E8ECF0;font-family:sans-serif">Esta herramienta requiere JavaScript habilitado para funcionar.</div></noscript>
 <div class="app">
   <h1>Densidad → Concentración</h1>
   <p class="subtitle">KROHNE OPTIMASS MFC 400 · Conversión densidad-concentración con corrección térmica</p>
-  <p style="font-size:11px;color:var(--text3);margin:-12px 0 16px;opacity:0.7">por <b>Josmar Angulo</b> · <a href="https://wa.me/59599131290" style="color:var(--acc);text-decoration:none">Contacto</a></p>
+  <p style="font-size:11px;color:var(--text3);margin:-12px 0 16px;opacity:0.7">por <b>Josmar Angulo</b> · <a href="https://wa.me/595991312920" style="color:var(--acc);text-decoration:none">Contacto</a></p>
 
   <div class="section-label">Escala de concentración</div>
 
@@ -142,13 +144,13 @@ API (°API): ASTM D1250-08, ρ_agua=999,016<br>
 
 </div>
 <script>
-// ── Disclaimer toggle ──
+// ── Disclaimer toggle (cached) ──
+const discToggle = document.getElementById('disc-toggle');
+const discBody   = document.getElementById('disc-body');
 function toggleDisc(){
-  const toggle = document.getElementById('disc-toggle');
-  const body   = document.getElementById('disc-body');
-  const isOpen = body.style.display !== 'none';
-  body.style.display = isOpen ? 'none' : 'block';
-  toggle.className   = isOpen ? 'alerts-toggle' : 'alerts-toggle open';
+  const isOpen = discBody.style.display !== 'none';
+  discBody.style.display = isOpen ? 'none' : 'block';
+  discToggle.className   = isOpen ? 'alerts-toggle' : 'alerts-toggle open';
 }
 
 // ═══════════════════════════════════════════
@@ -169,7 +171,7 @@ function spEval(sp,x){
   // Búsqueda binaria O(log N)
   let lo=0,hi=xs.length-2;
   while(lo<hi){const mid=(lo+hi+1)>>1;if(xs[mid]<=xc)lo=mid;else hi=mid-1;}
-  const dx=xc-xs[lo];return ys[lo]+b[lo]*dx+c[lo]*dx*dx+d[lo]*dx*dx*dx;
+  const dx=xc-xs[lo];return ys[lo]+dx*(b[lo]+dx*(c[lo]+dx*d[lo]));
 }
 
 // ═══════════════════════════════════════════
@@ -515,16 +517,21 @@ function render(tid){
 }
 
 // ═══════════════════════════════════════════
-// EVENTOS
+// DEBOUNCE + EVENTOS
 // ═══════════════════════════════════════════
+function debounce(fn, ms=60){
+  let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
+}
+
 TABS.forEach(cfg=>{
   const ds=document.getElementById('ds-'+cfg.id),dn=document.getElementById('dn-'+cfg.id);
-  ds.addEventListener('input',()=>{const v=parseFloat(ds.value);dn.value=v.toFixed(1);state[cfg.id].dens=v;render(cfg.id);});
-  dn.addEventListener('input',()=>{let v=parseFloat(dn.value);if(!isNaN(v)){v=Math.max(cfg.dMin,Math.min(cfg.dMax,v));ds.value=v;state[cfg.id].dens=v;render(cfg.id);}});
+  const renderD = debounce(() => render(cfg.id), 60);
+  ds.addEventListener('input',()=>{const v=parseFloat(ds.value);dn.value=v.toFixed(1);state[cfg.id].dens=v;renderD();});
+  dn.addEventListener('input',()=>{let v=parseFloat(dn.value);if(!isNaN(v)){v=Math.max(cfg.dMin,Math.min(cfg.dMax,v));ds.value=v;state[cfg.id].dens=v;renderD();}});
   if(cfg.hasTemp){
     const ts=document.getElementById('ts-'+cfg.id),tn=document.getElementById('tn-'+cfg.id);
-    ts.addEventListener('input',()=>{const v=parseFloat(ts.value);tn.value=v.toFixed(1);state[cfg.id].temp=v;render(cfg.id);});
-    tn.addEventListener('input',()=>{let v=parseFloat(tn.value);if(!isNaN(v)){v=Math.max(cfg.tMin,Math.min(cfg.tMax,v));ts.value=v;state[cfg.id].temp=v;render(cfg.id);}});
+    ts.addEventListener('input',()=>{const v=parseFloat(ts.value);tn.value=v.toFixed(1);state[cfg.id].temp=v;renderD();});
+    tn.addEventListener('input',()=>{let v=parseFloat(tn.value);if(!isNaN(v)){v=Math.max(cfg.tMin,Math.min(cfg.tMax,v));ts.value=v;state[cfg.id].temp=v;renderD();}});
   }
 });
 
