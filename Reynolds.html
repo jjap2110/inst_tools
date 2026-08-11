@@ -9,8 +9,8 @@
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#020B1F;--surface:#08132D;--surface2:#0D1B3A;
-  --text:#E8ECF0;--text2:#B0BEC5;--text3:#6B8299;
-  --border:rgba(0,242,255,0.10);--border2:rgba(0,242,255,0.20);
+  --text:#E8ECF0;--text2:#B0BEC5;--text3:#8A9BB5;
+  --border:rgba(0,242,255,0.15);--border2:rgba(0,242,255,0.25);
   --radius:8px;
   --acc:#00CFFF;--acc-bg:#061E3F;--acc-text:#00CFFF;
   --ok:#00E676;--ok-bg:#062E1A;--ok-text:#00E676;
@@ -43,7 +43,7 @@ input[type="number"]:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(0,2
 .slider-wrap{display:flex;flex-direction:column;gap:2px}
 .slider-row{display:flex;align-items:center;gap:6px}
 input[type="range"]{-webkit-appearance:none;flex:1;height:3px;background:var(--surface2);border-radius:2px;outline:none;cursor:pointer}
-input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--acc);cursor:pointer;border:2px solid var(--bg);box-shadow:0 0 8px rgba(0,207,255,0.4)}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--acc);cursor:pointer;border:2px solid var(--bg);box-shadow:0 0 8px rgba(0,207,255,0.3)}
 #diametro_idx::-webkit-slider-thumb{border-radius:3px;width:10px}
 .slider-val{font-family:'Roboto Mono',monospace;font-size:13px;color:var(--text);font-weight:700;min-width:72px;text-align:right}
 .slider-range{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);font-family:'Roboto Mono',monospace}
