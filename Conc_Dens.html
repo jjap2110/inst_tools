@@ -9,8 +9,8 @@
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#020B1F;--surface:#08132D;--surface2:#0D1B3A;
-  --text:#E8ECF0;--text2:#B0BEC5;--text3:#6B8299;
-  --border:rgba(0,242,255,0.10);--border2:rgba(0,242,255,0.20);
+  --text:#E8ECF0;--text2:#B0BEC5;--text3:#8A9BB5;
+  --border:rgba(0,242,255,0.15);--border2:rgba(0,242,255,0.25);
   --radius:8px;
   --acc:#00CFFF;--acc-bg:#061E3F;--acc-text:#00CFFF;
   --ok:#00E676;--ok-bg:#062E1A;--ok-text:#00E676;
@@ -21,6 +21,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 .app{max-width:480px;margin:0 auto;padding:16px 14px 40px}
 h1{font-size:18px;font-weight:600;color:var(--text);margin-bottom:2px}
 .subtitle{font-size:12px;color:var(--text3);margin-bottom:16px}
+.section-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin:14px 0 8px}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px}
 
 /* ── Tabs ── */
@@ -28,7 +29,7 @@ h1{font-size:18px;font-weight:600;color:var(--text);margin-bottom:2px}
 .tab{background:none;border:none;padding:7px 12px;font-size:13px;font-weight:600;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;border-radius:6px 6px 0 0;transition:all .15s;font-family:inherit}
 .tab:hover{color:var(--text);background:var(--surface2)}
 .tab.active{color:var(--text);border-bottom-color:var(--acc);background:var(--surface2)}
-.tab.placeholder{color:#2A4060;font-style:italic;cursor:default}
+.tab.placeholder{color:#3A5070;font-style:italic;cursor:default}
 .panel{display:none}.panel.active{display:block}
 
 /* ── Toggles ── */
@@ -61,7 +62,7 @@ h1{font-size:18px;font-weight:600;color:var(--text);margin-bottom:2px}
 input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:7px;border-radius:var(--radius);outline:none;margin:6px 0}
 .srow.dens input[type=range]{background:linear-gradient(90deg,var(--acc),var(--surface2))}
 .srow.temp input[type=range]{background:linear-gradient(90deg,var(--acc),var(--danger))}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--bg);border:3px solid var(--acc);cursor:pointer;box-shadow:0 0 8px rgba(0,207,255,.4)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--bg);border:3px solid var(--acc);cursor:pointer;box-shadow:0 0 8px rgba(0,207,255,.3)}
 input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--bg);border:3px solid var(--acc);cursor:pointer}
 input[type=number]{width:80px;font-size:14px;padding:5px 6px;border:1px solid var(--border2);border-radius:var(--radius);text-align:center;color:var(--text);font-weight:700;background:var(--surface2);font-family:'Roboto Mono',monospace}
 .ticks{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:1px}
@@ -87,6 +88,8 @@ svg.chart{width:100%;height:auto;display:block;margin:10px 0 4px}
   <h1>Densidad → Concentración</h1>
   <p class="subtitle">KROHNE OPTIMASS MFC 400 · Conversión densidad-concentración con corrección térmica</p>
   <p style="font-size:11px;color:var(--text3);margin:-12px 0 16px;opacity:0.7">por <b>Josmar Angulo</b> · <a href="https://wa.me/59599131290" style="color:var(--acc);text-decoration:none">Contacto</a></p>
+
+  <div class="section-label">Escala de concentración</div>
 
   <div class="card">
     <div class="tabs" id="tabs"></div>
@@ -417,18 +420,18 @@ function drawChart(tid){
   // Grid
   for(let i=0;i<=5;i++){
     const c=yMin+i*(yMax-yMin)/5;
-    svg.appendChild(ns('line',{x1:ml,y1:py(c),x2:W-mr,y2:py(c),stroke:'#E4EAF0','stroke-width':1}));
-    const txt=ns('text',{x:ml-6,y:py(c)+4,'text-anchor':'end','font-size':10,fill:'#6B7280','font-family':'Inter'});
+    svg.appendChild(ns('line',{x1:ml,y1:py(c),x2:W-mr,y2:py(c),stroke:'#0A2E5B','stroke-width':1}));
+    const txt=ns('text',{x:ml-6,y:py(c)+4,'text-anchor':'end','font-size':10,fill:'#8A9BB5','font-family':'Inter'});
     txt.textContent=Math.round(c);svg.appendChild(txt);
   }
   for(let i=0;i<=5;i++){
     const d=xMin+i*(xMax-xMin)/5;
-    const txt=ns('text',{x:px(d),y:H-8,'text-anchor':'middle','font-size':10,fill:'#6B7280','font-family':'Inter'});
+    const txt=ns('text',{x:px(d),y:H-8,'text-anchor':'middle','font-size':10,fill:'#8A9BB5','font-family':'Inter'});
     txt.textContent=Math.round(d);svg.appendChild(txt);
   }
-  let xl=ns('text',{x:(ml+W-mr)/2,y:H,'text-anchor':'middle','font-size':10.5,fill:'#6B7280','font-family':'Inter','font-weight':'bold'});
+  let xl=ns('text',{x:(ml+W-mr)/2,y:H,'text-anchor':'middle','font-size':10.5,fill:'#8A9BB5','font-family':'Inter','font-weight':'bold'});
   xl.textContent='Densidad (kg/m³)';svg.appendChild(xl);
-  let yl=ns('text',{x:10,y:H/2,'text-anchor':'middle','font-size':10,fill:'#6B7280','font-family':'Inter',transform:`rotate(-90 10 ${H/2})`});
+  let yl=ns('text',{x:10,y:H/2,'text-anchor':'middle','font-size':10,fill:'#8A9BB5','font-family':'Inter',transform:`rotate(-90 10 ${H/2})`});
   yl.textContent=cfg.yLabel;svg.appendChild(yl);
 
   const g=ns('g',{'clip-path':`url(#clip-${tid})`});
@@ -440,7 +443,7 @@ function drawChart(tid){
     const d=calcDensity(tid,c,temp)*1000;
     path+=(c===cfg.cMin?'M':'L')+px(d).toFixed(1)+' '+py(c).toFixed(1)+' ';
   }
-  g.appendChild(ns('path',{d:path,fill:'none',stroke:'#0E9AA7','stroke-width':2.5,'stroke-linecap':'round'}));
+  g.appendChild(ns('path',{d:path,fill:'none',stroke:'#00CFFF','stroke-width':2.5,'stroke-linecap':'round'}));
 
   // Curva ref si temp ≠ ref
   if(cfg.hasTemp&&Math.abs(temp-cfg.tRef)>1){
@@ -449,16 +452,16 @@ function drawChart(tid){
       const d=calcDensity(tid,c,cfg.tRef)*1000;
       rp+=(c===cfg.cMin?'M':'L')+px(d).toFixed(1)+' '+py(c).toFixed(1)+' ';
     }
-    g.appendChild(ns('path',{d:rp,fill:'none',stroke:'#94A3B8','stroke-width':1.2,'stroke-dasharray':'5 4'}));
+    g.appendChild(ns('path',{d:rp,fill:'none',stroke:'#4A6FA5','stroke-width':1.2,'stroke-dasharray':'5 4'}));
   }
 
   // Punto operativo
   const conc=invertDensity(tid,s.dens,temp);
   if(conc!==null){
     const X=px(s.dens),Y=py(conc);
-    g.appendChild(ns('line',{x1:X,y1:mt,x2:X,y2:H-mb,stroke:'#1F5FA6','stroke-width':1,'stroke-dasharray':'3 3',opacity:.5}));
-    g.appendChild(ns('line',{x1:ml,y1:Y,x2:W-mr,y2:Y,stroke:'#1F5FA6','stroke-width':1,'stroke-dasharray':'3 3',opacity:.5}));
-    g.appendChild(ns('circle',{cx:X,cy:Y,r:6,fill:'#13315C',stroke:'#fff','stroke-width':2}));
+    g.appendChild(ns('line',{x1:X,y1:mt,x2:X,y2:H-mb,stroke:'#0A2E5B','stroke-width':1,'stroke-dasharray':'3 3',opacity:.5}));
+    g.appendChild(ns('line',{x1:ml,y1:Y,x2:W-mr,y2:Y,stroke:'#0A2E5B','stroke-width':1,'stroke-dasharray':'3 3',opacity:.5}));
+    g.appendChild(ns('circle',{cx:X,cy:Y,r:6,fill:'#08132D',stroke:'#00CFFF','stroke-width':2}));
   }
   svg.appendChild(g);
 }
