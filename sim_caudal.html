@@ -172,8 +172,8 @@ tr.model-row:hover td{background:var(--surface2)}
       <div style="display:flex;gap:6px;align-items:center">
         <input type="number" id="f-pres" value="1" step="0.1" style="flex:1" oninput="onConditionChangeDebounced()">
         <div class="unit-toggle" style="margin:0;flex-shrink:0;width:100px">
-          <button id="btn-barg" onclick="setPressUnit('g')" style="font-size:11px;padding:5px 6px">barg</button>
-          <button id="btn-bara" class="active" onclick="setPressUnit('a')" style="font-size:11px;padding:5px 6px">bara</button>
+          <button id="btn-barg" class="active" onclick="setPressUnit('g')" style="font-size:11px;padding:5px 6px">barg</button>
+          <button id="btn-bara" onclick="setPressUnit('a')" style="font-size:11px;padding:5px 6px">bara</button>
         </div>
       </div>
     </div>
@@ -554,7 +554,7 @@ const S = {
   unit:       'kgh',      // 'kgh' | 'm3h'
   phase:      'liquid',   // 'liquid' | 'gas' | 'steam'
   norm:       'Nm3',      // 'Nm3' | 'Sm3'
-  pressUnit:  'a',        // 'a'=bara | 'g'=barg
+  pressUnit:  'g',        // 'a'=bara | 'g'=barg
   steamPUnit: 'g',        // 'a'=bara | 'g'=barg (steam box)
   chartInst:  null,
   candidates: [],
