@@ -5,69 +5,90 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Densidad → Concentración · MFC 400</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap');
-  :root{--navy:#00F2FF;--blue:#00CFFF;--teal:#00CFFF;--light:#0D1B3A;--ink:#E8ECF0;--grey:#6B8299;--line:rgba(0,242,255,0.15);--amber:#FFB300;}
-  *{box-sizing:border-box;margin:0;}
-  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#020B1F;color:var(--ink);font-size:15px;line-height:1.5;min-height:100vh;}
-  .app{max-width:480px;margin:0 auto;padding:16px 14px 40px}
-  h1{font-size:18px;font-weight:600;color:#E8ECF0;margin-bottom:2px;}
-  .subtitle{font-size:12px;color:var(--grey);margin-bottom:16px;}
-  .author-line{font-size:11px;color:var(--grey);margin:-12px 0 16px;opacity:0.7}
-  .author-line b{color:var(--ink)}
-  .author-line a{color:#00CFFF;text-decoration:none}
-  .content-card{background:#08132D;border:1px solid var(--line);border-radius:12px;padding:14px;}
-  .tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px;border-bottom:2px solid var(--line);padding-bottom:0;}
-  .tab{background:none;border:none;padding:7px 12px;font-size:13px;font-weight:600;color:var(--grey);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;border-radius:6px 6px 0 0;transition:all .15s;}
-  .tab:hover{color:#E8ECF0;background:#0D1B3A;}
-  .tab.active{color:#E8ECF0;border-bottom-color:#00CFFF;background:#0D1B3A;}
-  .tab.placeholder{color:#2A4060;font-style:italic;cursor:default;}
-  .panel{display:none;}.panel.active{display:block;}
-  .togglerow{display:flex;gap:6px;margin-bottom:10px;}
-  .tbtn{padding:5px 14px;font-size:12px;font-weight:600;border:1px solid var(--line);border-radius:8px;background:#0D1B3A;color:var(--grey);cursor:pointer;transition:all .15s;}
-  .tbtn.active{background:#061E3F;color:#00CFFF;border-color:#00CFFF;}
-  .hero{background:linear-gradient(135deg,#061E3F,#0A2E5B);border:1px solid rgba(0,207,255,0.2);border-radius:14px;padding:16px 18px;color:#00F2FF;text-align:center;margin-bottom:10px;}
-  .hero .lbl{font-size:11px;text-transform:uppercase;letter-spacing:1px;opacity:.9;font-weight:600;}
-  .hero .big{font-size:38px;font-weight:800;line-height:1.1;margin-top:3px;}
-  .hero .big .u{font-size:16px;font-weight:600;opacity:.9;}
-  .hero .sub2{font-size:13px;opacity:.85;margin-top:3px;}
-  .oor{background:#2A1F00;border:1px solid rgba(255,179,0,0.3);color:#FFD54F;font-size:12px;border-radius:8px;padding:8px 11px;margin-bottom:8px;display:none;}
-  .oor.show{display:block;}
-  .grid{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
-  .box{flex:1 1 0;min-width:100px;background:var(--light);border-radius:10px;padding:10px 12px;text-align:center;}
-  .box .bl{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--grey);font-weight:600;}
-  .box .bv{font-size:22px;font-weight:700;color:#E8ECF0;line-height:1.1;margin-top:2px;}
-  .box .bu{font-size:11px;color:var(--grey);}
-  .srow{margin-bottom:8px;}
-  .srow .sl{font-size:11px;color:var(--grey);font-weight:600;margin-bottom:3px;display:flex;justify-content:space-between;}
-  .srow .si{display:flex;align-items:center;gap:10px;}
-  input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:7px;border-radius:5px;outline:none;margin:6px 0;}
-  .srow.dens input[type=range]{background:linear-gradient(90deg,#00CFFF,#0A2E5B);}
-  .srow.temp input[type=range]{background:linear-gradient(90deg,#00CFFF,#FF5252);}
-  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#020B1F;border:3px solid #00CFFF;cursor:pointer;box-shadow:0 0 8px rgba(0,207,255,.4);}
-  input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#020B1F;border:3px solid #00CFFF;cursor:pointer;}
-  input[type=number]{width:80px;font-size:14px;padding:5px 6px;border:1px solid var(--line);border-radius:7px;text-align:center;color:#E8ECF0;font-weight:700;background:#0D1B3A;}
-  .ticks{display:flex;justify-content:space-between;font-size:10px;color:var(--grey);margin-top:1px;}
-  svg.chart{width:100%;height:auto;display:block;margin:10px 0 4px;}
-  .derived{font-size:12px;color:var(--ink);margin-top:6px;}.derived b{color:#E8ECF0;}
-  .note{font-size:11px;color:var(--grey);font-style:italic;margin-top:12px;line-height:1.4;border-top:1px solid var(--line);padding-top:10px;}
-  /* ── Disclaimer desplegable ── */
-  .alerts-toggle{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--grey);cursor:pointer;padding:4px 0;margin-top:6px;user-select:none;background:none;border:none;font-family:inherit;width:100%;text-align:left}
-  .alerts-toggle:hover{color:var(--ink)}
-  .alerts-toggle .toggle-icon{font-size:10px;transition:transform .2s}
-  .alerts-toggle.open .toggle-icon{transform:rotate(90deg)}
-  .disclaimer{background:#08132D;border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:14px;font-size:11px;color:var(--grey);line-height:1.6}
-  .disclaimer b{color:var(--ink)}
-  .eq-block{margin-top:8px;padding:8px 10px;background:#0D1B3A;border-radius:8px;font-family:'Roboto Mono',monospace;font-size:11px;line-height:1.8;color:var(--ink)}
-  .warn-block{margin-top:8px;padding:8px 10px;background:#2D0A0A;border-radius:8px;color:#FF8A80;font-size:11px;line-height:1.5}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#020B1F;--surface:#08132D;--surface2:#0D1B3A;
+  --text:#E8ECF0;--text2:#B0BEC5;--text3:#6B8299;
+  --border:rgba(0,242,255,0.10);--border2:rgba(0,242,255,0.20);
+  --radius:8px;
+  --acc:#00CFFF;--acc-bg:#061E3F;--acc-text:#00CFFF;
+  --ok:#00E676;--ok-bg:#062E1A;--ok-text:#00E676;
+  --warn:#FFB300;--warn-bg:#2A1F00;--warn-text:#FFD54F;
+  --danger:#FF5252;--danger-bg:#2D0A0A;--danger-text:#FF8A80;
+}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-height:100vh}
+.app{max-width:480px;margin:0 auto;padding:16px 14px 40px}
+h1{font-size:18px;font-weight:600;color:var(--text);margin-bottom:2px}
+.subtitle{font-size:12px;color:var(--text3);margin-bottom:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px}
+
+/* ── Tabs ── */
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px;border-bottom:2px solid var(--border2);padding-bottom:0}
+.tab{background:none;border:none;padding:7px 12px;font-size:13px;font-weight:600;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;border-radius:6px 6px 0 0;transition:all .15s;font-family:inherit}
+.tab:hover{color:var(--text);background:var(--surface2)}
+.tab.active{color:var(--text);border-bottom-color:var(--acc);background:var(--surface2)}
+.tab.placeholder{color:#2A4060;font-style:italic;cursor:default}
+.panel{display:none}.panel.active{display:block}
+
+/* ── Toggles ── */
+.togglerow{display:flex;gap:6px;margin-bottom:10px}
+.tbtn{padding:5px 14px;font-size:12px;font-weight:600;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface2);color:var(--text3);cursor:pointer;transition:all .15s;font-family:inherit}
+.tbtn.active{background:var(--acc-bg);color:var(--acc-text);border-color:var(--acc)}
+
+/* ── Hero result ── */
+.hero{background:var(--acc-bg);border:1px solid var(--border2);border-radius:12px;padding:16px 18px;color:var(--text);text-align:center;margin-bottom:10px}
+.hero .lbl{font-size:11px;text-transform:uppercase;letter-spacing:1px;opacity:.9;font-weight:600;color:var(--text3)}
+.hero .big{font-size:38px;font-weight:800;line-height:1.1;margin-top:3px;color:var(--text)}
+.hero .big .u{font-size:16px;font-weight:600;opacity:.9}
+.hero .sub2{font-size:13px;opacity:.85;margin-top:3px;color:var(--text2)}
+
+/* ── OOR warning ── */
+.oor{background:var(--warn-bg);border:1px solid rgba(255,179,0,0.3);color:var(--warn-text);font-size:12px;border-radius:var(--radius);padding:8px 11px;margin-bottom:8px;display:none}
+.oor.show{display:block}
+
+/* ── Stats boxes ── */
+.grid{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.box{flex:1 1 0;min-width:100px;background:var(--surface2);border-radius:var(--radius);padding:10px 12px;text-align:center}
+.box .bl{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);font-weight:600}
+.box .bv{font-size:22px;font-weight:700;color:var(--text);line-height:1.1;margin-top:2px}
+.box .bu{font-size:11px;color:var(--text3)}
+
+/* ── Sliders ── */
+.srow{margin-bottom:8px}
+.srow .sl{font-size:11px;color:var(--text3);font-weight:600;margin-bottom:3px;display:flex;justify-content:space-between}
+.srow .si{display:flex;align-items:center;gap:10px}
+input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:7px;border-radius:var(--radius);outline:none;margin:6px 0}
+.srow.dens input[type=range]{background:linear-gradient(90deg,var(--acc),var(--surface2))}
+.srow.temp input[type=range]{background:linear-gradient(90deg,var(--acc),var(--danger))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--bg);border:3px solid var(--acc);cursor:pointer;box-shadow:0 0 8px rgba(0,207,255,.4)}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--bg);border:3px solid var(--acc);cursor:pointer}
+input[type=number]{width:80px;font-size:14px;padding:5px 6px;border:1px solid var(--border2);border-radius:var(--radius);text-align:center;color:var(--text);font-weight:700;background:var(--surface2);font-family:'Roboto Mono',monospace}
+.ticks{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:1px}
+
+/* ── Chart & derived ── */
+svg.chart{width:100%;height:auto;display:block;margin:10px 0 4px}
+.derived{font-size:12px;color:var(--text2);margin-top:6px}.derived b{color:var(--text)}
+.note{font-size:11px;color:var(--text3);font-style:italic;margin-top:12px;line-height:1.4;border-top:1px solid var(--border);padding-top:10px}
+
+/* ── Disclaimer desplegable ── */
+.alerts-toggle{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);cursor:pointer;padding:4px 0;margin-top:6px;user-select:none;background:none;border:none;font-family:inherit;width:100%;text-align:left}
+.alerts-toggle:hover{color:var(--text2)}
+.alerts-toggle .toggle-icon{font-size:10px;transition:transform .2s}
+.alerts-toggle.open .toggle-icon{transform:rotate(90deg)}
+.disclaimer{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:14px;font-size:11px;color:var(--text3);line-height:1.6}
+.disclaimer b{color:var(--text2)}
+.eq-block{margin-top:8px;padding:8px 10px;background:var(--surface2);border-radius:var(--radius);font-family:'Roboto Mono',monospace;font-size:11px;line-height:1.8;color:var(--text2)}
+.warn-block{margin-top:8px;padding:8px 10px;background:var(--danger-bg);border-radius:var(--radius);color:var(--danger-text);font-size:11px;line-height:1.5}
 </style>
 </head>
 <body>
 <div class="app">
   <h1>Densidad → Concentración</h1>
   <p class="subtitle">KROHNE OPTIMASS MFC 400 · Conversión densidad-concentración con corrección térmica</p>
-  <p class="author-line">por <b>Josmar Angulo</b> · <a href="https://wa.me/59599131290">Contacto</a></p>
+  <p style="font-size:11px;color:var(--text3);margin:-12px 0 16px;opacity:0.7">por <b>Josmar Angulo</b> · <a href="https://wa.me/59599131290" style="color:var(--acc);text-decoration:none">Contacto</a></p>
 
-  <div class="content-card">
+  <div class="card">
     <div class="tabs" id="tabs"></div>
     <div id="panels"></div>
   </div>
@@ -81,11 +102,11 @@
     <div id="disc-body" style="display:none">
     <div class="disclaimer" style="margin-top:6px">
 
-      <div style="font-size:12px;color:var(--ink);line-height:1.7;margin-bottom:10px">
+      <div style="font-size:12px;color:var(--text);line-height:1.7;margin-bottom:10px">
         Esta herramienta es un <b>desarrollo personal</b> realizado de forma independiente, sin colaboración, patrocinio ni vinculación contractual con KROHNE Group ni ninguna otra empresa. Su objetivo es exclusivamente <b>educativo e informativo</b>, orientado a facilitar la conversión densidad-concentración como complemento al caudalímetro Coriolis <b>KROHNE OPTIMASS MFC 400</b>.
       </div>
 
-      <div style="font-size:12px;color:var(--ink);line-height:1.7;margin-bottom:10px">
+      <div style="font-size:12px;color:var(--text);line-height:1.7;margin-bottom:10px">
         Las curvas densidad-concentración provienen de fuentes públicas (USDA/AOAC, ICUMSA, ASBC, Perry's, CRC Handbook, OIML R 22, ASTM D1250). Se utiliza <b>interpolación por spline cúbico natural</b> para obtener valores intermedios. La corrección térmica es aproximada (lineal a primer orden); el MFC 400 usa tablas internas de mayor precisión.
       </div>
 
@@ -105,7 +126,7 @@ NaOH (%m/m): Perry's 7ª / CRC a 20 °C<br>
 API (°API): ASTM D1250-08, ρ_agua=999,016<br>
       </div>
 
-      <div style="font-size:11px;color:var(--grey);margin-top:10px;line-height:1.6">
+      <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.6">
         <b>Fuentes:</b> USDA/AOAC · ICUMSA · ASBC · Perry's Chemical Engineers' Handbook 7ª ed. · CRC Handbook of Chemistry and Physics · OIML R 22 · ASTM D1250-08 · ASTM E100.
       </div>
 
@@ -397,17 +418,17 @@ function drawChart(tid){
   for(let i=0;i<=5;i++){
     const c=yMin+i*(yMax-yMin)/5;
     svg.appendChild(ns('line',{x1:ml,y1:py(c),x2:W-mr,y2:py(c),stroke:'#E4EAF0','stroke-width':1}));
-    const txt=ns('text',{x:ml-6,y:py(c)+4,'text-anchor':'end','font-size':10,fill:'#6B7280','font-family':'Arial'});
+    const txt=ns('text',{x:ml-6,y:py(c)+4,'text-anchor':'end','font-size':10,fill:'#6B7280','font-family':'Inter'});
     txt.textContent=Math.round(c);svg.appendChild(txt);
   }
   for(let i=0;i<=5;i++){
     const d=xMin+i*(xMax-xMin)/5;
-    const txt=ns('text',{x:px(d),y:H-8,'text-anchor':'middle','font-size':10,fill:'#6B7280','font-family':'Arial'});
+    const txt=ns('text',{x:px(d),y:H-8,'text-anchor':'middle','font-size':10,fill:'#6B7280','font-family':'Inter'});
     txt.textContent=Math.round(d);svg.appendChild(txt);
   }
-  let xl=ns('text',{x:(ml+W-mr)/2,y:H,'text-anchor':'middle','font-size':10.5,fill:'#6B7280','font-family':'Arial','font-weight':'bold'});
+  let xl=ns('text',{x:(ml+W-mr)/2,y:H,'text-anchor':'middle','font-size':10.5,fill:'#6B7280','font-family':'Inter','font-weight':'bold'});
   xl.textContent='Densidad (kg/m³)';svg.appendChild(xl);
-  let yl=ns('text',{x:10,y:H/2,'text-anchor':'middle','font-size':10,fill:'#6B7280','font-family':'Arial',transform:`rotate(-90 10 ${H/2})`});
+  let yl=ns('text',{x:10,y:H/2,'text-anchor':'middle','font-size':10,fill:'#6B7280','font-family':'Inter',transform:`rotate(-90 10 ${H/2})`});
   yl.textContent=cfg.yLabel;svg.appendChild(yl);
 
   const g=ns('g',{'clip-path':`url(#clip-${tid})`});
