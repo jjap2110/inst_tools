@@ -10,8 +10,8 @@
 <style>
 :root{
   --bg:#020B1F;--surface:#08132D;--surface2:#0D1B3A;
-  --text:#E8ECF0;--text2:#B0BEC5;--text3:#6B8299;
-  --border:rgba(0,242,255,0.10);--border2:rgba(0,242,255,0.20);
+  --text:#E8ECF0;--text2:#B0BEC5;--text3:#8A9BB5;
+  --border:rgba(0,242,255,0.15);--border2:rgba(0,242,255,0.25);
   --radius:8px;
   --acc:#00CFFF;--acc-bg:#061E3F;--acc-text:#00CFFF;
 }
@@ -26,18 +26,18 @@ h1{font-size:18px;font-weight:600;color:var(--text);margin-bottom:2px}
 .tool-card{
   display:block;
   background:var(--surface);
-  border:1px solid var(--border2);
+  border:1px solid var(--border);
   border-radius:12px;
   padding:14px;
-  margin-bottom:10px;
+  margin-bottom:14px;
   text-decoration:none;
   color:var(--text);
   transition:border-color .2s;
 }
 .tool-card:hover,.tool-card:active{
-  border-color:rgba(0,207,255,0.35);
+  border-color:rgba(0,207,255,0.30);
 }
-.tool-title{font-size:15px;font-weight:600;color:#E8ECF0;margin-bottom:4px}
+.tool-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px}
 .tool-desc{font-size:12px;color:var(--text2);line-height:1.5}
 .tool-tag{
   display:inline-block;
@@ -54,7 +54,7 @@ h1{font-size:18px;font-weight:600;color:var(--text);margin-bottom:2px}
 .disclaimer{
   background:var(--surface);
   border:1px solid var(--border);
-  border-radius:var(--radius);
+  border-radius:12px;
   padding:14px;
   margin-top:14px;
   font-size:11px;
