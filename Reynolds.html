@@ -30,24 +30,23 @@ h1{font-size:18px;font-weight:600;color:var(--text);margin-bottom:2px}
 .card-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:6px;display:flex;align-items:center;gap:8px;justify-content:space-between}
 .card-title .norm-tag{font-family:'Roboto Mono',monospace;font-size:10px;color:var(--text);background:var(--acc-bg);padding:2px 6px;border-radius:var(--radius);letter-spacing:.04em;white-space:nowrap;flex-shrink:0}
 
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-
 label{display:block;font-size:12px;color:var(--text2);margin-bottom:3px}
-label b{color:var(--text);font-family:'Roboto Mono',monospace;font-weight:400;font-size:13px}
 
 input[type="number"]{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:'Roboto Mono',monospace;font-size:14px;padding:6px 8px;outline:none;transition:border-color .2s}
 input[type="number"]:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(0,207,255,0.15)}
 .unit-note{font-size:11px;color:var(--text3);margin-top:3px;font-family:'Roboto Mono',monospace}
 
-/* ── Sliders ── */
-.slider-wrap{display:flex;flex-direction:column;gap:2px}
-.slider-row{display:flex;align-items:center;gap:6px}
-input[type="range"]{-webkit-appearance:none;flex:1;height:3px;background:var(--surface2);border-radius:2px;outline:none;cursor:pointer}
-input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--acc);cursor:pointer;border:2px solid var(--bg);box-shadow:0 0 8px rgba(0,207,255,0.3)}
-#diametro_idx::-webkit-slider-thumb{border-radius:3px;width:10px}
-.slider-val{font-family:'Roboto Mono',monospace;font-size:13px;color:var(--text);font-weight:700;min-width:72px;text-align:right}
-.slider-range{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);font-family:'Roboto Mono',monospace}
+/* ── Sliders (formato Conc_Dens) ── */
+.srow{margin-bottom:10px}
+.srow .sl{font-size:11px;color:var(--text3);font-weight:600;margin-bottom:3px;display:flex;justify-content:space-between}
+.srow .si{display:flex;align-items:center;gap:10px}
+input[type="range"]{-webkit-appearance:none;appearance:none;flex:1;height:7px;background:linear-gradient(90deg,var(--acc),var(--surface2));border-radius:var(--radius);outline:none;margin:6px 0}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--bg);border:3px solid var(--acc);cursor:pointer;box-shadow:0 0 8px rgba(0,207,255,.3)}
+input[type="range"]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--bg);border:3px solid var(--acc);cursor:pointer}
+#diametro_idx::-webkit-slider-thumb{border-radius:4px;width:16px;height:24px}
+.srow .val{font-family:'Roboto Mono',monospace;font-size:14px;color:var(--text);font-weight:700;min-width:80px;text-align:right}
+.ticks{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:1px}
+.unit-note{font-size:11px;color:var(--text3);margin-top:3px;font-family:'Roboto Mono',monospace}
 
 /* ── Resultado Re ── */
 #resultado{width:100%;border-radius:12px;border:1px solid var(--border);padding:14px;margin-bottom:14px;background:var(--surface);transition:border-color .3s,background .3s}
@@ -116,49 +115,46 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;hei
 <!-- Panel de control -->
 <div class="card">
   <div class="card-title">Panel de Control Operativo</div>
-  <div class="grid2">
 
-    <div class="slider-wrap">
-      <label><b>d</b> — Diámetro nominal (ASME BPE)</label>
-      <div class="slider-row">
-        <input type="range" id="diametro_idx" min="0" max="7" step="1" value="2" oninput="onDiameterChange()">
-        <span class="slider-val" id="diametro_val">1"</span>
-      </div>
-      <div class="unit-note">
-        OD: <b id="diametro_od_val" style="color:var(--text)">—</b> mm &nbsp;·&nbsp;
-        ID real BPE: <b id="diametro_id_val" style="color:var(--acc)">—</b> mm &nbsp;·&nbsp;
-        Pared: <b id="diametro_wall_val" style="color:var(--text)">—</b> mm
-      </div>
+  <div class="srow">
+    <div class="sl"><span><b>d</b> — Diámetro nominal (ASME BPE)</span></div>
+    <div class="si">
+      <input type="range" id="diametro_idx" min="0" max="7" step="1" value="2" oninput="onDiameterChange()">
+      <span class="val" id="diametro_val">1"</span>
     </div>
-
-    <div class="slider-wrap">
-      <label><b>Q</b> — Caudal volumétrico</label>
-      <div class="slider-row">
-        <input type="range" id="caudal" min="0.1" max="5.5" step="0.1" value="2.0" oninput="syncDebounced()">
-        <span class="slider-val" id="caudal_val">2,00 m³/h</span>
-      </div>
-      <div class="slider-range">
-        <span id="q_min_lbl">—</span>
-        <span id="q_mid_lbl">—</span>
-        <span id="q_max_lbl">—</span>
-      </div>
+    <div class="unit-note">
+      OD: <b id="diametro_od_val" style="color:var(--text)">—</b> mm &nbsp;·&nbsp;
+      ID: <b id="diametro_id_val" style="color:var(--acc)">—</b> mm &nbsp;·&nbsp;
+      Pared: <b id="diametro_wall_val" style="color:var(--text)">—</b> mm
     </div>
-
-    <div class="slider-wrap">
-      <label><b>T</b> — Temperatura del agua</label>
-      <div class="slider-row">
-        <input type="range" id="temp" min="15" max="80" step="1" value="25" oninput="syncDebounced()">
-        <span class="slider-val" id="temp_val">25 °C</span>
-      </div>
-      <div class="slider-range"><span>15 °C</span><span>47 °C</span><span>80 °C</span></div>
-      <div class="unit-note" style="margin-top:4px">
-        ν = <span id="nu_val" style="color:var(--acc); font-weight:700">—</span> × 10⁻⁶ m²/s &nbsp;·&nbsp;
-        ρ = <span id="rho_val" style="color:var(--acc); font-weight:700">—</span> kg/m³
-      </div>
-    </div>
-
-
   </div>
+
+  <div class="srow">
+    <div class="sl"><span><b>Q</b> — Caudal volumétrico</span></div>
+    <div class="si">
+      <input type="range" id="caudal" min="0.1" max="5.5" step="0.1" value="2.0" oninput="syncDebounced()">
+      <span class="val" id="caudal_val">2,00 m³/h</span>
+    </div>
+    <div class="ticks">
+      <span id="q_min_lbl">—</span>
+      <span id="q_mid_lbl">—</span>
+      <span id="q_max_lbl">—</span>
+    </div>
+  </div>
+
+  <div class="srow">
+    <div class="sl"><span><b>T</b> — Temperatura del agua</span></div>
+    <div class="si">
+      <input type="range" id="temp" min="15" max="80" step="1" value="25" oninput="syncDebounced()">
+      <span class="val" id="temp_val">25 °C</span>
+    </div>
+    <div class="ticks"><span>15 °C</span><span>47 °C</span><span>80 °C</span></div>
+    <div class="unit-note" style="margin-top:4px">
+      ν = <span id="nu_val" style="color:var(--acc);font-weight:700">—</span> × 10⁻⁶ m²/s &nbsp;·&nbsp;
+      ρ = <span id="rho_val" style="color:var(--acc);font-weight:700">—</span> kg/m³
+    </div>
+  </div>
+
 </div>
 
 <!-- Resultado Reynolds -->
