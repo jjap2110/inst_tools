@@ -140,6 +140,9 @@ tr.model-row:hover td{background:var(--surface2)}
       <option value="ethanol96">Alcohol etílico 96%</option>
       <option value="soybean_oil">Aceite de soja</option>
       <option value="sunflower_oil">Aceite de girasol</option>
+      <option value="peanut_oil">Aceite de maní</option>
+      <option value="safflower_oil">Aceite de cártamo</option>
+      <option value="canola_oil">Aceite de canola</option>
       <option value="beef_tallow">Grasa vacuna (sebo)</option>
     </select>
   </div>
@@ -420,6 +423,7 @@ const C = {
   RHO_LOW_DENS:  400,       // kg/m³ — below this: low-density fluid rules apply
   MU_HIGH_VISC:  50.0,      // mPa·s — above this: high-viscosity rules apply
   MU_VORTEX_MAX: 1.5,       // mPa·s — max viscosity for vortex eligibility
+  MU_H250_MAX:   200,       // mPa·s — max viscosity for H250 (rotameter tolerates viscous fluids; above this, float response is unreliable)
   // Velocity limits
   V_LIQ_MIN:     0.33,      // m/s   — soft minimum sensor velocity (liquids)
   V_LIQ_MAX:     12.0,      // m/s   — hard maximum sensor velocity (liquids)
@@ -1105,6 +1109,27 @@ const LIQ_PRESETS = {
     rhoT: [[10,924],[20,918],[30,912],[40,906],[50,899],[60,893],[80,879],[100,865],[120,851],[150,830],[180,808]],
     muT:  [[10,110.0],[20,58.5],[30,35.0],[40,22.5],[50,15.3],[60,10.8],[80,5.8],[100,3.6],[120,2.4],[150,1.5],[180,1.0]],
   },
+  peanut_oil: {
+    name: 'Aceite de maní', conductive: false,
+    tMin: 10, tMax: 180,
+    // Source: Noureddini et al. (1992); Fasina & Colley (2008); Perry's 8th ed.
+    rhoT: [[10,921],[20,914],[30,908],[40,902],[50,896],[60,889],[80,876],[100,862],[120,848],[150,827],[180,806]],
+    muT:  [[10,120.0],[20,68.0],[30,40.0],[40,25.5],[50,17.2],[60,12.1],[80,6.5],[100,4.0],[120,2.7],[150,1.6],[180,1.1]],
+  },
+  safflower_oil: {
+    name: 'Aceite de cártamo', conductive: false,
+    tMin: 10, tMax: 180,
+    // Source: Fasina et al. (2006); Esteban et al. (2012); CRC Handbook
+    rhoT: [[10,926],[20,920],[30,913],[40,907],[50,901],[60,894],[80,881],[100,867],[120,853],[150,832],[180,810]],
+    muT:  [[10,96.0],[20,52.0],[30,31.5],[40,20.5],[50,14.0],[60,10.0],[80,5.5],[100,3.4],[120,2.3],[150,1.4],[180,1.0]],
+  },
+  canola_oil: {
+    name: 'Aceite de canola', conductive: false,
+    tMin: 10, tMax: 180,
+    // Source: Noureddini et al. (1992); Toro-Vazquez et al. (2000); AOCS data
+    rhoT: [[10,922],[20,916],[30,910],[40,903],[50,897],[60,891],[80,877],[100,863],[120,849],[150,828],[180,807]],
+    muT:  [[10,98.0],[20,55.0],[30,33.0],[40,21.5],[50,14.8],[60,10.5],[80,5.7],[100,3.5],[120,2.4],[150,1.5],[180,1.0]],
+  },
   beef_tallow: {
     name: 'Grasa vacuna (sebo)', conductive: false,
     tMin: 45, tMax: 180,
@@ -1217,8 +1242,8 @@ function updateTechOptions(){
   // EMF: solo líquidos conductivos
   if(isCond)
     opts.push({value:'emf', label:'Electromagnético (OPTIFLUX 1050)'});
-  // H250: solo si μ ≤ 1.5 (líquidos) o gas/vapor — misma regla que vortex
-  if(isGas || lowMu)
+  // H250: μ ≤ 200 mPa·s (rotámetro tolera fluidos viscosos, principio distinto al vortex)
+  if(isGas || mu <= C.MU_H250_MAX)
     opts.push({value:'h250', label:'Área Variable (H250)'});
 
   // Preservar selección si sigue siendo válida
@@ -1712,8 +1737,8 @@ function _simulateCore(){
     if(techSel === 'h250') candidates = []; // modo exclusivo
     // isGas incluye vapor saturado — el vapor a ρ≈5 kg/m³ se comporta como gas en el flotador
     const isGasMode = isGas;
-    // H250 excluido para líquidos con μ > 1.5 mPa·s (riesgo de obstrucción + sin corrección Ruppel)
-    if(!isGasMode && mu > C.MU_VORTEX_MAX){
+    // H250 excluido para líquidos con μ > 200 mPa·s (respuesta del flotador no confiable)
+    if(!isGasMode && mu > C.MU_H250_MAX){
       // No agregar candidatos H250
     } else {
     H250_TBL.forEach(entry => {
@@ -1978,8 +2003,10 @@ function renderResults(selIdx, isFirstRender){
       let notes = [];
       if(qp < 50) notes.push(`q% = ${qp.toFixed(1)}% < 50% → error = ${rec.err.toFixed(1)}% (clase 1.6 solo arriba del 50%)`);
       if(qp > 90) notes.push(`q% = ${qp.toFixed(1)}% > 90% → poco margen para aumento de caudal`);
-      if(!isGas && mu > C.MU_VORTEX_MAX)
-        notes.push(`μ = ${mu.toFixed(2)} mPa·s > 1.5 — corrección por viscosidad (Ruppel) no disponible, error adicional estimado 2–3%`);
+      if(!isGas && mu > C.MU_VORTEX_MAX && mu <= 30)
+        notes.push(`μ = ${mu.toFixed(1)} mPa·s — requiere corrección por viscosidad (Ruppel/VDI 3513). Precisión reducida aprox. +1–2%.`);
+      if(!isGas && mu > 30)
+        notes.push(`μ = ${mu.toFixed(1)} mPa·s — alta viscosidad. Corrección Ruppel indispensable. Consultar KROHNE para verificar flotador adecuado. Error adicional estimado 3–5%.`);
       alerts.innerHTML += `<div class="alert alert-info">📐 H250 Área Variable — ΔP constante (${(rec.dp*1000).toFixed(0)} mbar), indicación mecánica local, sin alimentación eléctrica.${notes.length ? '<br>⚠ ' + notes.join('<br>⚠ ') : ''}</div>`;
     }
     // EMF-specific alerts
@@ -2352,8 +2379,7 @@ function runSelfTests(){
     return approx(base, 1.7, 1e-9) && approx(MU_CONV.cst.fromBase(base, 850), 2.0, 1e-9);
   })());
 
-  // ── H250 viscosity exclusion (bug fix jul-2026: dulce de leche μ=20000) ───
-  // Ejercita updateTechOptions() real: con μ>1.5 el menú NO debe ofrecer H250.
+  // ── H250 viscosity exclusion (limit = 200 mPa·s, not 1.5 like vortex) ───
   t('H250 menu excluded @ μ=20000',       (() => {
     if(!UI['f-mu'] || !UI['u-mu'] || !UI['f-tech']) return false;
     const sMu = UI['f-mu'].value, sU = UI['u-mu'].value, sPh = S.phase;
@@ -2373,6 +2399,26 @@ function runSelfTests(){
     UI['f-mu'].value = sMu; UI['u-mu'].value = sU; S.phase = sPh;
     updateTechOptions();
     return present;
+  })());
+  t('H250 menu present @ μ=25 (vegetal oil)',(() => {
+    if(!UI['f-mu'] || !UI['u-mu'] || !UI['f-tech']) return false;
+    const sMu = UI['f-mu'].value, sU = UI['u-mu'].value, sPh = S.phase;
+    UI['u-mu'].value = 'mpas'; UI['f-mu'].value = '25'; S.phase = 'liquid';
+    updateTechOptions();
+    const present = [...UI['f-tech'].options].some(o => o.value === 'h250');
+    UI['f-mu'].value = sMu; UI['u-mu'].value = sU; S.phase = sPh;
+    updateTechOptions();
+    return present;
+  })());
+  t('H250 menu excluded @ μ=250 (> limit)',  (() => {
+    if(!UI['f-mu'] || !UI['u-mu'] || !UI['f-tech']) return false;
+    const sMu = UI['f-mu'].value, sU = UI['u-mu'].value, sPh = S.phase;
+    UI['u-mu'].value = 'mpas'; UI['f-mu'].value = '250'; S.phase = 'liquid';
+    updateTechOptions();
+    const excluded = ![...UI['f-tech'].options].some(o => o.value === 'h250');
+    UI['f-mu'].value = sMu; UI['u-mu'].value = sU; S.phase = sPh;
+    updateTechOptions();
+    return excluded;
   })());
 
   // ── Report ─────  // ── Report ─────────────────────────────────────────────────────────────────
