@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Conductividad eléctrica de H₂SO₄ concentrado en función de temperatura y concentración">
+<title>Conductividad H₂SO₄ · OAPSA</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#020B1F;--surface:#08132D;--surface2:#0D1B3A;
+  --text:#E8ECF0;--text2:#B0BEC5;--text3:#8A9BB5;
+  --border:rgba(0,242,255,0.15);--border2:rgba(0,242,255,0.25);
+  --radius:8px;
+  --acc:#00CFFF;--acc-bg:#061E3F;--acc-text:#00CFFF;
+  --ok:#00E676;--ok-bg:#062E1A;
+  --warn:#FFB300;--warn-bg:#2A1F00;--warn-text:#FFD54F;
+  --danger:#FF5252;--danger-bg:#2D0A0A;--danger-text:#FF8A80;
+}
+
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+     background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-height:100vh}
+
+.app{max-width:480px;margin:0 auto;padding:16px 14px 40px}
+
+h1{font-size:18px;font-weight:600;color:var(--text);margin-bottom:2px}
+.subtitle{font-size:12px;color:var(--text3);margin-bottom:16px}
+.byline{font-size:11px;color:var(--text3);margin:-12px 0 16px;opacity:.7}
+.byline a{color:var(--acc);text-decoration:none}
+
+.section-label{font-size:11px;font-weight:600;color:var(--text3);
+               text-transform:uppercase;letter-spacing:.05em;margin:14px 0 8px}
+
+.card{background:var(--surface);border:1px solid var(--border);
+      border-radius:12px;padding:14px;margin-bottom:14px}
+
+/* ── Hero ── */
+.hero{background:var(--acc-bg);border:1px solid var(--border2);
+      border-radius:12px;padding:16px 18px;text-align:center;margin-bottom:10px}
+.hero .lbl{font-size:11px;text-transform:uppercase;letter-spacing:1px;
+           color:var(--text3);font-weight:600}
+.hero .big{font-size:38px;font-weight:800;line-height:1.1;
+           margin-top:3px;color:var(--text);font-family:'Roboto Mono',monospace}
+.hero .big .u{font-size:16px;font-weight:600;opacity:.9}
+.hero .sub2{font-size:12px;color:var(--text3);margin-top:4px}
+
+/* ── OOR banner ── */
+.oor{background:var(--warn-bg);border:1px solid rgba(255,179,0,.3);
+     color:var(--warn-text);font-size:12px;border-radius:var(--radius);
+     padding:8px 11px;margin-bottom:8px;display:none}
+.oor.show{display:block}
+
+/* ── Grid boxes ── */
+.grid{display:flex;gap:8px;margin-bottom:10px}
+.box{flex:1 1 0;background:var(--surface2);border-radius:var(--radius);
+     padding:10px 12px;text-align:center}
+.box .bl{font-size:10px;text-transform:uppercase;letter-spacing:.5px;
+         color:var(--text3);font-weight:600}
+.box .bv{font-size:20px;font-weight:700;color:var(--text);line-height:1.1;
+         margin-top:2px;font-family:'Roboto Mono',monospace}
+.box .bu{font-size:11px;color:var(--text3)}
+
+/* ── Sliders ── */
+.srow{margin-bottom:10px}
+.srow .sl{font-size:11px;color:var(--text3);font-weight:600;
+          margin-bottom:3px;display:flex;justify-content:space-between}
+.srow .si{display:flex;align-items:center;gap:10px}
+
+input[type=range]{-webkit-appearance:none;appearance:none;flex:1;
+                  height:7px;border-radius:var(--radius);outline:none;margin:6px 0}
+.srow.temp input[type=range]{background:linear-gradient(90deg,var(--acc),var(--danger))}
+.srow.conc input[type=range]{background:linear-gradient(90deg,var(--ok),var(--acc))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;
+  border-radius:50%;background:var(--bg);border:3px solid var(--acc);
+  cursor:pointer;box-shadow:0 0 8px rgba(0,207,255,.3)}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;
+  background:var(--bg);border:3px solid var(--acc);cursor:pointer}
+input[type=number]{width:72px;font-size:13px;padding:5px 6px;
+  border:1px solid var(--border2);border-radius:var(--radius);
+  text-align:center;color:var(--text);font-weight:700;
+  background:var(--surface2);font-family:'Roboto Mono',monospace}
+.ticks{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:1px}
+
+/* ── Chart ── */
+svg.chart{width:100%;height:auto;display:block;margin:10px 0 4px}
+
+/* ── Sensitivity row ── */
+.derived{font-size:12px;color:var(--text2);margin-top:6px}
+.derived b{color:var(--text)}
+
+.note{font-size:11px;color:var(--text3);font-style:italic;margin-top:12px;
+      line-height:1.4;border-top:1px solid var(--border);padding-top:10px}
+
+/* ── Disclaimer ── */
+.alerts-toggle{display:flex;align-items:center;gap:6px;font-size:12px;
+               color:var(--text3);cursor:pointer;padding:4px 0;margin-top:6px;
+               user-select:none;background:none;border:none;
+               font-family:inherit;width:100%;text-align:left}
+.alerts-toggle:hover{color:var(--text2)}
+.alerts-toggle .toggle-icon{font-size:10px;transition:transform .2s}
+.alerts-toggle.open .toggle-icon{transform:rotate(90deg)}
+
+.disclaimer{background:var(--surface);border:1px solid var(--border);
+            border-radius:12px;padding:14px;margin-top:6px;
+            font-size:11px;color:var(--text3);line-height:1.6}
+.disclaimer b{color:var(--text2)}
+.eq-block{margin-top:8px;padding:8px 10px;background:var(--surface2);
+          border-radius:var(--radius);font-family:'Roboto Mono',monospace;
+          font-size:11px;line-height:1.8;color:var(--text2)}
+.warn-block{margin-top:8px;padding:8px 10px;background:var(--danger-bg);
+            border-radius:var(--radius);color:var(--danger-text);
+            font-size:11px;line-height:1.5}
+
+/* ── Extrapolation badge ── */
+.badge-extrap{display:inline-block;font-size:10px;font-weight:700;
+              color:var(--warn-text);background:var(--warn-bg);
+              border:1px solid rgba(255,179,0,.3);border-radius:4px;
+              padding:1px 6px;margin-left:6px;vertical-align:middle}
+
+/* ── Curve legend ── */
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 2px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)}
+.legend-dot{width:20px;height:3px;border-radius:2px}
+</style>
+</head>
+<body>
+<noscript><div style="padding:20px;text-align:center;color:#E8ECF0;font-family:sans-serif">
+Esta herramienta requiere JavaScript habilitado.</div></noscript>
+
+<div class="app">
+  <h1>Conductividad H₂SO₄</h1>
+  <p class="subtitle">Ácido sulfúrico concentrado (96–100 % w/w) · Modelo polinomial 2D normalizado</p>
+  <p class="byline">por <b>Josmar Angulo</b> · <a href="https://wa.me/595991312920">Contacto</a></p>
+
+  <div class="section-label">Calculadora</div>
+  <div class="card">
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="lbl">Conductividad calculada</div>
+      <div class="big"><span id="kv">--</span> <span class="u">mS/cm</span></div>
+      <div class="sub2" id="sub2"></div>
+    </div>
+
+    <!-- OOR -->
+    <div class="oor" id="oor">⚠ Concentración 95% es extrapolación fuera del rango de ajuste (96–100%). Usar con precaución.</div>
+
+    <!-- Boxes -->
+    <div class="grid">
+      <div class="box">
+        <div class="bl">Temperatura</div>
+        <div class="bv"><span id="tv">55</span></div>
+        <div class="bu">°C</div>
+      </div>
+      <div class="box">
+        <div class="bl">Concentración</div>
+        <div class="bv"><span id="cv">98</span></div>
+        <div class="bu">% w/w</div>
+      </div>
+      <div class="box">
+        <div class="bl">R²</div>
+        <div class="bv">0.9994</div>
+        <div class="bu">modelo</div>
+      </div>
+    </div>
+
+    <!-- Slider: Temperatura -->
+    <div class="srow temp">
+      <div class="sl">
+        <span>Temperatura proceso (°C)</span>
+        <span style="font-weight:400;font-size:10px">rango: 20–90 °C</span>
+      </div>
+      <div class="si">
+        <input type="range" id="ts" min="20" max="90" step="0.5" value="55">
+        <input type="number" id="tn" min="20" max="90" step="0.5" value="55">
+      </div>
+      <div class="ticks"><span>20</span><span>38</span><span>55</span><span>73</span><span>90</span></div>
+    </div>
+
+    <!-- Slider: Concentración -->
+    <div class="srow conc">
+      <div class="sl">
+        <span>Concentración H₂SO₄ (% w/w)</span>
+        <span style="font-weight:400;font-size:10px">datos: 96–100%</span>
+      </div>
+      <div class="si">
+        <input type="range" id="cs" min="95" max="100" step="0.1" value="98">
+        <input type="number" id="cn" min="95" max="100" step="0.1" value="98">
+      </div>
+      <div class="ticks"><span>95</span><span>96</span><span>97</span><span>98</span><span>99</span><span>100</span></div>
+    </div>
+
+    <!-- Chart legend -->
+    <div class="legend" id="legend"></div>
+
+    <!-- SVG chart -->
+    <svg class="chart" id="svg-chart" viewBox="0 0 600 250" preserveAspectRatio="xMidYMid meet"></svg>
+
+    <!-- Sensitivity -->
+    <div class="derived" id="derived"></div>
+
+    <div class="note">
+      Ajuste polinomial 2D de grado 3 con variables normalizadas a [−1, 1].
+      Datos: 8 temperaturas × 5 concentraciones = 40 puntos.
+      R² = 0.9994 · RMSE = 2.49 mS/cm · Nº condición = 7.88.
+      Rango ajuste: T ∈ [20–90] °C, C ∈ [96–100] % w/w. Fuente: datos de laboratorio interno.
+    </div>
+  </div>
+
+  <!-- Disclaimer collapsible -->
+  <div>
+    <button class="alerts-toggle" onclick="toggleDisc()" id="disc-toggle">
+      <span class="toggle-icon">▶</span>
+      <span>ℹ Modelo matemático y ecuaciones</span>
+    </button>
+    <div id="disc-body" style="display:none">
+      <div class="disclaimer">
+        <div style="font-size:12px;color:var(--text);line-height:1.7;margin-bottom:10px">
+          Herramienta de <b>desarrollo personal</b>, sin vinculación con ningún fabricante.
+          La conductividad eléctrica del H₂SO₄ concentrado presenta un máximo alrededor de
+          84–86% w/w y decrece en altas concentraciones (efecto de menor disociación iónica).
+          Esta herramienta cubre exclusivamente la región 96–100% w/w donde la conductividad
+          aumenta con la temperatura y decrece con la concentración.
+        </div>
+        <div class="eq-block">
+— Variables normalizadas —<br>
+Tn = 2·(T − 20) / (90 − 20) − 1    ∈ [−1, 1]<br>
+Cn = 2·(C − 96) / (100 − 96) − 1   ∈ [−1, 1]<br><br>
+— Modelo polinomial grado 3 —<br>
+K = Σ aᵢⱼ · Tnⁱ · Cnʲ   con i+j ≤ 3<br><br>
+a₀₀ = +172.2161   (cte)<br>
+a₀₁ = −84.1271    (Cn)<br>
+a₁₀ = +107.3519   (Tn)<br>
+a₀₂ = −47.1071    (Cn²)<br>
+a₁₁ = −56.4750    (Tn·Cn)<br>
+a₂₀ = +11.1708    (Tn²)<br>
+a₀₃ = −13.9167    (Cn³)<br>
+a₁₂ = −26.8690    (Tn·Cn²)<br>
+a₂₁ = −7.0438     (Tn²·Cn)<br>
+a₃₀ = −3.3780     (Tn³)<br><br>
+R² = 0.999355 · RMSE = 2.49 mS/cm<br>
+Nº condición matriz = 7.88  (excelente estabilidad)
+        </div>
+        <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.6">
+          La normalización reduce el número de condición de ~6×10¹¹ (sin normalizar)
+          a ~8 (normalizado), garantizando estabilidad numérica independiente de la
+          versión de NumPy o plataforma de cálculo.
+        </div>
+        <div class="warn-block" style="margin-top:12px">
+          ⚠ <b>Solo para fines educativos e informativos.</b>
+          Los valores son aproximaciones basadas en datos de laboratorio.
+          Para aplicaciones de control de calidad o procesos críticos,
+          valide siempre con instrumentación calibrada en campo.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:20px;text-align:center;font-size:11px;color:var(--text3)">
+    <a href="index.html" style="color:var(--acc);text-decoration:none">← Volver al inicio</a>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+// MODELO — Polinomio 2D normalizado, grado 3
+// ══════════════════════════════════════════════════
+const T_MIN=20, T_MAX=90;
+const C_MIN=96, C_MAX=100;
+// Coeficientes en orden: [1, Cn, Tn, Cn², Tn·Cn, Tn², Cn³, Tn·Cn², Tn²·Cn, Tn³]
+const COEF=[172.2160714286,-84.1270833333,107.3519480519,-47.1071428571,
+            -56.475,11.1708333333,-13.9166666667,-26.869047619,-7.04375,-3.378030303];
+
+function conductividad(T, C){
+  const Tn = 2*(T - T_MIN)/(T_MAX - T_MIN) - 1;
+  const Cn = 2*(C - C_MIN)/(C_MAX - C_MIN) - 1;
+  const t=[1, Cn, Tn, Cn*Cn, Tn*Cn, Tn*Tn,
+           Cn*Cn*Cn, Tn*Cn*Cn, Tn*Tn*Cn, Tn*Tn*Tn];
+  return COEF.reduce((s,c,i)=>s+c*t[i],0);
+}
+
+// ══════════════════════════════════════════════════
+// ESTADO
+// ══════════════════════════════════════════════════
+let state = { T: 55, C: 98 };
+
+// ══════════════════════════════════════════════════
+// CURVAS DEL GRÁFICO (K vs T, una por concentración)
+// ══════════════════════════════════════════════════
+const CURVES = [
+  { c:96, color:'#00CFFF', label:'96%' },
+  { c:97, color:'#00B4D8', label:'97%' },
+  { c:98, color:'#0096C7', label:'98%' },
+  { c:99, color:'#0077B6', label:'99%' },
+  { c:100,color:'#4895EF', label:'100%'},
+];
+
+function buildLegend(){
+  const el = document.getElementById('legend');
+  el.innerHTML = CURVES.map(cu=>
+    `<div class="legend-item">
+       <div class="legend-dot" style="background:${cu.color}"></div>
+       <span>${cu.label} w/w</span>
+     </div>`
+  ).join('');
+}
+
+// ══════════════════════════════════════════════════
+// CHART SVG
+// ══════════════════════════════════════════════════
+let rafId = null;
+
+function drawChart(){
+  const svg = document.getElementById('svg-chart');
+  svg.innerHTML = '';
+  const W=600, H=250, ml=50, mr=14, mt=14, mb=30;
+
+  function ns(tag,a){
+    const e=document.createElementNS('http://www.w3.org/2000/svg',tag);
+    for(const k in a) e.setAttribute(k,a[k]);
+    return e;
+  }
+
+  // Clip
+  const defs=ns('defs',{});
+  const cp=ns('clipPath',{id:'clip-cond'});
+  cp.appendChild(ns('rect',{x:ml,y:mt,width:W-ml-mr,height:H-mt-mb}));
+  defs.appendChild(cp); svg.appendChild(defs);
+
+  const xMin=T_MIN, xMax=T_MAX;
+  const yMin=0,     yMax=420;
+  const px = x => ml + (x-xMin)/(xMax-xMin)*(W-ml-mr);
+  const py = y => mt + (yMax-y)/(yMax-yMin)*(H-mt-mb);
+
+  // Grid horizontal
+  [0,100,200,300,400].forEach(y=>{
+    svg.appendChild(ns('line',{x1:ml,y1:py(y),x2:W-mr,y2:py(y),
+      stroke:'#0A2E5B','stroke-width':1}));
+    const txt=ns('text',{x:ml-6,y:py(y)+4,'text-anchor':'end',
+      'font-size':10,fill:'#8A9BB5','font-family':'Inter'});
+    txt.textContent=y; svg.appendChild(txt);
+  });
+
+  // Grid vertical
+  [20,35,50,65,80,90].forEach(x=>{
+    const txt=ns('text',{x:px(x),y:H-10,'text-anchor':'middle',
+      'font-size':10,fill:'#8A9BB5','font-family':'Inter'});
+    txt.textContent=x; svg.appendChild(txt);
+  });
+
+  // Axis labels
+  const xl=ns('text',{x:(ml+W-mr)/2,y:H,'text-anchor':'middle',
+    'font-size':10.5,fill:'#8A9BB5','font-family':'Inter','font-weight':'bold'});
+  xl.textContent='Temperatura (°C)'; svg.appendChild(xl);
+  const yl=ns('text',{x:10,y:H/2,'text-anchor':'middle',
+    'font-size':10,fill:'#8A9BB5','font-family':'Inter',
+    transform:`rotate(-90 10 ${H/2})`});
+  yl.textContent='Conductividad (mS/cm)'; svg.appendChild(yl);
+
+  const g=ns('g',{'clip-path':'url(#clip-cond)'});
+
+  // Curvas de referencia
+  CURVES.forEach(cu=>{
+    let path='';
+    for(let T=T_MIN;T<=T_MAX;T+=0.5){
+      const K=conductividad(T,cu.c);
+      path+=(T===T_MIN?'M':'L')+px(T).toFixed(1)+' '+py(K).toFixed(1)+' ';
+    }
+    const nearestC = CURVES.reduce((b,x)=>Math.abs(x.c-state.C)<Math.abs(b.c-state.C)?x:b).c;
+    g.appendChild(ns('path',{d:path,fill:'none',stroke:cu.color,
+      'stroke-width': cu.c===nearestC?3:1.5,
+      'stroke-opacity': cu.c===nearestC?1:0.45}));
+  });
+
+  // Punto operativo
+  const Kop = conductividad(state.T, state.C);
+  const X=px(state.T), Y=py(Kop);
+  g.appendChild(ns('line',{x1:X,y1:mt,x2:X,y2:H-mb,
+    stroke:'#FFB300','stroke-width':1,'stroke-dasharray':'4 3',opacity:.7}));
+  g.appendChild(ns('line',{x1:ml,y1:Y,x2:W-mr,y2:Y,
+    stroke:'#FFB300','stroke-width':1,'stroke-dasharray':'4 3',opacity:.7}));
+  g.appendChild(ns('circle',{cx:X,cy:Y,r:7,fill:'#08132D',
+    stroke:'#FFB300','stroke-width':2.5}));
+
+  svg.appendChild(g);
+}
+
+// ══════════════════════════════════════════════════
+// RENDER COMPLETO
+// ══════════════════════════════════════════════════
+function render(){
+  const {T,C} = state;
+  const K = conductividad(T,C);
+
+  // Hero
+  document.getElementById('kv').textContent = K.toFixed(1);
+
+  // OOR banner (si C < 96)
+  const extrap = C < C_MIN;
+  document.getElementById('oor').classList.toggle('show', extrap);
+
+  // Boxes
+  document.getElementById('tv').textContent = T.toFixed(1);
+  document.getElementById('cv').textContent = C.toFixed(1);
+
+  // Sub2
+  document.getElementById('sub2').textContent = extrap
+    ? '⚠ Extrapolación (dato fuera del rango de ajuste)'
+    : `T = ${T.toFixed(1)} °C · C = ${C.toFixed(1)} % w/w`;
+
+  // Sensibilidad — derivadas numéricas centradas con clamping en bordes del dominio
+  const eps = 0.05;
+  const Ch = Math.min(C_MAX, C + eps);
+  // Si C ya está en zona de extrapolación (<C_MIN) no clampear Cl hacia arriba:
+  // clampear causaría Ch<Cl e invertiría el signo de la derivada
+  const Cl = C < C_MIN ? C - eps : Math.max(C_MIN, C - eps);
+  const dKdC = (conductividad(T, Ch) - conductividad(T, Cl)) / (Ch - Cl);
+
+  const Th = Math.min(T_MAX, T + 0.5);
+  const Tl = Math.max(T_MIN, T - 0.5);
+  const dKdT = (conductividad(Th, C) - conductividad(Tl, C)) / (Th - Tl);
+
+  document.getElementById('derived').innerHTML =
+    `∂K/∂C ≈ <b>${dKdC.toFixed(1)}</b> mS/cm por % w/w &nbsp;·&nbsp; `+
+    `∂K/∂T ≈ <b>${dKdT.toFixed(2)}</b> mS/cm por °C`;
+
+  // Chart (debounced via rAF)
+  if(rafId) cancelAnimationFrame(rafId);
+  rafId = requestAnimationFrame(drawChart);
+}
+
+// ══════════════════════════════════════════════════
+// EVENTOS SLIDERS
+// ══════════════════════════════════════════════════
+function bindSlider(sliderId, numberId, stateKey, min, max){
+  const s=document.getElementById(sliderId);
+  const n=document.getElementById(numberId);
+  s.addEventListener('input',()=>{
+    const v=parseFloat(s.value);
+    n.value=v.toFixed(1);
+    state[stateKey]=v;
+    render();
+  });
+  n.addEventListener('input',()=>{
+    let v=parseFloat(n.value);
+    if(isNaN(v)) return;
+    v=Math.max(min,Math.min(max,v));
+    s.value=v;
+    state[stateKey]=v;
+    render();
+  });
+}
+
+bindSlider('ts','tn','T',20,90);
+bindSlider('cs','cn','C',95,100);
+
+// ══════════════════════════════════════════════════
+// DISCLAIMER TOGGLE
+// ══════════════════════════════════════════════════
+const discToggle=document.getElementById('disc-toggle');
+const discBody=document.getElementById('disc-body');
+function toggleDisc(){
+  const open = discBody.style.display !== 'none';
+  discBody.style.display = open ? 'none' : 'block';
+  discToggle.className = open ? 'alerts-toggle' : 'alerts-toggle open';
+}
+
+// ══════════════════════════════════════════════════
+// INIT — sync number inputs to match state format
+// ══════════════════════════════════════════════════
+document.getElementById('tn').value = state.T.toFixed(1);
+document.getElementById('cn').value = state.C.toFixed(1);
+buildLegend();
+render();
+</script>
+</body>
+</html>
