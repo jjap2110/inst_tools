@@ -119,17 +119,14 @@ svg.chart{width:100%;height:auto;display:block;margin:10px 0 4px}
   <div class="section-label">Calculadora</div>
   <div class="card">
 
-    <!-- Hero resultado -->
     <div class="hero">
       <div class="lbl">Conductividad calculada</div>
       <div class="big"><span id="kv">--</span> <span class="u">mS/cm</span></div>
       <div class="sub2" id="sub2"></div>
     </div>
 
-    <!-- Advertencia extrapolación -->
-    <div class="oor" id="oor">⚠ C = 95% está fuera del rango de ajuste (96–100%). Valor extrapolado.</div>
+    <div class="oor" id="oor"></div>
 
-    <!-- Boxes -->
     <div class="grid">
       <div class="box">
         <div class="bl">Temperatura</div>
@@ -148,7 +145,6 @@ svg.chart{width:100%;height:auto;display:block;margin:10px 0 4px}
       </div>
     </div>
 
-    <!-- Slider temperatura -->
     <div class="srow temp">
       <div class="sl">
         <span>Temperatura (°C)</span>
@@ -161,7 +157,6 @@ svg.chart{width:100%;height:auto;display:block;margin:10px 0 4px}
       <div class="ticks"><span>20</span><span>38</span><span>55</span><span>73</span><span>90</span></div>
     </div>
 
-    <!-- Slider concentración -->
     <div class="srow conc">
       <div class="sl">
         <span>Concentración H₂SO₄ (% w/w)</span>
@@ -174,10 +169,8 @@ svg.chart{width:100%;height:auto;display:block;margin:10px 0 4px}
       <div class="ticks"><span>95</span><span>96</span><span>97</span><span>98</span><span>99</span><span>100</span></div>
     </div>
 
-    <!-- Gráfico SVG -->
     <svg class="chart" id="svg-chart" viewBox="0 0 600 240" preserveAspectRatio="xMidYMid meet"></svg>
 
-    <!-- Sensibilidades -->
     <div class="derived" id="derived"></div>
 
     <div class="note">
@@ -226,180 +219,209 @@ R² = 0.9994 · RMSE = 2.49 mS/cm · Nº cond = 7.88
 
 <script>
 // ── MODELO ──────────────────────────────────────────────────
-var T_MIN=20, T_MAX=90, C_MIN=96, C_MAX=100;
-var COEF=[172.2160714286,-84.1270833333,107.3519480519,-47.1071428571,
-          -56.475,11.1708333333,-13.9166666667,-26.869047619,-7.04375,-3.378030303];
+const T_MIN = 20, T_MAX = 90, C_MIN = 96, C_MAX = 100;
+const COEF = [172.2160714286,-84.1270833333,107.3519480519,-47.1071428571,
+              -56.475,11.1708333333,-13.9166666667,-26.869047619,-7.04375,-3.378030303];
 
-function conductividad(T,C){
-  var Tn=2*(T-T_MIN)/(T_MAX-T_MIN)-1;
-  var Cn=2*(C-C_MIN)/(C_MAX-C_MIN)-1;
-  var t=[1,Cn,Tn,Cn*Cn,Tn*Cn,Tn*Tn,Cn*Cn*Cn,Tn*Cn*Cn,Tn*Tn*Cn,Tn*Tn*Tn];
-  var s=0; for(var i=0;i<COEF.length;i++) s+=COEF[i]*t[i];
-  return s;
+function conductividad(T, C) {
+  const Tn = 2*(T - T_MIN)/(T_MAX - T_MIN) - 1;
+  const Cn = 2*(C - C_MIN)/(C_MAX - C_MIN) - 1;
+  // Horner-style grouped evaluation
+  return COEF[0]
+    + Cn*(COEF[1] + Cn*(COEF[3] + Cn*COEF[6]))
+    + Tn*(COEF[2] + Cn*(COEF[4] + Cn*COEF[7])
+    + Tn*(COEF[5] + Cn*COEF[8] + Tn*COEF[9]));
 }
 
+// ── DOM CACHE ───────────────────────────────────────────────
+const UI = {};
+['kv','tv','cv','sub2','oor','derived','svg-chart',
+ 'ts','tn','cs','cn','disc-toggle','disc-body'
+].forEach(id => { UI[id] = document.getElementById(id); });
+
+// ── DEBOUNCE ────────────────────────────────────────────────
+function debounce(fn, ms = 60) {
+  let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
+}
+const renderDebounced = debounce(render, 60);
+
 // ── ESTADO ──────────────────────────────────────────────────
-var stateT=55, stateC=98;
+let stateT = 55, stateC = 98;
 
 // ── CURVAS DEL GRÁFICO ──────────────────────────────────────
-var CURVES=[
-  {c:96,color:'#00CFFF'},
-  {c:97,color:'#00B4D8'},
-  {c:98,color:'#0096C7'},
-  {c:99,color:'#0077B6'},
+const CURVES = [
+  {c:96, color:'#00CFFF'},
+  {c:97, color:'#00B4D8'},
+  {c:98, color:'#0096C7'},
+  {c:99, color:'#0077B6'},
   {c:100,color:'#4895EF'}
 ];
 
-// ── GRÁFICO SVG ─────────────────────────────────────────────
-function drawChart(){
-  var svg=document.getElementById('svg-chart');
-  svg.innerHTML='';
-  var W=600,H=240,ml=48,mr=12,mt=12,mb=28;
+// ── SVG HELPERS ─────────────────────────────────────────────
+function svgEl(tag, attrs) {
+  const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  return e;
+}
 
-  function el(tag,attrs){
-    var e=document.createElementNS('http://www.w3.org/2000/svg',tag);
-    for(var k in attrs) e.setAttribute(k,attrs[k]);
-    return e;
-  }
+// ── CHART — build once, update point/crosshairs ─────────────
+const W = 600, H = 240, ml = 48, mr = 12, mt = 12, mb = 28;
+const px = T => ml + (T - T_MIN)/(T_MAX - T_MIN) * (W - ml - mr);
+const py = K => mt + (420 - K)/420 * (H - mt - mb);
 
-  var px=function(T){return ml+(T-T_MIN)/(T_MAX-T_MIN)*(W-ml-mr);};
-  var py=function(K){return mt+(420-K)/420*(H-mt-mb);};
+let chartBuilt = false;
+let opDot, crossH, crossV;      // reusable SVG elements
+const curvePaths = [];           // path elements per curve
+
+function buildChart() {
+  const svg = UI['svg-chart'];
+  svg.innerHTML = '';
 
   // Clip
-  var defs=el('defs',{});
-  var cp=el('clipPath',{id:'clipK'});
-  cp.appendChild(el('rect',{x:ml,y:mt,width:W-ml-mr,height:H-mt-mb}));
+  const defs = svgEl('defs', {});
+  const cp = svgEl('clipPath', {id:'clipK'});
+  cp.appendChild(svgEl('rect', {x:ml, y:mt, width:W-ml-mr, height:H-mt-mb}));
   defs.appendChild(cp); svg.appendChild(defs);
 
-  // Grid horizontal
-  [0,100,200,300,400].forEach(function(K){
-    svg.appendChild(el('line',{x1:ml,y1:py(K),x2:W-mr,y2:py(K),
+  // Grid + Y labels
+  [0,100,200,300,400].forEach(K => {
+    svg.appendChild(svgEl('line', {x1:ml,y1:py(K),x2:W-mr,y2:py(K),
       stroke:'#0A2E5B','stroke-width':1}));
-    var t=el('text',{x:ml-5,y:py(K)+4,'text-anchor':'end',
+    const t = svgEl('text', {x:ml-5,y:py(K)+4,'text-anchor':'end',
       'font-size':10,fill:'#8A9BB5','font-family':'Inter'});
-    t.textContent=K; svg.appendChild(t);
+    t.textContent = K; svg.appendChild(t);
   });
 
-  // Ticks eje X
-  [20,35,50,65,80,90].forEach(function(T){
-    var t=el('text',{x:px(T),y:H-8,'text-anchor':'middle',
+  // X ticks
+  [20,35,50,65,80,90].forEach(T => {
+    const t = svgEl('text', {x:px(T),y:H-8,'text-anchor':'middle',
       'font-size':10,fill:'#8A9BB5','font-family':'Inter'});
-    t.textContent=T; svg.appendChild(t);
+    t.textContent = T; svg.appendChild(t);
   });
 
-  // Labels ejes
-  var xl=el('text',{x:(ml+W-mr)/2,y:H,'text-anchor':'middle',
+  // Axis labels
+  const xl = svgEl('text', {x:(ml+W-mr)/2,y:H,'text-anchor':'middle',
     'font-size':10,fill:'#8A9BB5','font-family':'Inter','font-weight':'600'});
-  xl.textContent='Temperatura (°C)'; svg.appendChild(xl);
-  var yl=el('text',{x:10,y:H/2,'text-anchor':'middle',
+  xl.textContent = 'Temperatura (°C)'; svg.appendChild(xl);
+  const yl = svgEl('text', {x:10,y:H/2,'text-anchor':'middle',
     'font-size':10,fill:'#8A9BB5','font-family':'Inter',
     transform:'rotate(-90 10 '+H/2+')'});
-  yl.textContent='Conductividad (mS/cm)'; svg.appendChild(yl);
+  yl.textContent = 'Conductividad (mS/cm)'; svg.appendChild(yl);
 
-  var g=el('g',{'clip-path':'url(#clipK)'});
+  // Clipped group for curves + operating point
+  const g = svgEl('g', {'clip-path':'url(#clipK)'});
 
-  // Curva más cercana a stateC
-  var nearest=CURVES.reduce(function(b,x){
-    return Math.abs(x.c-stateC)<Math.abs(b.c-stateC)?x:b;
+  // Static curves
+  CURVES.forEach((cu, idx) => {
+    let d = '';
+    for (let T = T_MIN; T <= T_MAX; T += 1) {
+      const K = conductividad(T, cu.c);
+      d += (T === T_MIN ? 'M' : 'L') + px(T).toFixed(1) + ' ' + py(K).toFixed(1) + ' ';
+    }
+    const path = svgEl('path', {d, fill:'none', stroke:cu.color,
+      'stroke-width':1.5, 'stroke-opacity':0.4});
+    g.appendChild(path);
+    curvePaths.push({el:path, c:cu.c, color:cu.color});
   });
 
-  CURVES.forEach(function(cu){
-    var d=''; var first=true;
-    for(var T=T_MIN;T<=T_MAX;T+=1){
-      var K=conductividad(T,cu.c);
-      d+=(first?'M':'L')+px(T).toFixed(1)+' '+py(K).toFixed(1)+' ';
-      first=false;
-    }
-    var isNearest=(cu.c===nearest.c);
-    g.appendChild(el('path',{d:d,fill:'none',stroke:cu.color,
-      'stroke-width':isNearest?3:1.5,
-      'stroke-opacity':isNearest?1:0.4}));
-
-    // Etiqueta al final de cada curva
-    if(isNearest){
-      var Kend=conductividad(T_MAX,cu.c);
-      var lbl=el('text',{x:px(T_MAX)+4,y:py(Kend)+4,
-        'font-size':9,fill:cu.color,'font-family':'Inter','font-weight':'600'});
-      lbl.textContent=cu.c+'%';
-      svg.appendChild(lbl);
-    }
-  });
-
-  // Punto operativo
-  var Kop=conductividad(stateT,stateC);
-  var X=px(stateT), Y=py(Kop);
-  g.appendChild(el('line',{x1:X,y1:mt,x2:X,y2:H-mb,
-    stroke:'#FFB300','stroke-width':1,'stroke-dasharray':'4 3',opacity:.7}));
-  g.appendChild(el('line',{x1:ml,y1:Y,x2:W-mr,y2:Y,
-    stroke:'#FFB300','stroke-width':1,'stroke-dasharray':'4 3',opacity:.7}));
-  g.appendChild(el('circle',{cx:X,cy:Y,r:6,fill:'#08132D',
-    stroke:'#FFB300','stroke-width':2.5}));
+  // Crosshairs (reused)
+  crossV = svgEl('line', {x1:0,y1:mt,x2:0,y2:H-mb,
+    stroke:'#FFB300','stroke-width':1,'stroke-dasharray':'4 3',opacity:.7});
+  crossH = svgEl('line', {x1:ml,y1:0,x2:W-mr,y2:0,
+    stroke:'#FFB300','stroke-width':1,'stroke-dasharray':'4 3',opacity:.7});
+  opDot = svgEl('circle', {cx:0,cy:0,r:6,fill:'#08132D',
+    stroke:'#FFB300','stroke-width':2.5});
+  g.appendChild(crossV);
+  g.appendChild(crossH);
+  g.appendChild(opDot);
 
   svg.appendChild(g);
+  chartBuilt = true;
+}
+
+function updateChart() {
+  if (!chartBuilt) buildChart();
+
+  // Highlight nearest curve
+  const nearest = CURVES.reduce((b, x) =>
+    Math.abs(x.c - stateC) < Math.abs(b.c - stateC) ? x : b);
+  curvePaths.forEach(cp => {
+    const isN = cp.c === nearest.c;
+    cp.el.setAttribute('stroke-width', isN ? 3 : 1.5);
+    cp.el.setAttribute('stroke-opacity', isN ? 1 : 0.4);
+  });
+
+  // Update operating point
+  const Kop = conductividad(stateT, stateC);
+  const X = px(stateT), Y = py(Kop);
+  crossV.setAttribute('x1', X); crossV.setAttribute('x2', X);
+  crossH.setAttribute('y1', Y); crossH.setAttribute('y2', Y);
+  opDot.setAttribute('cx', X);  opDot.setAttribute('cy', Y);
 }
 
 // ── RENDER ──────────────────────────────────────────────────
-function render(){
-  var K=conductividad(stateT,stateC);
-  var extrap=(stateC<C_MIN);
+function render() {
+  const K = conductividad(stateT, stateC);
+  const extrap = stateC < C_MIN;
 
-  document.getElementById('kv').textContent=K.toFixed(1);
-  document.getElementById('tv').textContent=stateT.toFixed(1);
-  document.getElementById('cv').textContent=stateC.toFixed(1);
-  document.getElementById('oor').className='oor'+(extrap?' show':'');
-  document.getElementById('sub2').textContent=
-    extrap?'⚠ Extrapolación fuera del rango de ajuste':
-    'T = '+stateT.toFixed(1)+' °C · C = '+stateC.toFixed(1)+' % w/w';
+  UI['kv'].textContent = K.toFixed(1);
+  UI['tv'].textContent = stateT.toFixed(1);
+  UI['cv'].textContent = stateC.toFixed(1);
+  UI['oor'].className = 'oor' + (extrap ? ' show' : '');
+  UI['oor'].textContent = extrap
+    ? '⚠ C = ' + stateC.toFixed(1) + '% está fuera del rango de ajuste (96–100%). Valor extrapolado.'
+    : '';
+  UI['sub2'].textContent = extrap
+    ? '⚠ Extrapolación fuera del rango de ajuste'
+    : 'T = ' + stateT.toFixed(1) + ' °C · C = ' + stateC.toFixed(1) + ' % w/w';
 
-  // Derivadas numéricas con clamping en bordes
-  var eps=0.05;
-  var Ch=Math.min(C_MAX,stateC+eps);
-  var Cl=stateC<C_MIN ? stateC-eps : Math.max(C_MIN,stateC-eps);
-  var dKdC=(conductividad(stateT,Ch)-conductividad(stateT,Cl))/(Ch-Cl);
-  var Th=Math.min(T_MAX,stateT+0.5);
-  var Tl=Math.max(T_MIN,stateT-0.5);
-  var dKdT=(conductividad(Th,stateC)-conductividad(Tl,stateC))/(Th-Tl);
+  // Numerical partial derivatives with proper clamping
+  const eps = 0.05;
+  const Ch = Math.min(C_MAX, stateC + eps);
+  const Cl = Math.max(stateC < C_MIN ? 95 : C_MIN, stateC - eps);
+  const dKdC = (conductividad(stateT, Ch) - conductividad(stateT, Cl)) / (Ch - Cl);
+  const Th = Math.min(T_MAX, stateT + 0.5);
+  const Tl = Math.max(T_MIN, stateT - 0.5);
+  const dKdT = (conductividad(Th, stateC) - conductividad(Tl, stateC)) / (Th - Tl);
 
-  document.getElementById('derived').innerHTML=
-    '&#8706;K/&#8706;C &#8776; <b>'+dKdC.toFixed(1)+'</b> mS/cm por % w/w &nbsp;&middot;&nbsp; '+
-    '&#8706;K/&#8706;T &#8776; <b>'+dKdT.toFixed(2)+'</b> mS/cm por °C';
+  UI['derived'].innerHTML =
+    '\u2202K/\u2202C \u2248 <b>' + dKdC.toFixed(1) + '</b> mS/cm por % w/w &nbsp;&middot;&nbsp; ' +
+    '\u2202K/\u2202T \u2248 <b>' + dKdT.toFixed(2) + '</b> mS/cm por °C';
 
-  drawChart();
+  updateChart();
 }
 
 // ── SLIDERS ─────────────────────────────────────────────────
-function bindSlider(sid,nid,getter,setter,min,max){
-  var s=document.getElementById(sid);
-  var n=document.getElementById(nid);
-  s.addEventListener('input',function(){
-    var v=parseFloat(s.value);
-    n.value=v.toFixed(1);
-    setter(v); render();
+function bindSlider(sid, nid, setter, min, max) {
+  const s = UI[sid], n = UI[nid];
+  s.addEventListener('input', () => {
+    const v = parseFloat(s.value);
+    n.value = v.toFixed(1);
+    setter(v);
+    renderDebounced();
   });
-  n.addEventListener('input',function(){
-    var v=parseFloat(n.value);
-    if(isNaN(v)) return;
-    v=Math.max(min,Math.min(max,v));
-    s.value=v; n.value=v.toFixed(1);
-    setter(v); render();
+  n.addEventListener('input', () => {
+    let v = parseFloat(n.value);
+    if (isNaN(v)) return;
+    v = Math.max(min, Math.min(max, v));
+    s.value = v; n.value = v.toFixed(1);
+    setter(v);
+    renderDebounced();
   });
 }
 
-bindSlider('ts','tn',
-  function(){return stateT;},function(v){stateT=v;},20,90);
-bindSlider('cs','cn',
-  function(){return stateC;},function(v){stateC=v;},95,100);
+bindSlider('ts', 'tn', v => { stateT = v; }, 20, 90);
+bindSlider('cs', 'cn', v => { stateC = v; }, 95, 100);
 
 // ── DISCLAIMER ──────────────────────────────────────────────
-function toggleDisc(){
-  var body=document.getElementById('disc-body');
-  var btn=document.getElementById('disc-toggle');
-  var open=body.style.display!=='none';
-  body.style.display=open?'none':'block';
-  btn.className=open?'alerts-toggle':'alerts-toggle open';
+function toggleDisc() {
+  const isOpen = UI['disc-body'].style.display !== 'none';
+  UI['disc-body'].style.display = isOpen ? 'none' : 'block';
+  UI['disc-toggle'].className = isOpen ? 'alerts-toggle' : 'alerts-toggle open';
 }
 
 // ── INIT ────────────────────────────────────────────────────
+buildChart();
 render();
 </script>
 </body>
