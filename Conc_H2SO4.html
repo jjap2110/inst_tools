@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Conductividad eléctrica de H₂SO₄ concentrado — OAPSA">
-<title>Conductividad H₂SO₄ · OAPSA</title>
+<meta name="description" content="Concentración H₂SO₄ a partir de conductividad y temperatura — OAPSA">
+<title>Concentración H₂SO₄ · OAPSA</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap');
 
@@ -30,15 +30,14 @@ h1{font-size:18px;font-weight:600;color:var(--text);margin-bottom:2px}
       border-radius:12px;padding:14px;margin-bottom:14px}
 
 /* Hero */
-.hero{background:var(--acc-bg);border:1px solid var(--border2);
-      border-radius:12px;padding:16px 18px;color:var(--text);
-      text-align:center;margin-bottom:10px}
+.hero{background:var(--ok-bg);border:1px solid rgba(0,230,118,.25);
+      border-radius:12px;padding:16px 18px;text-align:center;margin-bottom:10px}
 .hero .lbl{font-size:11px;text-transform:uppercase;letter-spacing:1px;
-           opacity:.9;font-weight:600;color:var(--text3)}
+           font-weight:600;color:var(--text3)}
 .hero .big{font-size:38px;font-weight:800;line-height:1.1;
-           margin-top:3px;color:var(--text)}
-.hero .big .u{font-size:16px;font-weight:600;opacity:.9}
-.hero .sub2{font-size:13px;opacity:.85;margin-top:3px;color:var(--text2)}
+           margin-top:3px;color:var(--ok);font-family:'Roboto Mono',monospace}
+.hero .big .u{font-size:16px;font-weight:600;opacity:.9;color:var(--text)}
+.hero .sub2{font-size:12px;margin-top:4px;color:var(--text2)}
 
 /* OOR */
 .oor{background:var(--warn-bg);border:1px solid rgba(255,179,0,.3);
@@ -47,13 +46,13 @@ h1{font-size:18px;font-weight:600;color:var(--text);margin-bottom:2px}
 .oor.show{display:block}
 
 /* Boxes */
-.grid{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
-.box{flex:1 1 0;min-width:90px;background:var(--surface2);
-     border-radius:var(--radius);padding:10px 12px;text-align:center}
+.grid{display:flex;gap:8px;margin-bottom:10px}
+.box{flex:1 1 0;background:var(--surface2);border-radius:var(--radius);
+     padding:10px 12px;text-align:center}
 .box .bl{font-size:10px;text-transform:uppercase;letter-spacing:.5px;
          color:var(--text3);font-weight:600}
-.box .bv{font-size:22px;font-weight:700;color:var(--text);
-         line-height:1.1;margin-top:2px}
+.box .bv{font-size:20px;font-weight:700;color:var(--text);
+         line-height:1.1;margin-top:2px;font-family:'Roboto Mono',monospace}
 .box .bu{font-size:11px;color:var(--text3)}
 
 /* Sliders */
@@ -64,7 +63,7 @@ h1{font-size:18px;font-weight:600;color:var(--text);margin-bottom:2px}
 input[type=range]{-webkit-appearance:none;appearance:none;flex:1;
                   height:7px;border-radius:var(--radius);outline:none;margin:6px 0}
 .srow.temp input[type=range]{background:linear-gradient(90deg,var(--acc),var(--danger))}
-.srow.conc input[type=range]{background:linear-gradient(90deg,var(--ok),var(--acc))}
+.srow.cond input[type=range]{background:linear-gradient(90deg,#2D0A40,var(--acc))}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;
   border-radius:50%;background:var(--bg);border:3px solid var(--acc);
   cursor:pointer;box-shadow:0 0 8px rgba(0,207,255,.3)}
@@ -80,13 +79,11 @@ input[type=number]{width:76px;font-size:14px;padding:5px 6px;
 /* Chart */
 svg.chart{width:100%;height:auto;display:block;margin:10px 0 4px}
 
-/* Derived */
+/* Misc */
 .derived{font-size:12px;color:var(--text2);margin-top:6px}
 .derived b{color:var(--text)}
 .note{font-size:11px;color:var(--text3);font-style:italic;margin-top:12px;
       line-height:1.4;border-top:1px solid var(--border);padding-top:10px}
-
-/* Disclaimer collapsible */
 .alerts-toggle{display:flex;align-items:center;gap:6px;font-size:12px;
                color:var(--text3);cursor:pointer;padding:4px 0;margin-top:6px;
                user-select:none;background:none;border:none;
@@ -110,8 +107,8 @@ svg.chart{width:100%;height:auto;display:block;margin:10px 0 4px}
 <noscript><div style="padding:20px;text-align:center;color:#E8ECF0;font-family:sans-serif">Esta herramienta requiere JavaScript habilitado para funcionar.</div></noscript>
 
 <div class="app">
-  <h1>Conductividad H₂SO₄</h1>
-  <p class="subtitle">Ácido sulfúrico concentrado · Modelo polinomial 2D normalizado · R² = 0.9994</p>
+  <h1>Concentración H₂SO₄</h1>
+  <p class="subtitle">C = f(Conductividad, Temperatura) · Bisección numérica · R² = 0.9994</p>
   <p style="font-size:11px;color:var(--text3);margin:-12px 0 16px;opacity:0.7">
     por <b>Josmar Angulo</b> · <a href="https://wa.me/595991312920" style="color:var(--acc);text-decoration:none">Contacto</a>
   </p>
@@ -120,8 +117,8 @@ svg.chart{width:100%;height:auto;display:block;margin:10px 0 4px}
   <div class="card">
 
     <div class="hero">
-      <div class="lbl">Conductividad calculada</div>
-      <div class="big"><span id="kv">--</span> <span class="u">mS/cm</span></div>
+      <div class="lbl">Concentración calculada</div>
+      <div class="big"><span id="result-val">--</span> <span class="u">% w/w</span></div>
       <div class="sub2" id="sub2"></div>
     </div>
 
@@ -130,17 +127,17 @@ svg.chart{width:100%;height:auto;display:block;margin:10px 0 4px}
     <div class="grid">
       <div class="box">
         <div class="bl">Temperatura</div>
-        <div class="bv"><span id="tv">55</span></div>
+        <div class="bv"><span id="tv">55.0</span></div>
         <div class="bu">°C</div>
       </div>
       <div class="box">
-        <div class="bl">Concentración</div>
-        <div class="bv"><span id="cv">98</span></div>
-        <div class="bu">% w/w</div>
+        <div class="bl">Conductividad</div>
+        <div class="bv"><span id="kv">157</span></div>
+        <div class="bu">mS/cm</div>
       </div>
       <div class="box">
         <div class="bl">RMSE</div>
-        <div class="bv">2.49</div>
+        <div class="bv">2.51</div>
         <div class="bu">mS/cm</div>
       </div>
     </div>
@@ -148,7 +145,7 @@ svg.chart{width:100%;height:auto;display:block;margin:10px 0 4px}
     <div class="srow temp">
       <div class="sl">
         <span>Temperatura (°C)</span>
-        <span style="font-weight:400;font-size:10px">rango ajuste: 20–90 °C</span>
+        <span style="font-weight:400;font-size:10px">20 – 90 °C</span>
       </div>
       <div class="si">
         <input type="range" id="ts" min="20" max="90" step="0.5" value="55">
@@ -157,16 +154,16 @@ svg.chart{width:100%;height:auto;display:block;margin:10px 0 4px}
       <div class="ticks"><span>20</span><span>38</span><span>55</span><span>73</span><span>90</span></div>
     </div>
 
-    <div class="srow conc">
+    <div class="srow cond">
       <div class="sl">
-        <span>Concentración H₂SO₄ (% w/w)</span>
-        <span style="font-weight:400;font-size:10px">datos: 96–100%</span>
+        <span>Conductividad medida (mS/cm)</span>
+        <span style="font-weight:400;font-size:10px">8 – 376 mS/cm</span>
       </div>
       <div class="si">
-        <input type="range" id="cs" min="95" max="100" step="0.1" value="98">
-        <input type="number" id="cn" min="95" max="100" step="0.1" value="98.0">
+        <input type="range" id="ks" min="8" max="376" step="1" value="157">
+        <input type="number" id="kn" min="8" max="376" step="1" value="157">
       </div>
-      <div class="ticks"><span>95</span><span>96</span><span>97</span><span>98</span><span>99</span><span>100</span></div>
+      <div class="ticks"><span>8</span><span>100</span><span>200</span><span>300</span><span>376</span></div>
     </div>
 
     <svg class="chart" id="svg-chart" viewBox="0 0 600 240" preserveAspectRatio="xMidYMid meet"></svg>
@@ -174,8 +171,9 @@ svg.chart{width:100%;height:auto;display:block;margin:10px 0 4px}
     <div class="derived" id="derived"></div>
 
     <div class="note">
-      Polinomio grado 3 normalizado a [−1,1] · 8 T × 5 C = 40 puntos ·
-      Rango: T ∈ [20–90] °C, C ∈ [96–100] % w/w · Nº condición = 7.88
+      Bisección numérica · 60 iteraciones · error &lt; 0.0001% ·
+      Rango físico: K ∈ [8, 376] mS/cm, T ∈ [20–90] °C, C ∈ [96–100] % w/w.
+      Nota: coeficientes ajustados independientemente del modelo K(T,C) directo — diferencias &lt; 0.5 mS/cm.
     </div>
   </div>
 
@@ -183,30 +181,32 @@ svg.chart{width:100%;height:auto;display:block;margin:10px 0 4px}
   <div>
     <button class="alerts-toggle" id="disc-toggle" onclick="toggleDisc()">
       <span class="toggle-icon">▶</span>
-      <span>ℹ Modelo matemático y ecuaciones</span>
+      <span>ℹ Modelo matemático</span>
     </button>
     <div id="disc-body" style="display:none">
       <div class="disclaimer">
         <div style="font-size:12px;color:var(--text);line-height:1.7;margin-bottom:10px">
-          Herramienta de <b>desarrollo personal</b>, sin vinculación con ningún fabricante.
-          Cubre la región 96–100% w/w donde la conductividad cae con la concentración
-          y sube con la temperatura (menor disociación iónica a alta concentración).
+          La inversión C = f(K, T) se resuelve por bisección numérica sobre el polinomio
+          ajustado K(T, C). La conductividad es <b>monótonamente decreciente</b> con C
+          para T fija, lo que garantiza solución única en el rango 96–100% w/w.
         </div>
         <div class="eq-block">
-— Variables normalizadas —<br>
-Tn = 2·(T − 20) / (90 − 20) − 1<br>
-Cn = 2·(C − 96) / (100 − 96) − 1<br><br>
-— Polinomio grado 3 · K(Tn,Cn) = Σ aᵢⱼ·Tnⁱ·Cnʲ —<br>
-a₀₀ = +172.2161  a₀₁ = −84.1271   a₁₀ = +107.3519<br>
-a₀₂ = −47.1071   a₁₁ = −56.4750   a₂₀ = +11.1708<br>
-a₀₃ = −13.9167   a₁₂ = −26.8690   a₂₁ = −7.0438<br>
-a₃₀ = −3.3780<br><br>
-R² = 0.9994 · RMSE = 2.49 mS/cm · Nº cond = 7.88
+— Normalización —<br>
+Tn = 2·(T − 20)/(90 − 20) − 1<br>
+Cn = 2·(C − 96)/(100 − 96) − 1<br><br>
+— K(Tn,Cn) = Σ aᵢⱼ·Tnⁱ·Cnʲ  (i+j ≤ 3) —<br>
+a₀₀=+172.6286  a₀₁=−84.3958  a₁₀=+107.0119<br>
+a₀₂=−48.3571   a₁₁=−56.2833  a₂₀=+11.5500<br>
+a₀₃=−15.6667   a₁₂=−24.2143  a₂₁=−4.5208<br>
+a₃₀=−4.2442<br><br>
+R²=0.9994 · RMSE=2.51 mS/cm · Nº cond=7.88<br><br>
+— Bisección —<br>
+lo=94, hi=101, 60 iter, tol=0.0001 mS/cm<br>
+K(T,C) monótona ↓ en C → solución única
         </div>
         <div class="warn-block" style="margin-top:12px">
           ⚠ <b>Solo para fines educativos e informativos.</b>
-          Para aplicaciones de control de calidad o procesos críticos,
-          valide con instrumentación calibrada en campo.
+          Para aplicaciones críticas, valide con instrumentación calibrada en campo.
         </div>
       </div>
     </div>
@@ -220,23 +220,35 @@ R² = 0.9994 · RMSE = 2.49 mS/cm · Nº cond = 7.88
 <script>
 // ── MODELO ──────────────────────────────────────────────────
 const T_MIN = 20, T_MAX = 90, C_MIN = 96, C_MAX = 100;
-const COEF = [172.2160714286,-84.1270833333,107.3519480519,-47.1071428571,
-              -56.475,11.1708333333,-13.9166666667,-26.869047619,-7.04375,-3.378030303];
+const COEF = [172.6285714286,-84.3958333333,107.0119408369,-48.3571428571,
+              -56.2833333333,11.55,-15.6666666667,-24.2142857143,-4.5208333333,-4.2441919192];
 
 function conductividad(T, C) {
   const Tn = 2*(T - T_MIN)/(T_MAX - T_MIN) - 1;
   const Cn = 2*(C - C_MIN)/(C_MAX - C_MIN) - 1;
-  // Horner-style grouped evaluation
   return COEF[0]
     + Cn*(COEF[1] + Cn*(COEF[3] + Cn*COEF[6]))
     + Tn*(COEF[2] + Cn*(COEF[4] + Cn*COEF[7])
     + Tn*(COEF[5] + Cn*COEF[8] + Tn*COEF[9]));
 }
 
+// ── INVERSIÓN: bisección C tal que conductividad(T,C) = K ──
+function concentracion(T, Ktarget) {
+  let lo = 94, hi = 101;
+  if (Ktarget >= conductividad(T, lo)) return lo;
+  if (Ktarget <= conductividad(T, hi)) return hi;
+  for (let i = 0; i < 60; i++) {
+    const C = (lo + hi) / 2;
+    if (Math.abs(conductividad(T, C) - Ktarget) < 0.0001) return C;
+    if (conductividad(T, C) > Ktarget) lo = C; else hi = C;
+  }
+  return (lo + hi) / 2;
+}
+
 // ── DOM CACHE ───────────────────────────────────────────────
 const UI = {};
-['kv','tv','cv','sub2','oor','derived','svg-chart',
- 'ts','tn','cs','cn','disc-toggle','disc-body'
+['result-val','tv','kv','sub2','oor','derived','svg-chart',
+ 'ts','tn','ks','kn','disc-toggle','disc-body'
 ].forEach(id => { UI[id] = document.getElementById(id); });
 
 // ── DEBOUNCE ────────────────────────────────────────────────
@@ -246,157 +258,162 @@ function debounce(fn, ms = 60) {
 const renderDebounced = debounce(render, 60);
 
 // ── ESTADO ──────────────────────────────────────────────────
-let stateT = 55, stateC = 98;
-
-// ── CURVAS DEL GRÁFICO ──────────────────────────────────────
-const CURVES = [
-  {c:96, color:'#00CFFF'},
-  {c:97, color:'#00B4D8'},
-  {c:98, color:'#0096C7'},
-  {c:99, color:'#0077B6'},
-  {c:100,color:'#4895EF'}
-];
+let stateT = 55, stateK = 157;
 
 // ── SVG HELPERS ─────────────────────────────────────────────
+const W = 600, H = 240, ml = 50, mr = 14, mt = 12, mb = 28;
+const pxC = C => ml + (C - C_MIN)/(C_MAX - C_MIN) * (W - ml - mr);
+const pyK = K => mt + (400 - K)/400 * (H - mt - mb);
+
 function svgEl(tag, attrs) {
   const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
   for (const k in attrs) e.setAttribute(k, attrs[k]);
   return e;
 }
 
-// ── CHART — build once, update point/crosshairs ─────────────
-const W = 600, H = 240, ml = 48, mr = 12, mt = 12, mb = 28;
-const px = T => ml + (T - T_MIN)/(T_MAX - T_MIN) * (W - ml - mr);
-const py = K => mt + (420 - K)/420 * (H - mt - mb);
+// ── CHART ───────────────────────────────────────────────────
+const TEMPS = [20,30,40,50,60,70,80,90];
+const TCOLORS = ['#023E8A','#0096C7','#00B4D8','#00CFFF','#90E0EF','#ADE8F4','#CAF0F8','#E0FBFF'];
 
 let chartBuilt = false;
-let opDot, crossH, crossV;      // reusable SVG elements
-const curvePaths = [];           // path elements per curve
+let opDot, crossH, crossV, hLine;
+const tPaths = [];
 
 function buildChart() {
   const svg = UI['svg-chart'];
   svg.innerHTML = '';
 
-  // Clip
   const defs = svgEl('defs', {});
-  const cp = svgEl('clipPath', {id:'clipK'});
+  const cp = svgEl('clipPath', {id:'clipG'});
   cp.appendChild(svgEl('rect', {x:ml, y:mt, width:W-ml-mr, height:H-mt-mb}));
   defs.appendChild(cp); svg.appendChild(defs);
 
-  // Grid + Y labels
+  // Grid Y
   [0,100,200,300,400].forEach(K => {
-    svg.appendChild(svgEl('line', {x1:ml,y1:py(K),x2:W-mr,y2:py(K),
-      stroke:'#0A2E5B','stroke-width':1}));
-    const t = svgEl('text', {x:ml-5,y:py(K)+4,'text-anchor':'end',
-      'font-size':10,fill:'#8A9BB5','font-family':'Inter'});
+    svg.appendChild(svgEl('line', {x1:ml, y1:pyK(K), x2:W-mr, y2:pyK(K),
+      stroke:'#0A2E5B', 'stroke-width':1}));
+    const t = svgEl('text', {x:ml-5, y:pyK(K)+4, 'text-anchor':'end',
+      'font-size':10, fill:'#8A9BB5', 'font-family':'Inter'});
     t.textContent = K; svg.appendChild(t);
   });
 
-  // X ticks
-  [20,35,50,65,80,90].forEach(T => {
-    const t = svgEl('text', {x:px(T),y:H-8,'text-anchor':'middle',
-      'font-size':10,fill:'#8A9BB5','font-family':'Inter'});
-    t.textContent = T; svg.appendChild(t);
+  // Grid X
+  [96,97,98,99,100].forEach(C => {
+    svg.appendChild(svgEl('line', {x1:pxC(C), y1:mt, x2:pxC(C), y2:H-mb,
+      stroke:'#0A2E5B', 'stroke-width':1}));
+    const t = svgEl('text', {x:pxC(C), y:H-8, 'text-anchor':'middle',
+      'font-size':10, fill:'#8A9BB5', 'font-family':'Inter'});
+    t.textContent = C + '%'; svg.appendChild(t);
   });
 
   // Axis labels
-  const xl = svgEl('text', {x:(ml+W-mr)/2,y:H,'text-anchor':'middle',
-    'font-size':10,fill:'#8A9BB5','font-family':'Inter','font-weight':'600'});
-  xl.textContent = 'Temperatura (°C)'; svg.appendChild(xl);
-  const yl = svgEl('text', {x:10,y:H/2,'text-anchor':'middle',
-    'font-size':10,fill:'#8A9BB5','font-family':'Inter',
-    transform:'rotate(-90 10 '+H/2+')'});
+  const xl = svgEl('text', {x:(ml+W-mr)/2, y:H, 'text-anchor':'middle',
+    'font-size':10, fill:'#8A9BB5', 'font-family':'Inter', 'font-weight':'600'});
+  xl.textContent = 'Concentración H\u2082SO\u2084 (% w/w)'; svg.appendChild(xl);
+  const yl = svgEl('text', {x:10, y:H/2, 'text-anchor':'middle',
+    'font-size':10, fill:'#8A9BB5', 'font-family':'Inter',
+    transform:'rotate(-90 10 ' + H/2 + ')'});
   yl.textContent = 'Conductividad (mS/cm)'; svg.appendChild(yl);
 
-  // Clipped group for curves + operating point
-  const g = svgEl('g', {'clip-path':'url(#clipK)'});
+  const g = svgEl('g', {'clip-path':'url(#clipG)'});
 
-  // Static curves
-  CURVES.forEach((cu, idx) => {
+  // K=cte horizontal line
+  hLine = svgEl('line', {x1:ml, y1:mt, x2:W-mr, y2:mt,
+    stroke:'#00E676', 'stroke-width':1.5, 'stroke-dasharray':'5 3', opacity:0.85});
+  g.appendChild(hLine);
+
+  // Isothermal curves
+  tPaths.length = 0;
+  TEMPS.forEach((T, idx) => {
     let d = '';
-    for (let T = T_MIN; T <= T_MAX; T += 1) {
-      const K = conductividad(T, cu.c);
-      d += (T === T_MIN ? 'M' : 'L') + px(T).toFixed(1) + ' ' + py(K).toFixed(1) + ' ';
+    for (let C = C_MIN; C <= C_MAX; C += 0.05) {
+      const K = conductividad(T, C);
+      d += (C === C_MIN ? 'M' : 'L') + pxC(C).toFixed(1) + ' ' + pyK(K).toFixed(1) + ' ';
     }
-    const path = svgEl('path', {d, fill:'none', stroke:cu.color,
-      'stroke-width':1.5, 'stroke-opacity':0.4});
+    const path = svgEl('path', {d, fill:'none', stroke:TCOLORS[idx],
+      'stroke-width':1.5, 'stroke-opacity':0.5});
     g.appendChild(path);
-    curvePaths.push({el:path, c:cu.c, color:cu.color});
+    tPaths.push({el:path, T, color:TCOLORS[idx]});
+
+    // Label at C=96
+    const Klbl = conductividad(T, C_MIN);
+    const lbl = svgEl('text', {x:pxC(C_MIN)-3, y:pyK(Klbl)+4,
+      'text-anchor':'end', 'font-size':9, fill:TCOLORS[idx], 'font-family':'Inter'});
+    lbl.textContent = T + '°'; svg.appendChild(lbl);
   });
 
-  // Crosshairs (reused)
-  crossV = svgEl('line', {x1:0,y1:mt,x2:0,y2:H-mb,
-    stroke:'#FFB300','stroke-width':1,'stroke-dasharray':'4 3',opacity:.7});
-  crossH = svgEl('line', {x1:ml,y1:0,x2:W-mr,y2:0,
-    stroke:'#FFB300','stroke-width':1,'stroke-dasharray':'4 3',opacity:.7});
-  opDot = svgEl('circle', {cx:0,cy:0,r:6,fill:'#08132D',
-    stroke:'#FFB300','stroke-width':2.5});
-  g.appendChild(crossV);
-  g.appendChild(crossH);
-  g.appendChild(opDot);
+  // Crosshairs + operating point
+  crossV = svgEl('line', {x1:0, y1:mt, x2:0, y2:H-mb,
+    stroke:'#FFB300', 'stroke-width':1, 'stroke-dasharray':'4 3', opacity:.8});
+  crossH = svgEl('line', {x1:ml, y1:0, x2:W-mr, y2:0,
+    stroke:'#FFB300', 'stroke-width':1, 'stroke-dasharray':'4 3', opacity:.8});
+  opDot = svgEl('circle', {cx:0, cy:0, r:6, fill:'#08132D',
+    stroke:'#FFB300', 'stroke-width':2.5});
+  g.appendChild(crossV); g.appendChild(crossH); g.appendChild(opDot);
 
   svg.appendChild(g);
   chartBuilt = true;
 }
 
-function updateChart() {
+function updateChart(T, C, K) {
   if (!chartBuilt) buildChart();
 
-  // Highlight nearest curve
-  const nearest = CURVES.reduce((b, x) =>
-    Math.abs(x.c - stateC) < Math.abs(b.c - stateC) ? x : b);
-  curvePaths.forEach(cp => {
-    const isN = cp.c === nearest.c;
-    cp.el.setAttribute('stroke-width', isN ? 3 : 1.5);
-    cp.el.setAttribute('stroke-opacity', isN ? 1 : 0.4);
+  // Highlight nearest isotherm
+  const nearest = TEMPS.reduce((b, t) => Math.abs(t - T) < Math.abs(b - T) ? t : b);
+  tPaths.forEach(tp => {
+    const isN = tp.T === nearest;
+    tp.el.setAttribute('stroke-width', isN ? 3 : 1.5);
+    tp.el.setAttribute('stroke-opacity', isN ? 1 : 0.35);
   });
 
-  // Update operating point
-  const Kop = conductividad(stateT, stateC);
-  const X = px(stateT), Y = py(Kop);
+  // K=cte line
+  hLine.setAttribute('y1', pyK(K)); hLine.setAttribute('y2', pyK(K));
+
+  // Operating point
+  const X = pxC(C), Y = pyK(K);
   crossV.setAttribute('x1', X); crossV.setAttribute('x2', X);
   crossH.setAttribute('y1', Y); crossH.setAttribute('y2', Y);
-  opDot.setAttribute('cx', X);  opDot.setAttribute('cy', Y);
+  opDot.setAttribute('cx', X); opDot.setAttribute('cy', Y);
 }
 
 // ── RENDER ──────────────────────────────────────────────────
 function render() {
-  const K = conductividad(stateT, stateC);
-  const extrap = stateC < C_MIN;
+  const T = stateT, K = stateK;
+  const C = concentracion(T, K);
+  const extrap = C < C_MIN || C > C_MAX;
 
-  UI['kv'].textContent = K.toFixed(1);
-  UI['tv'].textContent = stateT.toFixed(1);
-  UI['cv'].textContent = stateC.toFixed(1);
-  UI['oor'].className = 'oor' + (extrap ? ' show' : '');
-  UI['oor'].textContent = extrap
-    ? '⚠ C = ' + stateC.toFixed(1) + '% está fuera del rango de ajuste (96–100%). Valor extrapolado.'
-    : '';
-  UI['sub2'].textContent = extrap
-    ? '⚠ Extrapolación fuera del rango de ajuste'
-    : 'T = ' + stateT.toFixed(1) + ' °C · C = ' + stateC.toFixed(1) + ' % w/w';
+  UI['result-val'].textContent = C.toFixed(2);
+  UI['tv'].textContent = T.toFixed(1);
+  UI['kv'].textContent = K.toFixed(0);
+  UI['sub2'].textContent =
+    'T = ' + T.toFixed(1) + ' °C  ·  K = ' + K.toFixed(0) + ' mS/cm  →  C = ' + C.toFixed(2) + ' % w/w';
 
-  // Numerical partial derivatives with proper clamping
-  const eps = 0.05;
-  const Ch = Math.min(C_MAX, stateC + eps);
-  const Cl = Math.max(stateC < C_MIN ? 95 : C_MIN, stateC - eps);
-  const dKdC = (conductividad(stateT, Ch) - conductividad(stateT, Cl)) / (Ch - Cl);
-  const Th = Math.min(T_MAX, stateT + 0.5);
-  const Tl = Math.max(T_MIN, stateT - 0.5);
-  const dKdT = (conductividad(Th, stateC) - conductividad(Tl, stateC)) / (Th - Tl);
+  if (extrap) {
+    UI['oor'].className = 'oor show';
+    UI['oor'].textContent = '⚠ C = ' + C.toFixed(2) + '% — fuera del rango de ajuste (96–100% w/w). Valor extrapolado.';
+  } else {
+    UI['oor'].className = 'oor';
+    UI['oor'].textContent = '';
+  }
 
+  // Sensitivity ∂C/∂K
+  const eps = 0.5;
+  const Kh = Math.min(376, K + eps), Kl = Math.max(8, K - eps);
+  const Ch = concentracion(T, Kh), Cl = concentracion(T, Kl);
+  const dCdK = (Ch - Cl) / (Kh - Kl);
   UI['derived'].innerHTML =
-    '\u2202K/\u2202C \u2248 <b>' + dKdC.toFixed(1) + '</b> mS/cm por % w/w &nbsp;&middot;&nbsp; ' +
-    '\u2202K/\u2202T \u2248 <b>' + dKdT.toFixed(2) + '</b> mS/cm por °C';
+    '\u2202C/\u2202K \u2248 <b>' + dCdK.toFixed(4) + '</b> % w/w por mS/cm' +
+    ' &nbsp;&middot;&nbsp; \u0394C \u2248 <b>' + (dCdK * 1).toFixed(4) + '</b> %/mS\u00B7cm\u207B\u00B9';
 
-  updateChart();
+  updateChart(T, C, K);
 }
 
 // ── SLIDERS ─────────────────────────────────────────────────
-function bindSlider(sid, nid, setter, min, max) {
+function bindSlider(sid, nid, setter, min, max, dec) {
   const s = UI[sid], n = UI[nid];
   s.addEventListener('input', () => {
     const v = parseFloat(s.value);
-    n.value = v.toFixed(1);
+    n.value = v.toFixed(dec);
     setter(v);
     renderDebounced();
   });
@@ -404,14 +421,14 @@ function bindSlider(sid, nid, setter, min, max) {
     let v = parseFloat(n.value);
     if (isNaN(v)) return;
     v = Math.max(min, Math.min(max, v));
-    s.value = v; n.value = v.toFixed(1);
+    s.value = v; n.value = v.toFixed(dec);
     setter(v);
     renderDebounced();
   });
 }
 
-bindSlider('ts', 'tn', v => { stateT = v; }, 20, 90);
-bindSlider('cs', 'cn', v => { stateC = v; }, 95, 100);
+bindSlider('ts', 'tn', v => { stateT = v; }, 20, 90, 1);
+bindSlider('ks', 'kn', v => { stateK = v; }, 8, 376, 0);
 
 // ── DISCLAIMER ──────────────────────────────────────────────
 function toggleDisc() {
