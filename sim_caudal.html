@@ -137,11 +137,11 @@ tr.model-row:hover td{background:var(--surface2)}
     <select id="liq-preset" onchange="applyLiqPreset()">
       <option value="">-Ingresar manualmente-</option>
       <option value="water" selected>Agua</option>
-      <option disabled>─Combustibles─</option>
+      <option disabled>── Combustibles ──</option>
       <option value="ethanol96">Alcohol etílico 96%</option>
       <option value="diesel">Diésel (EN 590)</option>
       <option value="biodiesel">Biodiésel (B100 FAME)</option>
-      <option disabled>─Aceites─</option>
+      <option disabled>── Aceites ──</option>
       <option value="soybean_oil">Aceite de soja</option>
       <option value="sunflower_oil">Aceite de girasol</option>
       <option value="palm_oil">Aceite de palma (RBD)</option>
@@ -149,12 +149,12 @@ tr.model-row:hover td{background:var(--surface2)}
       <option value="safflower_oil">Aceite de cártamo</option>
       <option value="canola_oil">Aceite de canola</option>
       <option value="beef_tallow">Grasa vacuna (sebo)</option>
-      <option disabled>─CIP Alcalino─</option>
+      <option disabled>── CIP Alcalino ──</option>
       <option value="naoh_1">NaOH 1% (CIP cáustico)</option>
       <option value="naoh_3">NaOH 3% (CIP estándar)</option>
       <option value="naoh_10">NaOH 10%</option>
       <option value="naoh_50">NaOH 50%</option>
-      <option disabled>─CIP Ácido─</option>
+      <option disabled>── CIP Ácido ──</option>
       <option value="hno3_1">HNO₃ 1% (CIP ácido)</option>
       <option value="hno3_10">HNO₃ 10%</option>
       <option value="hno3_50">HNO₃ 50%</option>
@@ -163,7 +163,7 @@ tr.model-row:hover td{background:var(--surface2)}
       <option value="h3po4_10">H₃PO₄ 10%</option>
       <option value="h3po4_50">H₃PO₄ 50%</option>
       <option value="h3po4_85">H₃PO₄ 85%</option>
-      <option disabled>─Sanitizantes─</option>
+      <option disabled>── Sanitizantes ──</option>
       <option value="peracetic">Ác. peracético 15%</option>
       <option value="naocl_1">NaOCl 1% (sanitizante CIP)</option>
       <option value="naocl_10">NaOCl 10%</option>
@@ -714,8 +714,8 @@ function onMuUnitChange(){
 }
 
 // Base-value caches: updated on every input change and preset load
-var _rhoBaseCache = 1000;
-var _muBaseCache  = 1.0;
+let _rhoBaseCache = 1000;
+let _muBaseCache  = 1.0;
 function syncRhoCache(){ _rhoBaseCache = getRhoBase(); }
 function syncMuCache(){  _muBaseCache  = getMuBase(); }
 // Helper — set textContent
