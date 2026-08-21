@@ -469,38 +469,52 @@ function drawChart(tid){
 }
 
 // ═══════════════════════════════════════════
+// DOM CACHE PER TAB (populated on first render)
+// ═══════════════════════════════════════════
+const tabUI = {};
+function getTabUI(tid){
+  if(tabUI[tid]) return tabUI[tid];
+  const u = {};
+  ['oor','dv','tv','cv','sgv','sub2','der','svg'].forEach(k => {
+    u[k] = document.getElementById(k+'-'+tid);
+  });
+  tabUI[tid] = u;
+  return u;
+}
+
+// ═══════════════════════════════════════════
 // RENDER
 // ═══════════════════════════════════════════
 function render(tid){
   const cfg=TABS.find(t=>t.id===tid);
   const s=state[tid];
+  const u=getTabUI(tid);
   const conc=invertDensity(tid,s.dens,s.temp);
   const oor=conc===null;
 
-  document.getElementById('oor-'+tid).classList.toggle('show',oor);
-  document.getElementById('dv-'+tid).textContent=s.dens.toFixed(1);
-  if(cfg.hasTemp) document.getElementById('tv-'+tid).textContent=s.temp.toFixed(1);
+  u.oor.classList.toggle('show',oor);
+  u.dv.textContent=s.dens.toFixed(1);
+  if(cfg.hasTemp && u.tv) u.tv.textContent=s.temp.toFixed(1);
 
   if(oor){
-    document.getElementById('cv-'+tid).textContent='—';
-    document.getElementById('sgv-'+tid).textContent='—';
-    document.getElementById('sub2-'+tid).textContent='';
-    document.getElementById('der-'+tid).innerHTML='';
+    u.cv.textContent='—';
+    u.sgv.textContent='—';
+    u.sub2.textContent='';
+    u.der.innerHTML='';
   } else {
     let displayConc=conc;
     let sub2='';
     if(tid==='alcohol'&&s.toggleVal==='vol'){
-      const rhoMezcla=spEval(s.sp,conc); // densidad a 20°C de la mezcla (g/cm³)
+      const rhoMezcla=spEval(s.sp,conc);
       displayConc=alcMassToVol(conc,rhoMezcla);
       sub2=`≈ ${conc.toFixed(1)} % masa`;
     }
-    document.getElementById('cv-'+tid).textContent=displayConc.toFixed(1);
-    document.getElementById('sub2-'+tid).textContent=sub2;
+    u.cv.textContent=displayConc.toFixed(1);
+    u.sub2.textContent=sub2;
 
     const sgRef=spEval(s.sp,conc);
-    document.getElementById('sgv-'+tid).textContent=sgRef.toFixed(4);
+    u.sgv.textContent=sgRef.toFixed(4);
 
-    // Sensibilidad: cuántos kg/m³ por unidad de concentración
     const ch=Math.min(conc+0.5,cfg.cMax),cl=Math.max(conc-0.5,cfg.cMin);
     const dd=ch-cl;
     let info='';
@@ -509,7 +523,7 @@ function render(tid){
       info=`Sensibilidad: <b>${sens.toFixed(1)}</b> kg/m³ por ${cfg.concUnit}`;
       if(sens>0) info+=` · Resolución del sensor (±0,5 kg/m³) ≈ ±${(0.5/sens).toFixed(2)} ${cfg.concUnit}`;
     }
-    document.getElementById('der-'+tid).innerHTML=info;
+    u.der.innerHTML=info;
   }
 
   if(rafIds[tid]) cancelAnimationFrame(rafIds[tid]);
