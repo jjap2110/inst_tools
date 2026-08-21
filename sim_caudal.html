@@ -135,15 +135,16 @@ tr.model-row:hover td{background:var(--surface2)}
   <div id="liq-library-row" class="field" style="margin-bottom:8px">
     <label>Líquido preconfigurado (opcional)</label>
     <select id="liq-preset" onchange="applyLiqPreset()">
-      <option value="">— Ingresar manualmente —</option>
+      <option value="">-Ingresar manualmente-</option>
       <option value="water" selected>Agua</option>
-      <option disabled>── Combustibles ──</option>       
+      <option disabled>── Combustibles ──</option>
       <option value="ethanol96">Alcohol etílico 96%</option>
       <option value="diesel">Diésel (EN 590)</option>
       <option value="biodiesel">Biodiésel (B100 FAME)</option>
       <option disabled>── Aceites ──</option>
       <option value="soybean_oil">Aceite de soja</option>
       <option value="sunflower_oil">Aceite de girasol</option>
+      <option value="palm_oil">Aceite de palma (RBD)</option>
       <option value="peanut_oil">Aceite de maní</option>
       <option value="safflower_oil">Aceite de cártamo</option>
       <option value="canola_oil">Aceite de canola</option>
@@ -1129,8 +1130,19 @@ const LIQ_PRESETS = {
     name: 'Aceite de girasol', conductive: false,
     tMin: 10, tMax: 180,
     // Source: Fasina & Colley (2008), high-oleic sunflower oil
+    // NOTA: la viscosidad varía ±30% según perfil de ácidos grasos (alto oleico vs linoleico).
+    // Si su aceite difiere, use "Ingresar manualmente" con los datos de su ficha técnica.
     rhoT: [[10,924],[20,918],[30,912],[40,906],[50,899],[60,893],[80,879],[100,865],[120,851],[150,830],[180,808]],
     muT:  [[10,110.0],[20,58.5],[30,35.0],[40,22.5],[50,15.3],[60,10.8],[80,5.8],[100,3.6],[120,2.4],[150,1.5],[180,1.0]],
+  },
+  palm_oil: {
+    name: 'Aceite de palma (RBD)', conductive: false,
+    tMin: 35, tMax: 180,
+    // Source: Noureddini et al. (1992); Esteban et al. (2012); Fasina (2006)
+    // RBD palm oil — punto de fusión ~33-35°C, datos válidos solo por encima
+    // Cliente ref: 60 cP @25°C, 28 cP @50°C (consistente con literatura)
+    rhoT: [[35,905],[40,901],[50,894],[60,887],[70,881],[80,874],[90,867],[100,860],[120,846],[150,825],[180,804]],
+    muT:  [[35,45.0],[40,34.0],[50,21.0],[60,14.0],[70,9.8],[80,7.2],[90,5.4],[100,4.2],[120,2.7],[150,1.6],[180,1.0]],
   },
   peanut_oil: {
     name: 'Aceite de maní', conductive: false,
