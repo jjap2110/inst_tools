@@ -10,7 +10,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#020B1F;--surface:#08132D;--surface2:#0D1B3A;
-  --text:#E8ECF0;--text2:#B0BEC5;--text3:#8A9BB5;
+  --text:#FFFFFF;--text2:#CCCCCC;--text3:#8A9BB5;
   --border:rgba(0,242,255,0.15);--border2:rgba(0,242,255,0.25);
   --radius:8px;
   --acc:#00CFFF;--acc-bg:#061E3F;--acc-text:#00CFFF;
@@ -42,8 +42,24 @@ input[type="number"]:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(0,2
 .srow .si{display:flex;align-items:center;gap:10px}
 input[type="range"]{-webkit-appearance:none;appearance:none;flex:1;height:7px;background:linear-gradient(90deg,var(--acc),var(--surface2));border-radius:var(--radius);outline:none;margin:6px 0}
 #temp{background:linear-gradient(90deg,var(--acc),var(--danger))}
-input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--bg);border:3px solid var(--acc);cursor:pointer;box-shadow:0 0 8px rgba(0,207,255,.3)}
-input[type="range"]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--bg);border:3px solid var(--acc);cursor:pointer}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--bg);border:3px solid var(--acc);cursor:pointer;box-shadow:0 0 8px rgba(0,207,255,.3);transition:border-color .3s,box-shadow .3s}
+input[type="range"]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--bg);border:3px solid var(--acc);cursor:pointer;transition:border-color .3s}
+
+/* Sliders dinámicos por estado Re */
+#caudal.re-ok{background:linear-gradient(90deg,var(--ok),var(--surface2))}
+#caudal.re-ok::-webkit-slider-thumb{border-color:var(--ok);box-shadow:0 0 8px rgba(0,230,118,.4)}
+#caudal.re-warn{background:linear-gradient(90deg,var(--warn),var(--surface2))}
+#caudal.re-warn::-webkit-slider-thumb{border-color:var(--warn);box-shadow:0 0 8px rgba(255,179,0,.4)}
+#caudal.re-fail{background:linear-gradient(90deg,var(--danger),var(--surface2))}
+#caudal.re-fail::-webkit-slider-thumb{border-color:var(--danger);box-shadow:0 0 8px rgba(255,82,82,.4)}
+
+/* Slider de diámetro también responde al estado Re */
+#diametro_idx.re-ok{background:linear-gradient(90deg,var(--ok),var(--surface2))}
+#diametro_idx.re-ok::-webkit-slider-thumb{border-color:var(--ok);box-shadow:0 0 8px rgba(0,230,118,.4)}
+#diametro_idx.re-warn{background:linear-gradient(90deg,var(--warn),var(--surface2))}
+#diametro_idx.re-warn::-webkit-slider-thumb{border-color:var(--warn);box-shadow:0 0 8px rgba(255,179,0,.4)}
+#diametro_idx.re-fail{background:linear-gradient(90deg,var(--danger),var(--surface2))}
+#diametro_idx.re-fail::-webkit-slider-thumb{border-color:var(--danger);box-shadow:0 0 8px rgba(255,82,82,.4)}
 .srow .val{font-family:'Roboto Mono',monospace;font-size:14px;color:var(--text);font-weight:700;min-width:80px;text-align:right}
 .ticks{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:1px}
 .unit-note{font-size:11px;color:var(--text3);margin-top:3px;font-family:'Roboto Mono',monospace}
@@ -103,7 +119,7 @@ input[type="range"]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;b
 </style>
 </head>
 <body>
-<noscript><div style="padding:20px;text-align:center;color:#E8ECF0;font-family:sans-serif">Esta herramienta requiere JavaScript habilitado para funcionar.</div></noscript>
+<noscript><div style="padding:20px;text-align:center;color:#FFFFFF;font-family:sans-serif">Esta herramienta requiere JavaScript habilitado para funcionar.</div></noscript>
 <div class="app">
   <h1>Reynolds — Loop Agua Purificada</h1>
   <p class="subtitle">Tubing ASME BPE · Propiedades interpoladas 15–80 °C · Calificación OQ</p>
@@ -427,6 +443,13 @@ function calcular() {
     const reEl  = UI['res_re'];
     const regEl = UI['res_regimen'];
     res.classList.remove('ok','warn','fail');
+
+    // Sliders dinámicos — color según zona Re
+    const reClass = Re >= 4000 ? 're-ok' : Re >= 2300 ? 're-warn' : 're-fail';
+    ['caudal','diametro_idx'].forEach(id => {
+      UI[id].classList.remove('re-ok','re-warn','re-fail');
+      UI[id].classList.add(reClass);
+    });
 
     if (Re>=4000) {
       res.classList.add('ok'); UI['gauge_re'].style.background='var(--ok)';
