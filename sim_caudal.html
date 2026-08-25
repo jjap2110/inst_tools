@@ -436,7 +436,7 @@ correlación es confiable ahí y el simulador emite alerta en ese régimen.
 </div><!-- /app -->
 
 <script>
-// ── Constants ────────────────────────────────────────────────────────────────
+// -- Constants ----------------------------------------------------------------
 const C = {
   // IAPWS steam
   STEAM_TC:      647.096,   // K  — critical temperature water
@@ -495,7 +495,7 @@ const C = {
   S_PER_HOUR:    3600,     // s/h
 };
 
-// ── IAPWS Steam Correlations ─────────────────────────────────────────────────
+// -- IAPWS Steam Correlations -------------------------------------------------
 function pSatWagner(T_C){
   const Tc=C.STEAM_TC, Pc=C.STEAM_PC, T=T_C+273.15;
   if(T>=Tc) return Pc;
@@ -591,7 +591,7 @@ function calcSteam(){
   }
 }
 
-// ── State ────────────────────────────────────────────────────────────────────
+// -- State --------------------------------------------------------------------
 const S = {
   unit:       'kgh',      // 'kgh' | 'm3h'
   phase:      'liquid',   // 'liquid' | 'gas' | 'steam'
@@ -606,7 +606,7 @@ const S = {
   mu:   1.0,
 };
 
-// ── DOM cache — avoids repeated getElementById lookups ───────────────────────
+// -- DOM cache — avoids repeated getElementById lookups -----------------------
 // Populated on DOMContentLoaded; all UI access goes through this object.
 const UI = {};
 document.addEventListener('DOMContentLoaded', () => {
@@ -653,7 +653,7 @@ function uiNum(id, fallback=0){ return parseFloat(UI[id]?.value) || fallback; }
 // Helper — set value on a cached input
 function uiSet(id, val){ if(UI[id]) UI[id].value = val; }
 
-// ── Unit conversion: density & viscosity ──────────────────────────────────
+// -- Unit conversion: density & viscosity ----------------------------------
 const RHO_CONV = {
   kgm3:  { toBase: v => v,           fromBase: v => v,             step:'0.1' },
   gcm3:  { toBase: v => v * 1000,    fromBase: v => v / 1000,      step:'0.0001' },
@@ -749,7 +749,7 @@ const onConditionChangeDebounced = debounce(() => onConditionChange(), 300);
 const calcSteamDebounced         = debounce(() => calcSteam(), 300);
 const updateConversionDebounced  = debounce(() => updateConversion(), 300);
 
-// ── Real-time input validation ───────────────────────────────────────────────
+// -- Real-time input validation -----------------------------------------------
 // Rules per field id: {min, minExclusive, msg}
 const VALIDATION_RULES = {
   'f-temp': { min: -273.15, msg: 'T debe ser ≥ −273.15 °C' },
@@ -805,9 +805,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-// ── Gas library ──────────────────────────────────────────────────────────────
+// -- Gas library --------------------------------------------------------------
 // Properties at ~20°C process unless noted. μ in mPa·s, ρ at 1 bar 20°C kg/m³, MW g/mol
-// ── Gas properties — NIST WebBook data (1 atm, μ in μPa·s) ──────────────────
+// -- Gas properties — NIST WebBook data (1 atm, μ in μPa·s) ------------------
 // Source: NIST Chemistry WebBook (webbook.nist.gov)
 // Viscosity at 1 atm; pressure correction <2% for P<20 bar — negligible for preselection
 // Interpolation: linear between tabulated points (error <0.5% within table range)
@@ -869,12 +869,12 @@ function mu_gas(g, T_C){
 }
 
 
-// ── OPTIMASS data ─────────────────────────────────────────────────────────────
+// -- OPTIMASS data -------------------------------------------------------------
 
 // gas_e_base: error base en % para gases por familia
 const GAS_E_BASE  = {'1400':0.50,'5400':0.50,'6400':0.35,'7400':0.35};
 
-// ── Índice de precios por modelo (fuente: precios.md) ────────────────────────
+// -- Índice de precios por modelo (fuente: precios.md) ------------------------
 // Clave: "FAMILIA-DN"  p. ej. "1400-S15", "5400-S10", "VORTEX-DN15"
 // Familia VORTEX = OPTISWIRL 4200. OF = OPTIFLUX (no cargado aún).
 const PRICE_INDEX = {
@@ -980,7 +980,7 @@ const MODELS = {
   ]}
 };
 
-// ── Physics ───────────────────────────────────────────────────────────────────
+// -- Physics -------------------------------------------------------------------
 // di_eff: internal tube diameter derived from curve coefficient a_v (m/s per kg/h)
 // a_v = 1/(3600·ρ_agua·A·N) → A = 1/(3600·1000·N·a_v) → di_eff = sqrt(4A/π)
 function di_eff(av, ntube){
@@ -993,7 +993,7 @@ function re_calc(Q_kgh, av, mu_mpas, ntube){
   return 4*(Q_kgh/3600)/(Math.PI*di*(mu_mpas/1000)*ntube);
 }
 
-// ── Friction factor ──────────────────────────────────────────────────────────
+// -- Friction factor ----------------------------------------------------------
 // Scheme: 64/Re (laminar) · linear blend 2300–4000 (transition) · 
 //         Blasius Re<1e5 / Filonenko-type Re≥1e5 (turbulent).
 //
@@ -1055,7 +1055,7 @@ function regime_label(Re){
   return ['Turbulento','turb'];
 }
 
-// ── Gas conversion ────────────────────────────────────────────────────────────
+// -- Gas conversion ------------------------------------------------------------
 function rho_std(mw, normMode){
   // density at standard conditions (Z=1, ideal)
   const T_ref = normMode==='Nm3' ? 273.15 : 288.15; // K
@@ -1094,7 +1094,7 @@ function updateConversion(){
     `Q<sub>proceso</sub> = <b>${qVolPr.toFixed(4)} m³/h</b>`;
 }
 
-// ── UI controls ───────────────────────────────────────────────────────────────
+// -- UI controls ---------------------------------------------------------------
 // Recalculate gas/steam density when T, P, or Z changes
 // Pure physics — returns {rho, mu} for a gas preset at given conditions. No DOM access.
 function gasProps(key, T_C, P_bara, Z){
@@ -1107,7 +1107,7 @@ function gasProps(key, T_C, P_bara, Z){
 }
 
 
-// ── Liquid presets — ρ(T) and μ(T) correlations ──────────────────────────────
+// -- Liquid presets — ρ(T) and μ(T) correlations ------------------------------
 // Each liquid has:
 //   name:       display name
 //   conductive: boolean — auto-sets checkbox
@@ -1203,11 +1203,11 @@ const LIQ_PRESETS = {
     muT:  [[0,18.0],[10,10.5],[15,8.2],[20,6.5],[30,4.5],[40,3.5],[50,2.7],[60,2.2],[70,1.8],[80,1.5],[100,1.1]],
   },
 
-  // ═══════════════════════════════════════════════════════════════
+  // ===============================================================
   // LÁCTEOS — V_MAX = 3.0 m/s (churning, separación de grasa)
   // Fuentes: Choi & Okos (1986), Singh & Heldman (2014), USDA SR28
   // Todas conductivas → EMF elegible
-  // ═══════════════════════════════════════════════════════════════
+  // ===============================================================
   whole_milk: {
     name: 'Leche entera (3.5% grasa)', conductive: true,
     tMin: 4, tMax: 80,
@@ -1234,13 +1234,13 @@ const LIQ_PRESETS = {
     muT:  [[4,250.0],[10,180.0],[20,100.0],[30,60.0],[40,40.0],[50,28.0]],
   },
 
-  // ═══════════════════════════════════════════════════════════════
+  // ===============================================================
   // CIP — SOLUCIONES ACUOSAS PARA INDUSTRIA DE ALIMENTOS Y BEBIDAS
   // Fuentes: Perry's 8th ed., CRC Handbook 97th ed., Zaytsev & Aseyev (1992)
   // Todas son conductivas → EMF elegible
-  // ═══════════════════════════════════════════════════════════════
+  // ===============================================================
 
-  // ── NaOH (Hidróxido de sodio) ─────────────────────────────────
+  // -- NaOH (Hidróxido de sodio) ---------------------------------
   naoh_1: {
     name: 'NaOH 1% (CIP cáustico)', conductive: true,
     tMin: 10, tMax: 90,
@@ -1269,7 +1269,7 @@ const LIQ_PRESETS = {
     muT:  [[20,30.0],[30,18.0],[40,12.0],[50,8.0],[60,5.8],[70,4.3],[80,3.3],[90,2.6]],
   },
 
-  // ── HNO₃ (Ácido nítrico) ─────────────────────────────────────
+  // -- HNO₃ (Ácido nítrico) -------------------------------------
   hno3_1: {
     name: 'HNO₃ 1% (CIP ácido)', conductive: true,
     tMin: 10, tMax: 70,
@@ -1297,7 +1297,7 @@ const LIQ_PRESETS = {
     muT:  [[10,1.55],[20,1.25],[30,1.02],[40,0.85],[50,0.72]],
   },
 
-  // ── H₃PO₄ (Ácido fosfórico) ──────────────────────────────────
+  // -- H₃PO₄ (Ácido fosfórico) ----------------------------------
   h3po4_1: {
     name: 'H₃PO₄ 1%', conductive: true,
     tMin: 10, tMax: 70,
@@ -1324,7 +1324,7 @@ const LIQ_PRESETS = {
     muT:  [[20,40.0],[30,24.0],[40,15.5],[50,10.5],[60,7.5],[70,5.5]],
   },
 
-  // ── Ácido peracético (CH₃CO₃H) ───────────────────────────────
+  // -- Ácido peracético (CH₃CO₃H) -------------------------------
   peracetic: {
     name: 'Ác. peracético 15% (sanitizante)', conductive: true,
     tMin: 5, tMax: 50,
@@ -1334,7 +1334,7 @@ const LIQ_PRESETS = {
     muT:  [[5,1.80],[10,1.50],[15,1.28],[20,1.10],[25,0.96],[30,0.85],[40,0.68],[50,0.56]],
   },
 
-  // ── NaOCl (Hipoclorito de sodio) ──────────────────────────────
+  // -- NaOCl (Hipoclorito de sodio) ------------------------------
   naocl_1: {
     name: 'NaOCl 1% (sanitizante CIP)', conductive: true,
     tMin: 5, tMax: 50,
@@ -1422,7 +1422,7 @@ function markLiqTempRange(liq, T){
     : '';
 }
 
-// ── Recalculate liquid props when T changes ──────────────────────────────────
+// -- Recalculate liquid props when T changes ----------------------------------
 function onLiqConditionChange(){
   const key = UI['liq-preset'].value;
   if(!key) return; // manual mode — user controls ρ and μ
@@ -1436,7 +1436,7 @@ function onLiqConditionChange(){
   markLiqTempRange(liq, T);
 }
 
-// ── Actualiza las opciones del menú de tecnología según fase/conductividad/viscosidad ──
+// -- Actualiza las opciones del menú de tecnología según fase/conductividad/viscosidad --
 // Reglas:
 //   Líquido conductivo + μ ≤ 1.5 mPa·s → todos (Coriolis, Vortex, EMF, H250)
 //   Líquido conductivo + μ > 1.5        → Coriolis, EMF (sin Vortex ni H250)
@@ -1600,7 +1600,7 @@ function applyGasPreset(){
   updateConversion();
 }
 
-// ── OPTISWIRL 4200 Vortex data ──────────────────────────────────────────────
+// -- OPTISWIRL 4200 Vortex data ----------------------------------------------
 // Validated vs KROSS 1.7P build 5003 (Water/Air/Steam, 7 DN combinations)
 // Di_eff: from velocity back-calculation | K: fluid-independent (Δ<1% water/air/steam)
 const VORTEX_FLOOR_LIQ = C.VORTEX_FLOOR_LIQ;
@@ -1622,7 +1622,7 @@ const VORTEX_MODELS = [
   {dn:'DN250', Di:253.0e-3, K:2.17, Kv:true,  v_min_liq:0.30,v_max_liq:10.0,v_min_gas:2.0,v_max_gas:80.0},
   {dn:'DN300', Di:302.0e-3, K:1.85, Kv:false, v_min_liq:0.30,v_max_liq:10.0,v_min_gas:2.0,v_max_gas:80.0},
 ];
-// ── Generic pipe hydraulics — shared by Vortex and EMF (audited: deduplication) ──
+// -- Generic pipe hydraulics — shared by Vortex and EMF (audited: deduplication) --
 // v [m/s] from mass flow through a circular section of internal diameter Di [m]
 function v_pipe(Di, Q_kgh, rho){
   return (Q_kgh / C.S_PER_HOUR) / (rho * Math.PI * Di**2 / 4);
@@ -1642,7 +1642,7 @@ function acc_vortex(Re,isGas){
   return isGas?VORTEX_FLOOR_GAS:VORTEX_FLOOR_LIQ;
 }
 
-// ── OPTIFLUX 1050 Electromagnetic data ──────────────────────────────────────
+// -- OPTIFLUX 1050 Electromagnetic data --------------------------------------
 // Only for conductive liquids (≥5 μS/cm). ΔP ≈ pipe friction only (no obstruction).
 // Accuracy: ±0.5% of measured value ± 1 mm/s
 // Di values: user-measured where noted (✓), rest extrapolated from PTFE liner std.
@@ -1685,7 +1685,7 @@ function dp_emf(m, Q_kgh, rho, mu){
   return f * m.Ld * rho * v**2 / 2 * 1e-5;  // bar — Ld per model, validated vs KROSS
 }
 
-// ── H250 M40 Variable Area (Rotameter) data ─────────────────────────────────
+// -- H250 M40 Variable Area (Rotameter) data ---------------------------------
 // Accuracy class G=1.6, qG=50% per VDI/VDE 3513-2:2008
 // Float material: Inox 316L, ρ_float = 8000 kg/m³
 // Ranges from TD H250-M40 R07, Table 2-19
@@ -1780,7 +1780,7 @@ const H250_TBL = [
 // H250 prices: 0.85 × OF 1050 of same DN
 const H250_PRICES = {'DN15':0.85,'DN25':0.85,'DN50':0.85,'DN80':0.85,'DN100':0.935};
 
-// ── H250 physics ─────────────────────────────────────────────────────────────
+// -- H250 physics -------------------------------------------------------------
 
 // Convert full-scale range to kg/h for actual fluid
 // Liquid: density correction from water calibration
@@ -1822,7 +1822,7 @@ function va_error(q_pct){
 }
 
 
-// ── Fluid context helper — centralises repeated checks ────────────────────────
+// -- Fluid context helper — centralises repeated checks ------------------------
 // Returns a consistent set of flags used across simulate(), renderResults(), buildChart()
 function getFluidContext(rho, mu, phase){
   const isGas   = phase==='gas' || phase==='steam';
@@ -1839,7 +1839,7 @@ function getFluidContext(rho, mu, phase){
   return {isGas, isSteam, isWater, isLowDens, isHighVisc, isGasLowMu, isLiqLowDens, isLiqLowMu, isConductive};
 }
 
-// ── Fluid-specific velocity limit ───────────────────────────────────────────
+// -- Fluid-specific velocity limit -------------------------------------------
 // Returns the max recommended velocity (m/s) for the current fluid category.
 // Falls back to the generic V_LIQ_MAX if no category matches.
 function getVMaxForFluid(){
@@ -1855,7 +1855,7 @@ function getVMaxForFluid(){
   return C.V_LIQ_MAX;
 }
 
-// ── Cavitation risk check ───────────────────────────────────────────────────
+// -- Cavitation risk check ---------------------------------------------------
 // P_salida > P_vapor(T) + 2×ΔP  →  if not, cavitation risk
 // Returns {risk:bool, pVapor:number, margin:number}
 function checkCavitation(dp_bar){
@@ -1869,7 +1869,7 @@ function checkCavitation(dp_bar){
   return {risk: margin < 0, pVapor: pVapor, margin: margin, pOutlet: pOutlet};
 }
 
-// ── Main simulation ───────────────────────────────────────────────────────────
+// -- Main simulation -----------------------------------------------------------
 // Public entry point — wraps the core so an unexpected error in physics,
 // sorting or rendering shows a friendly message instead of dying silently
 // in the console (auditor part 3: exception handling).
@@ -1886,7 +1886,7 @@ function simulate(){
 
 let _lastExtremeConditions = false;
 function _simulateCore(){
-  // ── Input validation ──────────────────────────────────────────────────────
+  // -- Input validation ------------------------------------------------------
   const rhoRaw = getRhoBase();
   const muRaw  = getMuBase();
   const qInRaw = parseFloat(UI['f-q'].value);
@@ -1908,12 +1908,12 @@ function _simulateCore(){
   S.Q=Q; S.rho=rho; S.mu=mu;
   S.simCtx = {isGas, isSteam, isWater};
 
-  // ── Tipo de caudalímetro seleccionado en el menú ──────────────────────────
+  // -- Tipo de caudalímetro seleccionado en el menú --------------------------
   const techSel = UI['f-tech'] ? UI['f-tech'].value : 'all';
 
   let candidates=[];
   if(techSel!=='vortex' && techSel!=='emf' && techSel!=='h250')
-  // ── Extreme conditions: T or P outside standard range → only 6400 ──────
+  // -- Extreme conditions: T or P outside standard range → only 6400 ------
   const tempVal = parseFloat(UI['f-temp']?.value) || 25;
   const pressVal = getPressBara();
   const extremeConditions = (!isGas && (tempVal > C.T_MAX_STD || tempVal < C.T_MIN_STD)) || pressVal > C.P_MAX_STD;
@@ -1954,7 +1954,7 @@ function _simulateCore(){
     });
   }
 
-  // ── Add VORTEX candidates (low-viscosity fluids only: μ ≤ 1.5 mPa·s) ──────
+  // -- Add VORTEX candidates (low-viscosity fluids only: μ ≤ 1.5 mPa·s) ------
   if((techSel==='all'||techSel==='vortex') && mu <= VORTEX_MU_MAX){
     VORTEX_MODELS.forEach((m,dnIdx)=>{
       const A      = Math.PI*m.Di**2/4;
@@ -1992,7 +1992,7 @@ function _simulateCore(){
     });
   }
 
-  // ── H250 Área Variable ────────────────────────────────────────────────────
+  // -- H250 Área Variable ----------------------------------------------------
   if(techSel === 'h250' || techSel === 'all'){
     if(techSel === 'h250') candidates = []; // modo exclusivo
     // isGas incluye vapor saturado — el vapor a ρ≈5 kg/m³ se comporta como gas en el flotador
@@ -2050,7 +2050,7 @@ function _simulateCore(){
     } // end else (viscosity filter)
   }
 
-  // ── Add EMF candidates (conductive liquids only, if tech allows)
+  // -- Add EMF candidates (conductive liquids only, if tech allows)
   if(techSel !== 'h250') // skip other techs if H250 exclusive ────────────────────────────
   if((techSel==='all'||techSel==='emf') && isConductive && !isGas){
     EMF_MODELS.forEach(m => {
@@ -2088,7 +2088,7 @@ function _simulateCore(){
     return;
   }
 
-  // ── Family preference rules ────────────────────────────────────────────────
+  // -- Family preference rules ------------------------------------------------
   // Rule A — Gas / vapor / baja densidad (ρ<400) + μ ≤ 1.5 mPa·s:
   //   VORTEX (OS4200) primero por precio, luego 6400 (mejor error gas 0.35%)
   // Rule B — Líquido baja densidad (ρ<400) + μ > 1.5 mPa·s:
@@ -2150,7 +2150,7 @@ function _simulateCore(){
   UI['results'].classList.remove('hidden');
 }
 
-// ── Render results ────────────────────────────────────────────────────────────
+// -- Render results ------------------------------------------------------------
 // Formatea un rango de caudal (almacenado internamente en kg/h) a la unidad de display.
 // Líquidos: kg/h o m³/h proceso (÷ ρ proceso).
 // Gases: kg/h, m³/h proceso, o Nm³/h / Sm³/h (÷ ρ_std del gas).
@@ -2199,7 +2199,7 @@ function renderResults(selIdx, isFirstRender){
   }
   const rec=S.candidates[0], sel=S.candidates[selIdx];
 
-  // ── KPIs — update for the selected model (not just the recommended) ──────
+  // -- KPIs — update for the selected model (not just the recommended) ------
   const selModelLabel=sel.fam==='VORTEX'
     ?`OS 4200 · ${sel.dn}`
     : sel.fam==='EMF'
@@ -2229,7 +2229,7 @@ function renderResults(selIdx, isFirstRender){
       ` <span class="regime ${regC}">${regL}</span>`;
   }
 
-  // ── Alerts — only on first render (for the recommended model) ──────────
+  // -- Alerts — only on first render (for the recommended model) ----------
   if(isFirstRender){
     const alerts=UI['r-alerts'];
     alerts.innerHTML='';
@@ -2369,7 +2369,7 @@ function renderResults(selIdx, isFirstRender){
   buildChart(sel,Q,rho,mu,isGas,isWater);
 }
 
-// ── Chart ─────────────────────────────────────────────────────────────────────
+// -- Chart ---------------------------------------------------------------------
 function buildChart(sel,Q_op,rho,mu,isGas,isWater){
   try { _buildChartCore(sel,Q_op,rho,mu,isGas,isWater); }
   catch(err){
@@ -2383,18 +2383,18 @@ function buildChart(sel,Q_op,rho,mu,isGas,isWater){
 function _buildChartCore(sel,Q_op,rho,mu,isGas,isWater){
   const m=sel.m, fd=sel.fd, fam=sel.fam;
 
-  // ── Unit label for X axis — match user selection ──────────────────────────
+  // -- Unit label for X axis — match user selection --------------------------
   const useM3h = S.unit==='m3h';
   const xUnit  = useM3h ? 'm³/h' : 'kg/h';
   // Convert Q from kg/h to display unit for labels and tooltip
   const toDisplay = q => useM3h ? q/rho : q;
   const fromDisplay = v => useM3h ? v*rho : v;
 
-  // ── Per-point calc — vortex/EMF use their own functions ─────────────────────
+  // -- Per-point calc — vortex/EMF use their own functions ---------------------
   const isVortex = !!sel.isVortex;
   const isEMF    = !!sel.isEMF;
   const isH250   = !!sel.isH250;
-  // ── Rango del gráfico ─────────────────────────────────────────────────────
+  // -- Rango del gráfico -----------------------------------------------------
   // Eje X siempre empieza en 0. Las curvas de error y ΔP empiezan en qmin
   // (definido por la rangeabilidad de cada tecnología):
   //   Coriolis: 130–300:1 (qmin del datasheet)
@@ -2517,7 +2517,7 @@ function _buildChartCore(sel,Q_op,rho,mu,isGas,isWater){
   });
 }
 
-// ── Alerts collapsible ───────────────────────────────────────────────────────────
+// -- Alerts collapsible -----------------------------------------------------------
 function toggleAlerts(){
   const toggle = UI['alerts-toggle'];
   const body   = UI['alerts-body'];
@@ -2538,17 +2538,17 @@ function toggleDisc(){
 
 
 
-// ═════════════════════════════════════════════════════════════════════════════
+// =============================================================================
 // SELF-TESTS — run with ?test=1 in the URL. Results in browser console.
 // Protects core physics & data against regressions when adding new families
 // (e.g. OPTIFLUX). No framework needed.
-// ═════════════════════════════════════════════════════════════════════════════
+// =============================================================================
 function runSelfTests(){
   const results = [];
   const approx = (a, b, tol) => Math.abs(a - b) <= tol;
   function t(name, cond){ results.push({name, pass: !!cond}); }
 
-  // ── IAPWS steam ────────────────────────────────────────────────────────────
+  // -- IAPWS steam ------------------------------------------------------------
   t('tSatFromP(1.01325) ≈ 100°C',        approx(tSatFromP(1.01325), 100.0, 0.05));
   t('tSatFromP(10) ≈ 179.9°C',           approx(tSatFromP(10), 179.88, 0.1));
   t('pSatWagner(100) ≈ 1.014 bar',       approx(pSatWagner(100), 1.0142, 0.002));
@@ -2559,14 +2559,14 @@ function runSelfTests(){
   t('steamProps(-1) returns null',        steamProps(-1) === null);
   t('steamProps(300) returns null',       steamProps(300) === null);
 
-  // ── Gas physics ────────────────────────────────────────────────────────────
+  // -- Gas physics ------------------------------------------------------------
   t('rho_process aire 20°C 1bar ≈ 1.19', approx(rho_process(28.97, 20, 1.01325, 1), 1.204, 0.02));
   t('mu_gas aire 20°C ≈ 0.0181 mPa·s',   approx(mu_gas(GAS_PRESETS.air, 20), 0.01813, 0.0005));
   t('mu_gas interpolation monotone',      mu_gas(GAS_PRESETS.air, 100) > mu_gas(GAS_PRESETS.air, 20));
   t('gasProps returns rho & mu',          (() => { const p = gasProps('air', 20, 1, 1); return p && p.rho > 0 && p.mu > 0; })());
   t('gasProps invalid key → null',        gasProps('nope', 20, 1, 1) === null);
 
-  // ── Reynolds & friction ────────────────────────────────────────────────────
+  // -- Reynolds & friction ----------------------------------------------------
   // End-to-end unit chain test: water 20°C in a 50mm pipe at 2 m/s
   // Re = ρ·v·D/μ = 998.2 · 2 · 0.05 / 1.002e-3 = 99,620 — if μ were mixed up
   // (mPa·s vs Pa·s) this would be off by ×1000 and fail loudly.
@@ -2587,12 +2587,12 @@ function runSelfTests(){
   t('friction turbulent Re=1e5 ≈ 0.018',  friction(1e5) > 0.015 && friction(1e5) < 0.022);
   t('friction continuous at Re=2300',     approx(friction(2299), friction(2301), 0.01));
 
-  // ── Price index ────────────────────────────────────────────────────────────
+  // -- Price index ------------------------------------------------------------
   t('makeCost 5400-S15 = 1.6',            makeCost('5400','S15') === 1.6);
   t('makeCost VORTEX-DN100 = 1.6',        makeCost('VORTEX','DN100') === 1.6);
   t('makeCost unknown → 9.9 fallback',    makeCost('9999','SXX') === 9.9);
 
-  // ── Vortex physics ─────────────────────────────────────────────────────────
+  // -- Vortex physics ---------------------------------------------------------
   t('v_vortex DN100 10t/h vapor ≈ 73.0',   (() => { const m = VORTEX_MODELS.find(x => x.dn === 'DN100');
                                                     return approx(v_vortex(m, 10000, 5.15), 72.99, 0.5); })());
   t('acc_vortex Re<10k → Infinity',        acc_vortex(5000, true) === Infinity);
@@ -2600,7 +2600,7 @@ function runSelfTests(){
   t('acc_vortex Re 25k gas → 1.0',         acc_vortex(25000, true) === C.VORTEX_FLOOR_GAS);
   t('acc_vortex Re 25k liq → 0.75',        acc_vortex(25000, false) === C.VORTEX_FLOOR_LIQ);
 
-  // ── Fluid context rules ────────────────────────────────────────────────────
+  // -- Fluid context rules ----------------------------------------------------
   t('ctx: agua → líquido normal',          (() => { const c = getFluidContext(1000, 1.0, 'liquid');
                                                     return !c.isGas && !c.isLowDens && !c.isHighVisc; })());
   t('ctx: vapor → isGasLowMu',             (() => { const c = getFluidContext(5.15, 0.0158, 'steam');
@@ -2608,13 +2608,13 @@ function runSelfTests(){
   t('ctx: aceite μ=100 → isHighVisc',      getFluidContext(900, 100, 'liquid').isHighVisc);
   t('ctx: liq ρ=300 μ=5 → isLiqLowDens',   getFluidContext(300, 5, 'liquid').isLiqLowDens);
 
-  // ── Accuracy Coriolis ──────────────────────────────────────────────────────
+  // -- Accuracy Coriolis ------------------------------------------------------
   t('acc_liquid ≥ floor always',           (() => { const fd = MODELS['5400'], m = fd.models[0];
                                                     return acc_liquid(fd, m, m.qmax) >= fd.floor; })());
   t('acc_gas → E_base at high Q',          (() => { const fd = MODELS['6400'], m = fd.models[2];
                                                     return approx(acc_gas('6400', fd, m, m.qmax), GAS_E_BASE['6400'], 0.02); })());
 
-  // ── EMF (OPTIFLUX 1050) ──────────────────────────────────────────────────────
+  // -- EMF (OPTIFLUX 1050) ------------------------------------------------------
   t('v_emf S40 1000kg/h water ≈ 0.221',  (() => { const m = EMF_MODELS.find(x => x.dn === 'S40');
                                                     return approx(v_emf(m, 1000, 1000), 0.221, 0.01); })());
   t('acc_emf at 1 m/s = 0.6%',            approx(acc_emf(1.0), 0.60, 0.001));
@@ -2625,7 +2625,7 @@ function runSelfTests(){
   t('makeCost EMF-S40 = 1.0',             makeCost('EMF','S40') === 1.0);
   t('makeCost EMF-S250 = 1.4',            makeCost('EMF','S250') === 1.4);
 
-  // ── H250 Variable Area ────────────────────────────────────────────────────
+  // -- H250 Variable Area ----------------------------------------------------
   t('va_error at 100% = 1.6',             va_error(100) === 1.6);
   t('va_error at 50% = 1.6',              va_error(50) === 1.6);
   t('va_error at 25% = 3.2',              va_error(25) === 3.2);
@@ -2641,7 +2641,7 @@ function runSelfTests(){
   })());
   t('H250 price DN25 = 0.85',             H250_PRICES['DN25'] === 0.85);
 
-  // ── Unit conversion (ρ / μ selectors) ─────────────────────────────────────
+  // -- Unit conversion (ρ / μ selectors) -------------------------------------
   t('RHO_CONV g/cm³: 1.0 → 1000',         RHO_CONV.gcm3.toBase(1.0) === 1000);
   t('RHO_CONV lb/ft³: 62.428 → ≈1000',    approx(RHO_CONV.lbft3.toBase(62.428), 1000, 0.1));
   t('MU_CONV P: 0.01 → 1.0 mPa·s',        MU_CONV.p.toBase(0.01) === 1.0);
@@ -2650,7 +2650,7 @@ function runSelfTests(){
     return approx(base, 1.7, 1e-9) && approx(MU_CONV.cst.fromBase(base, 850), 2.0, 1e-9);
   })());
 
-  // ── H250 viscosity exclusion (limit = 200 mPa·s, not 1.5 like vortex) ───
+  // -- H250 viscosity exclusion (limit = 200 mPa·s, not 1.5 like vortex) ---
   t('H250 menu excluded @ μ=20000',       (() => {
     if(!UI['f-mu'] || !UI['u-mu'] || !UI['f-tech']) return false;
     const sMu = UI['f-mu'].value, sU = UI['u-mu'].value, sPh = S.phase;
@@ -2692,7 +2692,7 @@ function runSelfTests(){
     return excluded;
   })());
 
-  // ── Report ─────  // ── Report ─────────────────────────────────────────────────────────────────
+  // -- Report -----  // -- Report -----------------------------------------------------------------
   const passed = results.filter(r => r.pass).length;
   const failed = results.length - passed;
   console.group(`%cSELF-TESTS: ${passed}/${results.length} passed${failed ? ' — ' + failed + ' FAILED' : ' ✓'}`,
