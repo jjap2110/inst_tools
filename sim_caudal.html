@@ -149,6 +149,11 @@ tr.model-row:hover td{background:var(--surface2)}
       <option value="safflower_oil">Aceite de cártamo</option>
       <option value="canola_oil">Aceite de canola</option>
       <option value="beef_tallow">Grasa vacuna (sebo)</option>
+      <option disabled>── Lácteos ──</option>
+      <option value="whole_milk">Leche entera</option>
+      <option value="skim_milk">Leche descremada</option>
+      <option value="cream_35">Crema 35%</option>
+      <option value="yogurt">Yogurt</option>
       <option disabled>── CIP Alcalino ──</option>
       <option value="naoh_1">NaOH 1% (CIP cáustico)</option>
       <option value="naoh_3">NaOH 3% (CIP estándar)</option>
@@ -450,8 +455,17 @@ const C = {
   MU_H250_MAX:   200,       // mPa·s — max viscosity for H250 (rotameter tolerates viscous fluids; above this, float response is unreliable)
   // Velocity limits
   V_LIQ_MIN:     0.33,      // m/s   — soft minimum sensor velocity (liquids)
-  V_LIQ_MAX:     12.0,      // m/s   — hard maximum sensor velocity (liquids)
+  V_LIQ_MAX:     12.0,      // m/s   — hard maximum sensor velocity (liquids, generic)
   V_GAS_WARN:    20.0,      // m/s   — above this: ΔP estimate ±5–10%
+  // Velocity limits by fluid category (guía KROHNE / eLearning)
+  V_MAX_DAIRY:    3.0,      // m/s   — leche/lácteos: churning, separación de grasa
+  V_MAX_SLURRY:   5.0,      // m/s   — slurries/abrasivos: erosión
+  V_MIN_SLURRY:   1.5,      // m/s   — slurries: sedimentación
+  V_MAX_HYDRO:    8.0,      // m/s   — hidrocarburos: cavitación + carga electrostática
+  // Extreme conditions → only 6400
+  T_MAX_STD:      200,      // °C — above this, only 6400
+  T_MIN_STD:      -40,      // °C — below this, only 6400
+  P_MAX_STD:      40,       // bar — above this, only 6400
   // Reynolds thresholds
   RE_LAM_MAX:    2300,      // laminar upper limit
   RE_TURB_MIN:   4000,      // turbulent lower limit
@@ -1190,6 +1204,37 @@ const LIQ_PRESETS = {
   },
 
   // ═══════════════════════════════════════════════════════════════
+  // LÁCTEOS — V_MAX = 3.0 m/s (churning, separación de grasa)
+  // Fuentes: Choi & Okos (1986), Singh & Heldman (2014), USDA SR28
+  // Todas conductivas → EMF elegible
+  // ═══════════════════════════════════════════════════════════════
+  whole_milk: {
+    name: 'Leche entera (3.5% grasa)', conductive: true,
+    tMin: 4, tMax: 80,
+    rhoT: [[4,1033],[10,1032],[20,1030],[30,1027],[40,1023],[50,1019],[60,1014],[70,1008],[80,1002]],
+    muT:  [[4,3.30],[10,2.70],[20,2.05],[30,1.60],[40,1.30],[50,1.08],[60,0.92],[70,0.80],[80,0.70]],
+  },
+  skim_milk: {
+    name: 'Leche descremada', conductive: true,
+    tMin: 4, tMax: 80,
+    rhoT: [[4,1036],[10,1035],[20,1033],[30,1030],[40,1027],[50,1023],[60,1018],[70,1013],[80,1007]],
+    muT:  [[4,2.50],[10,2.10],[20,1.60],[30,1.28],[40,1.05],[50,0.88],[60,0.76],[70,0.66],[80,0.58]],
+  },
+  cream_35: {
+    name: 'Crema 35% grasa', conductive: true,
+    tMin: 4, tMax: 70,
+    rhoT: [[4,1002],[10,1000],[20,996],[30,991],[40,985],[50,979],[60,972],[70,965]],
+    muT:  [[4,18.0],[10,13.5],[20,8.5],[30,5.8],[40,4.2],[50,3.2],[60,2.5],[70,2.0]],
+  },
+  yogurt: {
+    name: 'Yogurt (fluido)', conductive: true,
+    tMin: 4, tMax: 50,
+    // No-Newtoniano pseudoplástico — μ aparente a ~100 s⁻¹
+    rhoT: [[4,1040],[10,1038],[20,1035],[30,1031],[40,1027],[50,1022]],
+    muT:  [[4,250.0],[10,180.0],[20,100.0],[30,60.0],[40,40.0],[50,28.0]],
+  },
+
+  // ═══════════════════════════════════════════════════════════════
   // CIP — SOLUCIONES ACUOSAS PARA INDUSTRIA DE ALIMENTOS Y BEBIDAS
   // Fuentes: Perry's 8th ed., CRC Handbook 97th ed., Zaytsev & Aseyev (1992)
   // Todas son conductivas → EMF elegible
@@ -1794,6 +1839,36 @@ function getFluidContext(rho, mu, phase){
   return {isGas, isSteam, isWater, isLowDens, isHighVisc, isGasLowMu, isLiqLowDens, isLiqLowMu, isConductive};
 }
 
+// ── Fluid-specific velocity limit ───────────────────────────────────────────
+// Returns the max recommended velocity (m/s) for the current fluid category.
+// Falls back to the generic V_LIQ_MAX if no category matches.
+function getVMaxForFluid(){
+  const preset = UI['liq-preset'] ? UI['liq-preset'].value : '';
+  // Dairy: churning / fat separation
+  if(['whole_milk','skim_milk','cream_35','yogurt'].includes(preset))
+    return C.V_MAX_DAIRY;
+  // Hydrocarbons: cavitation + electrostatic charge
+  if(['diesel','biodiesel','ethanol96','beef_tallow'].includes(preset) ||
+     preset.includes('_oil'))
+    return C.V_MAX_HYDRO;
+  // Generic (water, CIP, chemicals, manual entry)
+  return C.V_LIQ_MAX;
+}
+
+// ── Cavitation risk check ───────────────────────────────────────────────────
+// P_salida > P_vapor(T) + 2×ΔP  →  if not, cavitation risk
+// Returns {risk:bool, pVapor:number, margin:number}
+function checkCavitation(dp_bar){
+  const T = parseFloat(UI['f-temp']?.value) || 25;
+  const pInlet = getPressBara();
+  // Antoine approximation for water vapor pressure (bar), adequate for CIP/water-based
+  // For oils/hydrocarbons this underestimates but is conservative
+  const pVapor = Math.pow(10, 5.40221 - 1838.675 / (T + 273.15 - 31.737)) / 750.062;
+  const pOutlet = pInlet - dp_bar;
+  const margin = pOutlet - pVapor - 2 * dp_bar;
+  return {risk: margin < 0, pVapor: pVapor, margin: margin, pOutlet: pOutlet};
+}
+
 // ── Main simulation ───────────────────────────────────────────────────────────
 // Public entry point — wraps the core so an unexpected error in physics,
 // sorting or rendering shows a friendly message instead of dying silently
@@ -1809,6 +1884,7 @@ function simulate(){
   }
 }
 
+let _lastExtremeConditions = false;
 function _simulateCore(){
   // ── Input validation ──────────────────────────────────────────────────────
   const rhoRaw = getRhoBase();
@@ -1837,7 +1913,16 @@ function _simulateCore(){
 
   let candidates=[];
   if(techSel!=='vortex' && techSel!=='emf' && techSel!=='h250')
+  // ── Extreme conditions: T or P outside standard range → only 6400 ──────
+  const tempVal = parseFloat(UI['f-temp']?.value) || 25;
+  const pressVal = getPressBara();
+  const extremeConditions = (!isGas && (tempVal > C.T_MAX_STD || tempVal < C.T_MIN_STD)) || pressVal > C.P_MAX_STD;
+  // Store for renderResults alerts
+  _lastExtremeConditions = extremeConditions;
+
   for(const [fam,fd] of Object.entries(MODELS)){
+    // Skip non-6400 families if extreme conditions apply
+    if(extremeConditions && fam !== '6400') continue;
     fd.models.forEach((m,dnIdx)=>{
       if(Q>=m.qmin && Q<=m.qmax){
         const costN = makeCost(fam, m.dn);
@@ -1860,8 +1945,9 @@ function _simulateCore(){
         // Hard exclusion filters — don't add to list at all:
         // 1. ΔP > P_inlet: physically impossible operation (all fluids)
         if(!dpOk) return;
-        // 2. Liquid/steam velocity > 12 m/s: above max recommended sensor velocity
-        if(!isGas && v > C.V_LIQ_MAX) return;
+        // 2. Liquid/steam velocity > fluid-specific max: above recommended sensor velocity
+        const vMaxFluid = isGas ? Infinity : getVMaxForFluid();
+        if(!isGas && v > vMaxFluid) return;
         const hasAlert = !vOk || dpRatio>0.30 || dp>2.0 || (Re>=C.RE_LAM_MAX && Re<C.RE_TURB_MIN) || (!isGas && Q/m.qmax<0.1);
         candidates.push({fam,dn:m.dn,m,fd,v,Re,dp,err,costN,vOk,effFloor,dpOk,dpRatio,hasAlert});
       }
@@ -1950,11 +2036,15 @@ function _simulateCore(){
         h250label: `${entry.cone} ${entry.flt}`
       });
     });
-    // Sort H250 candidates: menor error primero (mayor q%), desempate por MAYOR ΔP
+    // Sort H250 candidates: por DN de menor a mayor, luego menor error
+    // DN order: DN15 < DN25 < DN50 < DN80 < DN100
+    const dnOrder = {'DN15':1,'DN25':2,'DN50':3,'DN80':4,'DN100':5};
     if(techSel === 'h250'){
       candidates.sort((a,b) => {
-        if(a.err !== b.err) return a.err - b.err;
-        return b.dp - a.dp;  // mayor ΔP primero (desempate, solo H250)
+        const da = dnOrder[a.h250entry.dn] || 9;
+        const db = dnOrder[b.h250entry.dn] || 9;
+        if(da !== db) return da - db;
+        return a.err - b.err;  // within same DN, lower error first
       });
     }
     } // end else (viscosity filter)
@@ -2165,6 +2255,13 @@ function renderResults(selIdx, isFirstRender){
     if(rec.Re>=2300&&rec.Re<4000) alerts.innerHTML+=`<div class="alert alert-warn">⚠ Régimen de transición (Re ${Math.round(rec.Re).toLocaleString()}): flujo inestable.</div>`;
     if(!isGas && !rec.vOk) alerts.innerHTML+=`<div class="alert alert-warn">⚠ Velocidad sensor ${rec.v.toFixed(2)} m/s por debajo del mínimo operativo (0.33 m/s). Señal débil — considerar DN menor.</div>`;
     if(!isGas && rec.vOk && rec.v<1.0) alerts.innerHTML+=`<div class="alert alert-info">ℹ Velocidad ${rec.v.toFixed(2)} m/s — sobre el mínimo operativo (0.33 m/s) pero bajo el rango óptimo (1–4 m/s).</div>`;
+    // Cavitation risk alert (liquids only)
+    if(!isGas && rec.dp > 0.1){
+      const cav = checkCavitation(rec.dp);
+      if(cav.risk) alerts.innerHTML+=`<div class="alert alert-danger">⚠ Riesgo de cavitación: P_salida (${cav.pOutlet.toFixed(2)} bar) − P_vapor (${cav.pVapor.toFixed(3)} bar) − 2×ΔP (${(2*rec.dp).toFixed(3)} bar) = ${cav.margin.toFixed(2)} bar &lt; 0. Instalar válvula de contrapresión aguas abajo.</div>`;
+    }
+    // Extreme conditions alert
+    if(_lastExtremeConditions) alerts.innerHTML+=`<div class="alert alert-warn">⚠ Condiciones extremas (T fuera de −40/+200°C o P &gt; 40 bar) — solo OPTIMASS 6400 es elegible.</div>`;
     // Vortex-specific alerts
     if(rec.isVortex){
       const kNote=rec.KvalidatedDp?'':' · ⚠ K no validado para este DN — ΔP ±30%';
