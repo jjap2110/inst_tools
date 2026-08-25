@@ -2102,34 +2102,43 @@ function _simulateCore(){
   //   No conductivo + μ≤1.5: 1400/5400 → 6400 → VORTEX → 7400
   //   No conductivo + μ>1.5: 1400/5400 → 6400 → 7400
   function famPriority(fam){
-    if(fam==='H250') return -1; // always first when present (exclusive mode)
+    // H250 in exclusive mode gets top priority; in 'all' mode it goes after EMF/Coriolis
+    if(fam==='H250' && techSel==='h250') return -1;
     if(isGasLowMu){
-      // Gas/vapor/baja densidad + baja viscosidad: VORTEX → 6400 → resto Coriolis
-      return {VORTEX:0, '6400':1, '5400':2, '1400':3, '7400':4}[fam] ?? 5;
+      // Gas/vapor: VORTEX → 6400 → resto Coriolis → H250
+      return {VORTEX:0, '6400':1, '5400':2, '1400':3, '7400':4, H250:5}[fam] ?? 6;
     }
     if(isLiqLowDens){
-      // Líquido ligero + viscosidad >1.5 mPa·s: 6400 → 5400 → 1400 → 7400
-      return {'6400':0, '5400':1, '1400':2, '7400':3}[fam] ?? 4;
+      // Líquido ligero + viscosidad >1.5 mPa·s: 6400 → 5400 → 1400 → 7400 → H250
+      return {'6400':0, '5400':1, '1400':2, '7400':3, H250:4}[fam] ?? 5;
     }
     if(isHighVisc){
-      // Líquido viscoso (μ≥50 mPa·s): EMF si conductivo, luego 7400 → 1400 → 5400 → 6400
-      if(isConductive) return {EMF:0, '7400':1, '1400':2, '5400':3, '6400':4}[fam] ?? 5;
-      return {'7400':0, '1400':1, '5400':2, '6400':3}[fam] ?? 4;
+      // Líquido viscoso (μ≥50 mPa·s): EMF si conductivo, luego 7400 → 1400 → 5400 → 6400 → H250
+      if(isConductive) return {EMF:0, '7400':1, '1400':2, '5400':3, '6400':4, H250:5}[fam] ?? 6;
+      return {'7400':0, '1400':1, '5400':2, '6400':3, H250:4}[fam] ?? 5;
     }
-    // Líquido normal: EMF si conductivo, luego Coriolis; vortex si baja viscosidad
+    // Líquido normal: EMF si conductivo, luego Coriolis; vortex si baja viscosidad; H250 al final
     if(isConductive && isLiqLowMu)
-      return {EMF:0, '1400':1, '5400':1, '6400':2, VORTEX:3, '7400':4}[fam] ?? 5;
+      return {EMF:0, '1400':1, '5400':1, '6400':2, VORTEX:3, '7400':4, H250:5}[fam] ?? 6;
     if(isConductive)
-      return {EMF:0, '1400':1, '5400':1, '6400':2, '7400':3}[fam] ?? 4;
+      return {EMF:0, '1400':1, '5400':1, '6400':2, '7400':3, H250:4}[fam] ?? 5;
     if(isLiqLowMu)
-      return {VORTEX:0, '1400':1, '5400':1, '6400':2, '7400':3}[fam] ?? 4;
-    return {'1400':0, '5400':0, '6400':1, '7400':2}[fam] ?? 3;
+      return {VORTEX:0, '1400':1, '5400':1, '6400':2, '7400':3, H250:4}[fam] ?? 5;
+    return {'1400':0, '5400':0, '6400':1, '7400':2, H250:3}[fam] ?? 4;
   }
 
   candidates.sort((a,b)=>{
     // 1. Familia según tipo de fluido
     const fpA=famPriority(a.fam), fpB=famPriority(b.fam);
     if(fpA!==fpB) return fpA-fpB;
+    // 1b. H250 among themselves: sort by DN size (smallest/cheapest first)
+    if(a.isH250 && b.isH250){
+      const dnOrd = {'DN15':1,'DN25':2,'DN50':3,'DN80':4,'DN100':5};
+      const da = dnOrd[a.h250entry.dn] || 9;
+      const db = dnOrd[b.h250entry.dn] || 9;
+      if(da !== db) return da - db;
+      return a.err - b.err; // same DN: lower error first
+    }
     // 2. Sin alertas primero (dentro de la misma familia)
     if(a.hasAlert!==b.hasAlert) return a.hasAlert?1:-1;
     // 3. Velocidad ≥ 0.33 m/s (solo líquidos)
