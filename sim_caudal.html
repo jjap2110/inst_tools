@@ -1912,7 +1912,7 @@ function _simulateCore(){
   const techSel = UI['f-tech'] ? UI['f-tech'].value : 'all';
 
   let candidates=[];
-  if(techSel!=='vortex' && techSel!=='emf' && techSel!=='h250')
+  if(techSel!=='vortex' && techSel!=='emf' && techSel!=='h250'){
   // -- Extreme conditions: T or P outside standard range → only 6400 ------
   const tempVal = parseFloat(UI['f-temp']?.value) || 25;
   const pressVal = getPressBara();
@@ -1953,6 +1953,7 @@ function _simulateCore(){
       }
     });
   }
+  } // end if(techSel !== vortex/emf/h250) — Coriolis block
 
   // -- Add VORTEX candidates (low-viscosity fluids only: μ ≤ 1.5 mPa·s) ------
   if((techSel==='all'||techSel==='vortex') && mu <= VORTEX_MU_MAX){
