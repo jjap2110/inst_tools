@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Calculadora de sensores de temperatura — RTD y termocuplas vs temperatura">
+<title>Sensores de Temperatura · OAPSA</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#020B1F;--surface:#08132D;--surface2:#0D1B3A;
+  --text:#FFFFFF;--text2:#CCCCCC;--text3:#8A9BB5;
+  --border:rgba(0,242,255,0.15);--border2:rgba(0,242,255,0.25);
+  --radius:8px;
+  --acc:#00CFFF;--acc-bg:#061E3F;--acc-text:#00CFFF;
+  --ok:#00E676;--ok-bg:#062E1A;--ok-text:#00E676;
+  --warn:#FFB300;--warn-bg:#2A1F00;--warn-text:#FFD54F;
+  --danger:#FF5252;--danger-bg:#2D0A0A;--danger-text:#FF8A80;
+}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;min-height:100vh}
+.app{max-width:480px;margin:0 auto;padding:16px 14px 40px}
+h1{font-size:18px;font-weight:600;color:var(--text);margin-bottom:2px}
+.subtitle{font-size:12px;color:var(--text3);margin-bottom:16px}
+.section-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin:14px 0 8px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px}
+
+/* Input row */
+.input-row{display:flex;gap:8px;align-items:flex-end;margin-bottom:14px}
+.input-row .field{flex:1}
+.input-row .field label{display:block;font-size:11px;color:var(--text3);font-weight:600;margin-bottom:3px}
+.input-row .field input{width:100%;font-size:16px;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface2);color:var(--text);font-family:'Roboto Mono',monospace;outline:none}
+.input-row .field input:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(0,207,255,0.15)}
+.input-row .field select{width:100%;font-size:14px;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface2);color:var(--text);font-family:'Inter',sans-serif;outline:none;-webkit-appearance:none}
+
+/* Table */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead{position:sticky;top:0}
+th{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;text-align:left;padding:6px 8px;border-bottom:2px solid var(--border2);background:var(--surface)}
+td{padding:6px 8px;border-bottom:1px solid var(--border);font-family:'Roboto Mono',monospace;font-size:13px;white-space:nowrap}
+tr.group-header td{font-family:'Inter',sans-serif;font-weight:600;font-size:11px;color:var(--acc);padding:10px 8px 4px;border-bottom:1px solid var(--border2);letter-spacing:.03em}
+tr.oor td{color:var(--text3);opacity:.5}
+.sensor-name{font-family:'Inter',sans-serif;font-weight:500;color:var(--text2)}
+.val{text-align:right;color:var(--text)}
+.unit{color:var(--text3);font-size:11px;font-weight:400}
+.range-info{font-size:10px;color:var(--text3);text-align:right}
+
+/* Slider */
+.srow{margin-bottom:10px}
+.srow .sl{font-size:11px;color:var(--text3);font-weight:600;margin-bottom:3px;display:flex;justify-content:space-between}
+.srow .si{display:flex;align-items:center;gap:10px}
+input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:7px;background:linear-gradient(90deg,var(--acc),var(--danger));border-radius:var(--radius);outline:none;margin:6px 0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--bg);border:3px solid var(--acc);cursor:pointer;box-shadow:0 0 8px rgba(0,207,255,.3)}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--bg);border:3px solid var(--acc);cursor:pointer}
+.ticks{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:1px}
+
+/* Disclaimer */
+.alerts-toggle{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);cursor:pointer;padding:4px 0;margin-top:6px;user-select:none;background:none;border:none;font-family:inherit;width:100%;text-align:left}
+.alerts-toggle:hover{color:var(--text2)}
+.alerts-toggle .toggle-icon{font-size:10px;transition:transform .2s}
+.alerts-toggle.open .toggle-icon{transform:rotate(90deg)}
+.disclaimer{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:14px;font-size:11px;color:var(--text3);line-height:1.6}
+.disclaimer b{color:var(--text2)}
+.eq-block{margin-top:8px;padding:8px 10px;background:var(--surface2);border-radius:var(--radius);font-family:'Roboto Mono',monospace;font-size:11px;line-height:1.8;color:var(--text2)}
+.warn-block{margin-top:8px;padding:8px 10px;background:var(--danger-bg);border-radius:var(--radius);color:var(--danger-text);font-size:11px;line-height:1.5}
+</style>
+</head>
+<body>
+<noscript><div style="padding:20px;text-align:center;color:#FFFFFF;font-family:sans-serif">Esta herramienta requiere JavaScript habilitado para funcionar.</div></noscript>
+
+<div class="app">
+  <h1>Sensores de Temperatura</h1>
+  <p class="subtitle">RTD (IEC 60751) y Termocuplas (IEC 60584) — Valores eléctricos vs temperatura</p>
+  <p style="font-size:11px;color:var(--text3);margin:-12px 0 16px;opacity:0.7">por <b>Josmar Angulo</b> · <a href="https://wa.me/595991312920" style="color:var(--acc);text-decoration:none">Contacto</a></p>
+
+  <div class="section-label">Temperatura de entrada</div>
+  <div class="card">
+    <div class="srow">
+      <div class="sl">
+        <span>Temperatura</span>
+        <span id="temp-display" style="font-family:'Roboto Mono',monospace;color:var(--text);font-weight:700">25.0 °C</span>
+      </div>
+      <div class="si">
+        <input type="range" id="t-slider" min="-200" max="1800" step="0.5" value="25">
+        <input type="number" id="t-input" min="-200" max="1800" step="0.5" value="25" style="width:80px;font-size:14px;padding:5px 6px;border:1px solid var(--border2);border-radius:var(--radius);text-align:center;color:var(--text);font-weight:700;background:var(--surface2);font-family:'Roboto Mono',monospace">
+      </div>
+      <div class="ticks"><span>-200</span><span>0</span><span>400</span><span>800</span><span>1200</span><span>1800</span></div>
+    </div>
+    <div class="input-row" style="margin-bottom:0;margin-top:4px">
+      <div class="field" style="max-width:120px">
+        <label>Unidad</label>
+        <select id="t-unit">
+          <option value="C" selected>°C</option>
+          <option value="F">°F</option>
+          <option value="K">K</option>
+        </select>
+      </div>
+      <div class="field" style="flex:1">
+        <label>Ref. termocupla</label>
+        <select id="tc-ref">
+          <option value="0" selected>0 °C (estándar)</option>
+          <option value="25">25 °C (ambiente)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Valores calculados</div>
+  <div class="card" style="padding:8px">
+    <div class="tbl-wrap">
+      <table id="results-table">
+        <thead>
+          <tr>
+            <th>Sensor</th>
+            <th style="text-align:right">Valor</th>
+            <th style="text-align:right">Rango</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Disclaimer -->
+  <div>
+    <button class="alerts-toggle" id="disc-toggle" onclick="toggleDisc()">
+      <span class="toggle-icon">▶</span>
+      <span>ℹ Ecuaciones y referencias</span>
+    </button>
+    <div id="disc-body" style="display:none">
+      <div class="disclaimer">
+        <div style="font-size:12px;color:var(--text);line-height:1.7;margin-bottom:10px">
+          Herramienta de <b>desarrollo personal</b>, sin vinculación con ningún fabricante.
+          Los valores calculados son de referencia y no sustituyen la calibración del instrumento.
+        </div>
+        <div class="eq-block">
+-- RTD (Callendar-Van Dusen, IEC 60751) --<br>
+T >= 0: R = R0·(1 + A·T + B·T²)<br>
+T &lt; 0: R = R0·(1 + A·T + B·T² + C·(T-100)·T³)<br>
+A = 3.9083e-3, B = -5.775e-7, C = -4.183e-12<br>
+alpha = 0.00385055 (europeo IEC/DIN)<br><br>
+-- Ni RTD (DIN 43760) --<br>
+T >= 0: R = R0·(1 + A·T + B·T²)<br>
+A = 5.485e-3, B = 6.65e-6 (Ni)<br><br>
+-- Cu RTD (ASTM/GOST) --<br>
+R = R0·(1 + alpha·T), alpha = 4.274e-3<br><br>
+-- Termocuplas (IEC 60584-1, NIST ITS-90) --<br>
+Polinomios de referencia V(T) en mV<br>
+Ref. juntura fria = 0 °C (o 25 °C seleccionable)<br>
+Tipos: J, K, T, E, N, S, R, B
+        </div>
+        <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.6">
+          <b>Normas:</b> IEC 60751:2022 (RTD) · IEC 60584-1:2013 (Termocuplas) · DIN 43760 (Ni) · NIST Monograph 175 · ASTM E1137 (RTD) · ASTM E230 (TC).
+        </div>
+        <div class="warn-block" style="margin-top:12px">
+          ⚠ <b>Solo para fines educativos e informativos.</b>
+          Para calibración y verificación oficial, utilice tablas certificadas del fabricante del instrumento.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:20px;text-align:center;font-size:11px;color:var(--text3)">
+    <a href="index.html" style="color:var(--acc);text-decoration:none">← Volver al inicio</a>
+  </div>
+</div>
+
+<script>
+// -- DOM Cache ----------------------------------------------------------------
+const UI = {};
+['t-slider','t-input','t-unit','tc-ref','temp-display','tbody',
+ 'disc-toggle','disc-body'
+].forEach(id => { UI[id] = document.getElementById(id); });
+
+// -- Debounce -----------------------------------------------------------------
+function debounce(fn, ms=60){
+  let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); };
+}
+const renderD = debounce(render, 60);
+
+// =============================================================================
+// RTD: Callendar-Van Dusen (IEC 60751)
+// =============================================================================
+const CVD_A = 3.9083e-3;
+const CVD_B = -5.775e-7;
+const CVD_C = -4.183e-12; // only for T < 0
+
+function rtdPt(R0, T_C){
+  if(T_C >= 0) return R0 * (1 + CVD_A*T_C + CVD_B*T_C*T_C);
+  return R0 * (1 + CVD_A*T_C + CVD_B*T_C*T_C + CVD_C*(T_C - 100)*T_C*T_C*T_C);
+}
+
+// Ni RTD (DIN 43760)
+const NI_A = 5.485e-3;
+const NI_B = 6.65e-6;
+function rtdNi(R0, T_C){
+  return R0 * (1 + NI_A*T_C + NI_B*T_C*T_C);
+}
+
+// Cu RTD
+const CU_ALPHA = 4.274e-3;
+function rtdCu(R0, T_C){
+  return R0 * (1 + CU_ALPHA * T_C);
+}
+
+// =============================================================================
+// THERMOCOUPLES: NIST ITS-90 polynomials (simplified, high-accuracy)
+// Returns mV for given T in Celsius, cold junction at 0 degC
+// =============================================================================
+
+// Type K: -200 to 1372 degC
+function tcK(T){
+  if(T < -200 || T > 1372) return null;
+  if(T < 0){
+    const c=[-0.0176004136860e-1,3.9450128025e-2,2.3622373598e-5,-3.2858906784e-7,-4.9904828777e-9,-6.7509059173e-11,-5.7410327428e-13,-3.1088872894e-15,-1.0451609365e-17,-1.9889266878e-20,-1.6322697486e-22];
+    let v=0,p=1; for(const ci of c){v+=ci*p; p*=T;} return v;
+  }
+  const c=[-0.17600413686e-1,3.8921204975e-2,1.8558770032e-5,-9.9457592874e-8,3.1840945719e-10,-5.6072844889e-13,5.6075059059e-16,-3.2020720003e-19,9.7151147152e-23,-1.2104721275e-26];
+  let v=0,p=1; for(const ci of c){v+=ci*p; p*=T;}
+  // Add exponential term for T > 0
+  const a0=1.185976e-1, a1=-1.183432e-4, a2=126.9686;
+  v += a0 * Math.exp(a1 * (T - a2) * (T - a2));
+  return v;
+}
+
+// Type J: -210 to 1200 degC
+function tcJ(T){
+  if(T < -210 || T > 1200) return null;
+  if(T < 760){
+    const c=[0,5.0381187815e-2,3.0475836930e-5,-8.5681065720e-8,1.3228195295e-10,-1.7052958337e-13,2.0948090697e-16,-1.2538395336e-19,1.5631725697e-23];
+    let v=0,p=1; for(const ci of c){v+=ci*p; p*=T;} return v;
+  }
+  const c=[2.9645625681e2,-1.4976127786e0,3.1787103924e-3,-3.1847686701e-6,1.5720819004e-9,-3.0691369056e-13];
+  let v=0,p=1; for(const ci of c){v+=ci*p; p*=T;} return v;
+}
+
+// Type T: -200 to 400 degC
+function tcT(T){
+  if(T < -200 || T > 400) return null;
+  if(T < 0){
+    const c=[0,3.8748106364e-2,4.4194434347e-5,1.1844323105e-7,2.0032973554e-8,9.0138019559e-10,2.2651156593e-11,3.6071154205e-13,3.8493939884e-15,2.8213521925e-17,1.4251594779e-19,4.8768662286e-22,1.0795539270e-24,1.3945027062e-27,7.9795153927e-31];
+    let v=0,p=1; for(const ci of c){v+=ci*p; p*=T;} return v;
+  }
+  const c=[0,3.8748106364e-2,3.3292227880e-5,2.0618243404e-7,-2.1882256846e-9,1.0996880928e-11,-3.0815758772e-14,4.5479135290e-17,-2.7512901673e-20];
+  let v=0,p=1; for(const ci of c){v+=ci*p; p*=T;} return v;
+}
+
+// Type E: -200 to 1000 degC
+function tcE(T){
+  if(T < -200 || T > 1000) return null;
+  if(T < 0){
+    const c=[0,5.8665508708e-2,4.5410977124e-5,-7.7998048686e-7,-2.5800160843e-8,-5.9452583057e-10,-9.3214058667e-12,-1.0287605534e-13,-8.0370123621e-16,-4.3979497391e-18,-1.6414776355e-20,-3.9673619516e-23,-5.5827328721e-26,-3.4657842013e-29];
+    let v=0,p=1; for(const ci of c){v+=ci*p; p*=T;} return v;
+  }
+  const c=[0,5.8665508710e-2,4.5032275582e-5,2.8908407212e-8,-3.3056896652e-10,6.5024403270e-13,-1.9197495504e-16,-1.2536600497e-18,2.1489217569e-21,-1.4388041782e-24,3.5960899481e-28];
+  let v=0,p=1; for(const ci of c){v+=ci*p; p*=T;} return v;
+}
+
+// Type N: -200 to 1300 degC
+function tcN(T){
+  if(T < -200 || T > 1300) return null;
+  if(T < 0){
+    const c=[0,2.6159105962e-2,1.0957484228e-5,-9.3841111554e-8,-4.6412039759e-11,-2.6303357716e-12,-2.2653438003e-14,-7.6089300791e-17,-9.3419667835e-20];
+    let v=0,p=1; for(const ci of c){v+=ci*p; p*=T;} return v;
+  }
+  const c=[0,2.5929394601e-2,1.5710141880e-5,4.3825627237e-8,-2.5261169794e-10,6.4311819339e-13,-1.0063471519e-15,9.9745338992e-19,-6.0863245607e-22,2.0849229339e-25,-3.0682196151e-29];
+  let v=0,p=1; for(const ci of c){v+=ci*p; p*=T;} return v;
+}
+
+// Type S: -50 to 1768 degC
+function tcS(T){
+  if(T < -50 || T > 1768) return null;
+  if(T < 1064.18){
+    const c=[0,5.4038660840e-3,1.2593428974e-5,-2.3249327890e-8,3.2203093110e-11,-3.3145517730e-14,2.5579526040e-17,-1.2506617330e-20,2.7140810310e-24];
+    let v=0,p=1; for(const ci of c){v+=ci*p; p*=T;} return v;
+  }
+  if(T < 1664.5){
+    const c=[1.3290232000e0,3.3459311600e-3,6.5489341200e-6,-1.6481236600e-8,1.2998816400e-11];
+    let v=0,p=1; for(const ci of c){v+=ci*p; p*=T;} return v;
+  }
+  const c=[1.4655660570e2,-2.5178583670e-1,1.5877736400e-4,-3.2480958150e-8];
+  let v=0,p=1; for(const ci of c){v+=ci*p; p*=T;} return v;
+}
+
+// Type R: -50 to 1768 degC
+function tcR(T){
+  if(T < -50 || T > 1768) return null;
+  if(T < 1064.18){
+    const c=[0,5.2891179120e-3,1.3916575330e-5,-2.3885693560e-8,3.5691600890e-11,-4.6233529000e-14,4.4466757680e-17,-2.7298925640e-20,8.7441392680e-24,-1.1432074520e-27];
+    let v=0,p=1; for(const ci of c){v+=ci*p; p*=T;} return v;
+  }
+  if(T < 1664.5){
+    const c=[2.9515683740e0,-2.5209230370e-3,1.5952783280e-5,-7.6404893980e-9,2.0533959720e-12];
+    let v=0,p=1; for(const ci of c){v+=ci*p; p*=T;} return v;
+  }
+  const c=[1.5284256860e2,-2.6884169050e-1,1.7129914850e-4,-3.4542482680e-8];
+  let v=0,p=1; for(const ci of c){v+=ci*p; p*=T;} return v;
+}
+
+// Type B: 0 to 1820 degC
+function tcB(T){
+  if(T < 0 || T > 1820) return null;
+  if(T < 630.615){
+    const c=[0,-2.4650818346e-4,5.9040421171e-6,-1.3257931636e-9,1.5668291901e-12,-1.6944529240e-15,6.2990347094e-19];
+    let v=0,p=1; for(const ci of c){v+=ci*p; p*=T;} return v;
+  }
+  const c=[-3.8938168621e0,2.8571747470e-2,-8.4885104785e-5,1.5785280164e-7,-1.6835344864e-10,1.1109794013e-13,-4.4515431033e-17,9.8975640821e-21,-9.3791330289e-25];
+  let v=0,p=1; for(const ci of c){v+=ci*p; p*=T;} return v;
+}
+
+// =============================================================================
+// SENSOR DEFINITIONS
+// =============================================================================
+const SENSORS = [
+  // RTD
+  {group:'RTD — Resistencia (IEC 60751)'},
+  {name:'Pt100',   fn:T=>rtdPt(100,T),   unit:'\u03A9', tMin:-200, tMax:850, type:'rtd'},
+  {name:'Pt500',   fn:T=>rtdPt(500,T),   unit:'\u03A9', tMin:-200, tMax:850, type:'rtd'},
+  {name:'Pt1000',  fn:T=>rtdPt(1000,T),  unit:'\u03A9', tMin:-200, tMax:850, type:'rtd'},
+  // TC
+  {group:'Termocuplas — Tensión (IEC 60584)'},
+  {name:'Tipo K',  fn:tcK, unit:'mV', tMin:-200, tMax:1372, type:'tc', mat:'NiCr-NiAl'},
+  {name:'Tipo J',  fn:tcJ, unit:'mV', tMin:-210, tMax:1200, type:'tc', mat:'Fe-CuNi'},
+  {name:'Tipo T',  fn:tcT, unit:'mV', tMin:-200, tMax:400,  type:'tc', mat:'Cu-CuNi'},
+  {name:'Tipo N',  fn:tcN, unit:'mV', tMin:-200, tMax:1300, type:'tc', mat:'NiCrSi-NiSi'},
+  {name:'Tipo S',  fn:tcS, unit:'mV', tMin:-50,  tMax:1768, type:'tc', mat:'Pt-PtRh10', note:'similar a Tipo R'},
+  {name:'Tipo B',  fn:tcB, unit:'mV', tMin:0,    tMax:1820, type:'tc', mat:'PtRh6-PtRh30'},
+];
+
+// =============================================================================
+// RENDER
+// =============================================================================
+function toC(val, unit){
+  if(unit==='F') return (val - 32) * 5/9;
+  if(unit==='K') return val - 273.15;
+  return val;
+}
+
+function render(){
+  const rawVal = parseFloat(UI['t-input'].value) || 0;
+  const unit = UI['t-unit'].value;
+  const T_C = toC(rawVal, unit);
+  const tcRefT = parseFloat(UI['tc-ref'].value);
+  const unitLabel = unit==='C' ? '°C' : unit==='F' ? '°F' : 'K';
+
+  UI['temp-display'].textContent = rawVal.toFixed(1) + ' ' + unitLabel +
+    (unit !== 'C' ? ' (' + T_C.toFixed(1) + ' °C)' : '');
+
+  let html = '';
+  for(const s of SENSORS){
+    if(s.group){
+      html += '<tr class="group-header"><td colspan="3">' + s.group + '</td></tr>';
+      continue;
+    }
+    const oor = T_C < s.tMin || T_C > s.tMax;
+    let valStr = '--';
+    if(!oor){
+      let raw = s.fn(T_C);
+      // Thermocouple cold junction compensation
+      if(s.type === 'tc' && tcRefT !== 0 && raw !== null){
+        const vRef = s.fn(tcRefT);
+        if(vRef !== null) raw = raw - vRef;
+      }
+      if(raw !== null){
+        if(s.type === 'rtd') valStr = raw.toFixed(2);
+        else valStr = raw.toFixed(3);
+      }
+    }
+    const cls = oor ? ' class="oor"' : '';
+    const extra = s.mat ? ' <span style="color:var(--text3);font-size:10px">(' + s.mat + ')</span>' : '';
+    const noteStr = s.note ? ' <span style="color:var(--text3);font-size:10px">' + s.note + '</span>' : '';
+    html += '<tr' + cls + '>' +
+      '<td><span class="sensor-name">' + s.name + '</span>' + extra + noteStr + '</td>' +
+      '<td class="val">' + valStr + ' <span class="unit">' + s.unit + '</span></td>' +
+      '<td class="range-info">' + s.tMin + ' ... ' + s.tMax + ' °C</td>' +
+      '</tr>';
+  }
+  UI['tbody'].innerHTML = html;
+}
+
+// =============================================================================
+// EVENTS
+// =============================================================================
+UI['t-slider'].addEventListener('input', () => {
+  UI['t-input'].value = parseFloat(UI['t-slider'].value).toFixed(1);
+  renderD();
+});
+UI['t-input'].addEventListener('input', () => {
+  let v = parseFloat(UI['t-input'].value);
+  if(!isNaN(v)){
+    v = Math.max(-200, Math.min(1800, v));
+    UI['t-slider'].value = v;
+  }
+  renderD();
+});
+UI['t-unit'].addEventListener('change', render);
+UI['tc-ref'].addEventListener('change', render);
+
+// Disclaimer
+function toggleDisc(){
+  const isOpen = UI['disc-body'].style.display !== 'none';
+  UI['disc-body'].style.display = isOpen ? 'none' : 'block';
+  UI['disc-toggle'].className = isOpen ? 'alerts-toggle' : 'alerts-toggle open';
+}
+
+// Init
+render();
+</script>
+</body>
+</html>
