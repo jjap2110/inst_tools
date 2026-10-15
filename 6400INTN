@@ -1,326 +1,247 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Selección OPTIMASS 6400</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5">
+<meta name="description" content="Guía de selección técnica OPTIMASS 6400 — Patrón de GLP Clase 0.3 según OIML R 117-1">
+<meta name="theme-color" content="#020B1F">
+<title>Selección OPTIMASS 6400 — GLP</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
 <style>
-:root {
-  --bg: #f8f9fa;
-  --surface: #ffffff;
-  --border: #dee2e6;
-  --text: #212529;
-  --text-muted: #6c757d;
-  --accent: #0d6efd;
-  --accent-light: #e7f1ff;
-  --fixed-bg: #d1e7dd;
-  --fixed-border: #a3cfbb;
-  --fixed-text: #0f5132;
-  --decide-bg: #fff3cd;
-  --decide-border: #ffecb5;
-  --decide-text: #664d03;
-  --confirm-bg: #f8d7da;
-  --confirm-border: #f5c2c7;
-  --confirm-text: #842029;
-  --note-bg: #cff4fc;
-  --note-border: #b6effb;
-  --note-text: #055160;
-  --section-bg: #1a2332;
-  --section-text: #ffffff;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#020B1F;--surface:#08132D;--surface2:#0D1B3A;
+  --text:#FFFFFF;--text2:#CCCCCC;--text3:#8A9BB5;
+  --border:rgba(0,242,255,0.15);--border2:rgba(0,242,255,0.25);
+  --radius:8px;
+  --acc:#00CFFF;--acc-bg:#061E3F;--acc-text:#00CFFF;
+  --ok:#00E676;--ok-bg:#062E1A;--ok-text:#00E676;
+  --warn:#FFB300;--warn-bg:#2A1F00;--warn-text:#FFD54F;
+  --danger:#FF5252;--danger-bg:#2D0A0A;--danger-text:#FF8A80;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #121820;
-    --surface: #1a2332;
-    --border: #2d3748;
-    --text: #e2e8f0;
-    --text-muted: #a0aec0;
-    --accent: #63b3ed;
-    --accent-light: #1a365d;
-    --fixed-bg: #1a3a2a;
-    --fixed-border: #2d6a4f;
-    --fixed-text: #6ee7b7;
-    --decide-bg: #3d2e00;
-    --decide-border: #665000;
-    --decide-text: #fcd34d;
-    --confirm-bg: #3b1219;
-    --confirm-border: #7f1d1d;
-    --confirm-text: #fca5a5;
-    --note-bg: #0c2d3a;
-    --note-border: #155e75;
-    --note-text: #67e8f9;
-    --section-bg: #0f1724;
-    --section-text: #e2e8f0;
-  }
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:var(--bg);color:var(--text);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
 }
-:root[data-theme="dark"] {
-  --bg: #121820;
-  --surface: #1a2332;
-  --border: #2d3748;
-  --text: #e2e8f0;
-  --text-muted: #a0aec0;
-  --accent: #63b3ed;
-  --accent-light: #1a365d;
-  --fixed-bg: #1a3a2a;
-  --fixed-border: #2d6a4f;
-  --fixed-text: #6ee7b7;
-  --decide-bg: #3d2e00;
-  --decide-border: #665000;
-  --decide-text: #fcd34d;
-  --confirm-bg: #3b1219;
-  --confirm-border: #7f1d1d;
-  --confirm-text: #fca5a5;
-  --note-bg: #0c2d3a;
-  --note-border: #155e75;
-  --note-text: #67e8f9;
-  --section-bg: #0f1724;
-  --section-text: #e2e8f0;
+.app{max-width:480px;margin:0 auto;padding:16px 14px 40px}
+noscript{display:block;background:var(--danger-bg);color:var(--danger-text);padding:12px;border-radius:var(--radius);margin-bottom:12px;font-size:13px;text-align:center}
+
+/* ===== HEADER ===== */
+h1{font-size:18px;font-weight:600;color:#FFF;margin-bottom:2px}
+.subtitle{font-size:12px;color:var(--text3);margin-bottom:4px}
+.byline{font-size:11px;color:var(--text3);margin-bottom:14px}
+.byline a{color:var(--acc);text-decoration:none}
+.byline a:hover{text-decoration:underline}
+
+/* ===== REF BOX ===== */
+.ref-box{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:12px 14px;font-size:12px;color:var(--text2);line-height:1.8;margin-bottom:14px;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.5;
-  padding: 16px;
-  max-width: 900px;
-  margin: 0 auto;
+.ref-box strong{color:var(--text3);font-weight:500}
+
+/* ===== LEGEND ===== */
+.legend{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.legend-item{
+  font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;
+  text-transform:uppercase;letter-spacing:.04em;
 }
-.header {
-  background: var(--section-bg);
-  color: var(--section-text);
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 20px;
+.legend-ok{background:var(--ok-bg);color:var(--ok-text);border:1px solid rgba(0,230,118,0.25)}
+.legend-warn{background:var(--warn-bg);color:var(--warn-text);border:1px solid rgba(255,179,0,0.25)}
+.legend-danger{background:var(--danger-bg);color:var(--danger-text);border:1px solid rgba(255,82,82,0.25)}
+
+/* ===== SECTION ===== */
+.section-label{
+  font-size:11px;font-weight:600;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.05em;
+  margin-top:18px;margin-bottom:6px;padding:0 2px;
 }
-.header h1 { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
-.header .subtitle { font-size: 0.95rem; opacity: 0.85; margin-bottom: 16px; }
-.header .ref-box {
-  background: rgba(255,255,255,0.1);
-  border-radius: 8px;
-  padding: 12px 16px;
-  font-size: 0.85rem;
-  line-height: 1.7;
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:0;margin-bottom:10px;overflow:hidden;
 }
-.header .ref-box strong { opacity: 0.7; }
-.legend {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
-  font-size: 0.8rem;
+.section-head{
+  padding:10px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;
+  user-select:none;-webkit-tap-highlight-color:transparent;
 }
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: 6px;
+.section-head:active{opacity:.8}
+.section-title{font-size:13px;font-weight:600;color:var(--acc)}
+.arrow{font-size:10px;color:var(--text3);transition:transform .2s}
+.section-head.collapsed .arrow{transform:rotate(-90deg)}
+.section-body{border-top:1px solid var(--border)}
+.section-body.hidden{display:none}
+
+/* ===== PARAM ===== */
+.param{padding:12px 14px;border-bottom:1px solid rgba(0,242,255,0.08)}
+.param:last-child{border-bottom:none}
+.param-head{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px}
+.param-name{font-size:13px;font-weight:600;color:var(--text)}
+.badge{
+  font-size:9px;font-weight:600;padding:2px 6px;border-radius:3px;
+  text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;
 }
-.legend-fixed { background: var(--fixed-bg); color: var(--fixed-text); border: 1px solid var(--fixed-border); }
-.legend-decide { background: var(--decide-bg); color: var(--decide-text); border: 1px solid var(--decide-border); }
-.legend-confirm { background: var(--confirm-bg); color: var(--confirm-text); border: 1px solid var(--confirm-border); }
-.section {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  margin-bottom: 16px;
-  overflow: hidden;
+.badge-fixed{background:var(--ok-bg);color:var(--ok-text);border:1px solid rgba(0,230,118,0.2)}
+.badge-decide{background:var(--warn-bg);color:var(--warn-text);border:1px solid rgba(255,179,0,0.2)}
+.badge-confirm{background:var(--danger-bg);color:var(--danger-text);border:1px solid rgba(255,82,82,0.2)}
+.param-spec{font-size:11px;color:var(--text3);font-style:italic;margin-bottom:4px}
+.param-spec::before{content:'Req: ';font-weight:600;font-style:normal;color:var(--text3)}
+
+/* ===== FIXED VALUE ===== */
+.param-value{
+  background:var(--ok-bg);border:1px solid rgba(0,230,118,0.2);
+  border-radius:var(--radius);padding:8px 10px;font-size:12px;font-weight:500;color:var(--ok-text);
 }
-.section-header {
-  background: var(--section-bg);
-  color: var(--section-text);
-  padding: 14px 20px;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  user-select: none;
+.param-value::before{content:'✓ '}
+
+/* ===== RADIO OPTIONS ===== */
+.param-options{display:flex;flex-direction:column;gap:5px}
+.radio-option{
+  display:flex;align-items:flex-start;gap:8px;
+  padding:8px 10px;border:1px solid var(--border2);border-radius:var(--radius);
+  cursor:pointer;transition:all .15s;font-size:12px;
+  background:var(--surface2);
 }
-.section-header:hover { opacity: 0.9; }
-.section-header .arrow { transition: transform 0.2s; font-size: 0.8rem; }
-.section-header.collapsed .arrow { transform: rotate(-90deg); }
-.section-body { padding: 0; }
-.section-body.hidden { display: none; }
-.param {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
+.radio-option:hover{border-color:var(--acc);background:var(--acc-bg)}
+.radio-option input[type="radio"]{
+  margin-top:2px;accent-color:var(--acc);flex-shrink:0;
+  width:14px;height:14px;
 }
-.param:last-child { border-bottom: none; }
-.param-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+.radio-option.selected{border-color:var(--acc);background:var(--acc-bg)}
+.radio-label{flex:1}
+.radio-label strong{display:block;font-size:12px;color:var(--text);font-weight:600}
+.radio-desc{font-size:11px;color:var(--text3);display:block;margin-top:1px}
+
+/* ===== NOTES ===== */
+.note{
+  background:var(--acc-bg);border:1px solid rgba(0,207,255,0.2);
+  border-radius:var(--radius);padding:8px 10px;font-size:11px;color:var(--acc-text);margin-top:4px;
 }
-.param-name { font-weight: 600; font-size: 0.95rem; }
-.badge {
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
+.note::before{content:'ℹ ';font-weight:700}
+.confirm-note{
+  background:var(--danger-bg);border:1px solid rgba(255,82,82,0.2);
+  border-radius:var(--radius);padding:8px 10px;font-size:11px;color:var(--danger-text);margin-top:4px;
 }
-.badge-fixed { background: var(--fixed-bg); color: var(--fixed-text); border: 1px solid var(--fixed-border); }
-.badge-decide { background: var(--decide-bg); color: var(--decide-text); border: 1px solid var(--decide-border); }
-.badge-confirm { background: var(--confirm-bg); color: var(--confirm-text); border: 1px solid var(--confirm-border); }
-.param-spec {
-  font-size: 0.82rem;
-  color: var(--text-muted);
-  font-style: italic;
+.confirm-note::before{content:'⚡ ';font-weight:700}
+
+/* ===== SUMMARY ===== */
+.summary-card-outer{
+  background:var(--surface);border:1px solid var(--acc);
+  border-radius:12px;margin-top:14px;overflow:hidden;
 }
-.param-spec::before { content: 'Requisito: '; font-weight: 600; font-style: normal; }
-.param-value {
-  background: var(--fixed-bg);
-  color: var(--fixed-text);
-  border: 1px solid var(--fixed-border);
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 0.88rem;
-  font-weight: 500;
+.summary-title{
+  background:linear-gradient(135deg,#061E3F,#0A2E5B);
+  padding:10px 14px;font-size:13px;font-weight:600;color:var(--acc);
+  border-bottom:1px solid var(--acc);
 }
-.param-value::before { content: '✓ '; }
-.param-options {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+.summary-body{padding:12px 14px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media(max-width:360px){.grid2{grid-template-columns:1fr}}
+.stat{background:var(--surface2);border-radius:var(--radius);padding:9px 11px}
+.stat-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+.stat-val{font-size:12px;font-weight:600;color:var(--text)}
+
+.pending-box{
+  margin-top:10px;padding:10px 12px;
+  background:var(--warn-bg);border:1px solid rgba(255,179,0,0.2);border-radius:var(--radius);
 }
-.radio-option {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.15s;
-  font-size: 0.88rem;
+.pending-box h4{color:var(--warn-text);font-size:12px;margin-bottom:6px}
+.pending-box ul{padding-left:18px;color:var(--warn-text);font-size:11px}
+.pending-box li{margin-bottom:3px}
+
+.confirm-box{
+  margin-top:8px;padding:10px 12px;
+  background:var(--danger-bg);border:1px solid rgba(255,82,82,0.2);border-radius:var(--radius);
 }
-.radio-option:hover { border-color: var(--accent); background: var(--accent-light); }
-.radio-option input { margin-top: 3px; accent-color: var(--accent); }
-.radio-option.selected { border-color: var(--accent); background: var(--accent-light); }
-.radio-label { flex: 1; }
-.radio-label strong { display: block; }
-.radio-label .radio-desc { font-size: 0.8rem; color: var(--text-muted); }
-.note {
-  background: var(--note-bg);
-  color: var(--note-text);
-  border: 1px solid var(--note-border);
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 0.82rem;
+.confirm-box h4{color:var(--danger-text);font-size:12px;margin-bottom:6px}
+.confirm-box ul{padding-left:18px;color:var(--danger-text);font-size:11px}
+.confirm-box li{margin-bottom:3px}
+
+/* ===== CODE DISPLAY ===== */
+.code-box{
+  margin-top:10px;padding:10px 12px;
+  background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);
 }
-.note::before { content: '⚠ '; font-weight: 700; }
-.confirm-note {
-  background: var(--confirm-bg);
-  color: var(--confirm-text);
-  border: 1px solid var(--confirm-border);
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 0.82rem;
+.code-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.code-val{font-family:'Roboto Mono',monospace;font-size:13px;font-weight:500;color:var(--acc);word-break:break-all}
+
+/* ===== WHATSAPP BUTTON ===== */
+.wa-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;margin-top:12px;padding:12px;
+  background:linear-gradient(135deg,#075E54,#128C7E);
+  color:#FFFFFF;border:none;border-radius:var(--radius);
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;letter-spacing:.02em;
+  transition:opacity .15s;
 }
-.confirm-note::before { content: '⚡ '; font-weight: 700; }
-.summary-section {
-  background: var(--surface);
-  border: 2px solid var(--accent);
-  border-radius: 12px;
-  margin-top: 24px;
-  overflow: hidden;
-}
-.summary-header {
-  background: var(--accent);
-  color: white;
-  padding: 14px 20px;
-  font-weight: 700;
-  font-size: 1rem;
-}
-.summary-body { padding: 20px; }
-.summary-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-@media (max-width: 600px) { .summary-grid { grid-template-columns: 1fr; } }
-.summary-card {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 12px 16px;
-}
-.summary-card h4 { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-.summary-card .val { font-weight: 600; font-size: 0.95rem; }
-.pending-list {
-  margin-top: 16px;
-  padding: 16px;
-  background: var(--decide-bg);
-  border: 1px solid var(--decide-border);
-  border-radius: 8px;
-}
-.pending-list h4 { color: var(--decide-text); margin-bottom: 8px; font-size: 0.9rem; }
-.pending-list ul { padding-left: 20px; color: var(--decide-text); font-size: 0.85rem; }
-.pending-list li { margin-bottom: 4px; }
-.confirm-list {
-  margin-top: 12px;
-  padding: 16px;
-  background: var(--confirm-bg);
-  border: 1px solid var(--confirm-border);
-  border-radius: 8px;
-}
-.confirm-list h4 { color: var(--confirm-text); margin-bottom: 8px; font-size: 0.9rem; }
-.confirm-list ul { padding-left: 20px; color: var(--confirm-text); font-size: 0.85rem; }
-.confirm-list li { margin-bottom: 4px; }
-.footer {
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 0.75rem;
-  margin-top: 24px;
-  padding: 12px;
-}
-@media print {
-  body { padding: 0; }
-  .section-header { cursor: default; }
-  .section-body.hidden { display: block !important; }
-  .radio-option { break-inside: avoid; }
+.wa-btn:hover{opacity:.9}
+.wa-btn:active{opacity:.75}
+.wa-btn svg{width:20px;height:20px;fill:#FFFFFF}
+
+/* ===== FOOTER ===== */
+.footer{text-align:center;color:var(--text3);font-size:10px;margin-top:20px;padding:12px;line-height:1.6}
+
+/* ===== PRINT ===== */
+@media print{
+  body{background:#fff;color:#000}
+  .app{max-width:100%;padding:0}
+  .card{border-color:#ccc;break-inside:avoid}
+  .section-body.hidden{display:block!important}
+  .wa-btn{display:none}
+  .radio-option{break-inside:avoid}
+  .param-value{background:#e8f5e9;color:#1b5e20;border-color:#a5d6a7}
+  .badge-fixed{background:#e8f5e9;color:#1b5e20}
+  .badge-decide{background:#fff8e1;color:#e65100}
+  .badge-confirm{background:#ffebee;color:#b71c1c}
+  .note{background:#e3f2fd;color:#0d47a1;border-color:#90caf9}
+  .confirm-note{background:#ffebee;color:#b71c1c;border-color:#ef9a9a}
+  .pending-box{background:#fff8e1;color:#e65100;border-color:#ffe082}
+  .pending-box h4,.pending-box ul,.pending-box li{color:#e65100}
+  .confirm-box{background:#ffebee;color:#b71c1c;border-color:#ef9a9a}
+  .confirm-box h4,.confirm-box ul,.confirm-box li{color:#b71c1c}
+  .code-val{color:#0d47a1}
+  .stat{background:#f5f5f5}
+  .summary-card-outer{border-color:#0d47a1}
+  .summary-title{background:#e3f2fd;color:#0d47a1}
 }
 </style>
 </head>
 <body>
+<noscript>Esta herramienta requiere JavaScript para funcionar correctamente.</noscript>
 
-<div class="header">
-  <h1>OPTIMASS 6400 — Guía de Selección Técnica</h1>
-  <div class="subtitle">Patrón de Medición de Masa y Volumen para GLP · Clase 0.3 según OIML R 117-1</div>
-  <div class="ref-box">
-    <strong>Aplicación:</strong> Aprobación de Modelo y Verificación Inicial de sistemas Clase 1.0<br>
-    <strong>Fluido:</strong> Gas Licuado de Petróleo (GLP) — Fase líquida, 500–600 kg/m³<br>
-    <strong>Rango de caudal:</strong> 5 a 60 L/min (160 a 2,000 kg/h)<br>
-    <strong>Condiciones:</strong> -10°C a +40°C · 5 a 15 bar · Diseño ANSI 300# (mín. 25 bar)<br>
-    <strong>Normativa:</strong> OIML R 117-1 · ISO/IEC 17025 · ATEX/IECEx Zona 1, Grupo D, T4
-  </div>
+<div class="app">
+
+<!-- ===== HEADER ===== -->
+<h1>OPTIMASS 6400</h1>
+<div class="subtitle">Guía de Selección Técnica — Patrón GLP Clase 0.3 · OIML R 117-1</div>
+<div class="byline">por <b>Josmar Angulo</b> · <a href="https://wa.me/595991312920">Contacto</a></div>
+
+<div class="ref-box">
+  <strong>Aplicación:</strong> Aprobación de Modelo y Verificación Inicial de sistemas Clase 1.0<br>
+  <strong>Fluido:</strong> Gas Licuado de Petróleo (GLP) — Fase líquida, 500–600 kg/m³<br>
+  <strong>Rango:</strong> 5 a 60 L/min (160 a 2,000 kg/h)<br>
+  <strong>Condiciones:</strong> -10°C a +40°C · 5 a 15 bar · ANSI 300# (mín. 25 bar)<br>
+  <strong>Normativa:</strong> OIML R 117-1 · ISO/IEC 17025 · ATEX/IECEx Zona 1, Grupo D, T4
 </div>
 
 <div class="legend">
-  <div class="legend-item legend-fixed">Definido por la especificación</div>
-  <div class="legend-item legend-decide">Requiere decisión del cliente</div>
-  <div class="legend-item legend-confirm">Confirmar con KROHNE</div>
+  <span class="legend-item legend-ok">Definido</span>
+  <span class="legend-item legend-warn">Decisión cliente</span>
+  <span class="legend-item legend-danger">Confirmar KROHNE</span>
 </div>
 
 <!-- ===== SENSOR ===== -->
-<div class="section">
-  <div class="section-header" onclick="toggleSection(this)">
-    SENSOR — MFS 6000 (OPTIMASS 6400) <span class="arrow">▼</span>
+<div class="section-label">Sensor — MFS 6000 (OPTIMASS 6400)</div>
+<div class="card">
+  <div class="section-head" onclick="toggle(this)">
+    <span class="section-title">Parámetros del Sensor</span>
+    <span class="arrow">▼</span>
   </div>
   <div class="section-body">
 
-    <!-- Material -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">1. Material del Tubo Sensor</span>
@@ -330,7 +251,6 @@ body {
       <div class="param-value">S — Acero Inoxidable 316/316L Dual Certified</div>
     </div>
 
-    <!-- Acabado -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">2. Acabado Superficial</span>
@@ -340,37 +260,33 @@ body {
       <div class="param-value">0 — Estándar</div>
     </div>
 
-    <!-- Conexión -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">3. Conexión de Proceso</span>
         <span class="badge badge-fixed">Definido</span>
       </div>
-      <div class="param-spec">Bridas tipo ANSI 300# RF (Cara levantada) bajo norma ASME B16.5.</div>
-      <div class="param-value">ME — 1" ASME 300 lb (DN25 equivalente, sensor Size 15)</div>
+      <div class="param-spec">Bridas tipo ANSI 300# RF bajo norma ASME B16.5.</div>
+      <div class="param-value">ME — 1" ASME 300 lb (DN25, sensor Size 15)</div>
     </div>
 
-    <!-- Cara de sellado -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">4. Cara de Sellado</span>
         <span class="badge badge-fixed">Definido</span>
       </div>
-      <div class="param-spec">Cara levantada (RF) es el estándar para ASME B16.5 en servicio de GLP.</div>
+      <div class="param-spec">Cara levantada (RF) estándar para ASME B16.5 en GLP.</div>
       <div class="param-value">0 — Estándar (Raised Face)</div>
     </div>
 
-    <!-- Diseño -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">5. Diseño del Sensor</span>
         <span class="badge badge-fixed">Definido</span>
       </div>
-      <div class="param-spec">Temperatura de operación -10°C a +40°C — dentro del rango Short Stem (-196°C a +150°C).</div>
+      <div class="param-spec">Temperatura -10°C a +40°C — dentro del rango Short Stem (-196°C a +150°C).</div>
       <div class="param-value">0 — Short Stem</div>
     </div>
 
-    <!-- Opciones mecánicas -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">6. Opciones Mecánicas</span>
@@ -380,71 +296,66 @@ body {
       <div class="param-value">0 — Sin opciones adicionales</div>
     </div>
 
-    <!-- Hazardous Area -->
     <div class="param">
       <div class="param-head">
-        <span class="param-name">7. Certificación para Área Clasificada</span>
-        <span class="badge badge-decide">Decisión del cliente</span>
+        <span class="param-name">7. Certificación Área Clasificada</span>
+        <span class="badge badge-decide">Decisión cliente</span>
       </div>
-      <div class="param-spec">Zona 1 (o Clase I, División 1), Grupo D, T4. Ex d o Ex i.</div>
+      <div class="param-spec">Zona 1 (o Clase I, Div 1), Grupo D, T4. Ex d o Ex i.</div>
       <div class="param-options" data-field="hazarea_sensor">
         <label class="radio-option">
-          <input type="radio" name="hazarea_sensor" value="1-ATEX Ex ia (T1-T6)" onchange="selectOption(this)">
+          <input type="radio" name="hazarea_sensor" value="1" onchange="sel(this)">
           <span class="radio-label"><strong>1 — ATEX Ex ia (T1-T6)</strong><span class="radio-desc">Estándar europeo. Ampliamente aceptado internacionalmente.</span></span>
         </label>
         <label class="radio-option">
-          <input type="radio" name="hazarea_sensor" value="R-IECEx Ex ia (T1-T6)" onchange="selectOption(this)">
-          <span class="radio-label"><strong>R — IECEx Ex ia (T1-T6)</strong><span class="radio-desc">Estándar internacional. Recomendado para Latinoamérica sin marco regulatorio ATEX propio.</span></span>
+          <input type="radio" name="hazarea_sensor" value="R" onchange="sel(this)">
+          <span class="radio-label"><strong>R — IECEx Ex ia (T1-T6)</strong><span class="radio-desc">Estándar internacional. Recomendado para Latinoamérica sin marco ATEX propio.</span></span>
         </label>
       </div>
-      <div class="note">La selección debe coincidir con el transmisor MFC 400. IECEx es la opción recomendada para Paraguay, salvo que el marco regulatorio local exija otra certificación.</div>
+      <div class="note">IECEx es la opción recomendada para Paraguay. La selección debe coincidir con el transmisor (punto 16).</div>
     </div>
 
-    <!-- Configuración -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">8. Configuración Sensor-Transmisor</span>
-        <span class="badge badge-decide">Decisión del cliente</span>
+        <span class="badge badge-decide">Decisión cliente</span>
       </div>
-      <div class="param-spec">Montado sobre estructura portátil (skid móvil) para traslado a estaciones de verificación.</div>
+      <div class="param-spec">Montado sobre skid portátil para traslado a estaciones de verificación.</div>
       <div class="param-options" data-field="config">
         <label class="radio-option">
-          <input type="radio" name="config" value="0-Compacto/Integral (máx 230°C)" onchange="selectOption(this)">
-          <span class="radio-label"><strong>0 — Compacto / Integral</strong><span class="radio-desc">Sensor y transmisor en una sola unidad. Ideal para skid portátil: menos cableado, más compacto, sin cable de señal remoto.</span></span>
+          <input type="radio" name="config" value="0" onchange="sel(this)">
+          <span class="radio-label"><strong>0 — Compacto / Integral</strong><span class="radio-desc">Sensor y transmisor en una sola unidad. Ideal para skid portátil: menos cableado, más compacto.</span></span>
         </label>
         <label class="radio-option">
-          <input type="radio" name="config" value="1-Remoto con junction box Aluminio" onchange="selectOption(this)">
-          <span class="radio-label"><strong>1 — Remoto, Junction Box Aluminio</strong><span class="radio-desc">Transmisor separado del sensor. Útil si el display debe estar alejado del punto de medición o en área no clasificada.</span></span>
+          <input type="radio" name="config" value="1" onchange="sel(this)">
+          <span class="radio-label"><strong>1 — Remoto, Junction Box Aluminio</strong><span class="radio-desc">Transmisor separado del sensor. Útil si el display debe estar alejado del punto de medición.</span></span>
         </label>
         <label class="radio-option">
-          <input type="radio" name="config" value="2-Remoto con junction box Acero Inoxidable" onchange="selectOption(this)">
-          <span class="radio-label"><strong>2 — Remoto, Junction Box Acero Inox</strong><span class="radio-desc">Igual que opción 1 pero con mayor resistencia a corrosión.</span></span>
+          <input type="radio" name="config" value="2" onchange="sel(this)">
+          <span class="radio-label"><strong>2 — Remoto, Junction Box Acero Inox</strong><span class="radio-desc">Igual que opción 1 con mayor resistencia a corrosión.</span></span>
         </label>
       </div>
     </div>
 
-    <!-- Calibración -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">9. Calibración</span>
         <span class="badge badge-fixed">Definido</span>
       </div>
-      <div class="param-spec">Certificado ISO/IEC 17025, incertidumbre expandida (k=2) ≤ 0.06%, EMP ±0.2% en masa y volumen.</div>
-      <div class="param-value">S — Calibración 0.05% flujo másico, 5 puntos + volumen acc. ISO 10790 + Certificado ISO/IEC 17025</div>
-      <div class="confirm-note">Confirmar con KROHNE que la incertidumbre expandida (k=2) declarada en el certificado sea ≤ 0.06%. Con calibración base de 0.05%, debería ser alcanzable.</div>
+      <div class="param-spec">Certificado ISO/IEC 17025, incertidumbre (k=2) ≤ 0.06%, EMP ±0.2% en masa y volumen.</div>
+      <div class="param-value">S — Calibración 0.05% flujo másico, 5 puntos + vol. ISO 10790 + Cert. ISO/IEC 17025</div>
+      <div class="confirm-note">Confirmar con KROHNE que la incertidumbre expandida (k=2) declarada en el certificado sea ≤ 0.06%.</div>
     </div>
 
-    <!-- Process Req -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">10. Requisitos de Proceso</span>
         <span class="badge badge-fixed">Definido</span>
       </div>
-      <div class="param-spec">GLP comercial a temperatura ambiente. No se requiere criogénico ni alta temperatura.</div>
+      <div class="param-spec">GLP comercial a temperatura ambiente. No requiere criogénico ni alta temperatura.</div>
       <div class="param-value">0 — Estándar</div>
     </div>
 
-    <!-- Extended Options - OIML -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">11. Conformidad OIML R 117-1</span>
@@ -454,27 +365,24 @@ body {
       <div class="param-value">Z — acc. OIML R117-1 para líquidos distintos al agua</div>
     </div>
 
-    <!-- Burst Disk -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">12. Disco de Ruptura</span>
-        <span class="badge badge-confirm">Confirmar con KROHNE</span>
+        <span class="badge badge-confirm">Confirmar KROHNE</span>
       </div>
-      <div class="param-spec">Obligatorio para aplicaciones de gas licuado por encima de 10 barg. GLP opera entre 5 y 15 bar.</div>
-      <div class="confirm-note">La opción G (Burst Disk) es obligatoria para GLP >10 barg. Sin embargo, las opciones Z y G están en el mismo campo del configurador. Confirmar con KROHNE si ambas pueden seleccionarse simultáneamente o si Z ya incluye el burst disk.</div>
+      <div class="param-spec">Obligatorio para gas licuado por encima de 10 barg. GLP opera entre 5 y 15 bar.</div>
+      <div class="confirm-note">La opción G (Burst Disk) es obligatoria para GLP >10 barg. Opciones Z y G están en el mismo campo. Confirmar con KROHNE si ambas pueden seleccionarse simultáneamente o si Z ya incluye el burst disk.</div>
     </div>
 
-    <!-- Converter Type -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">13. Tipo de Convertidor</span>
         <span class="badge badge-fixed">Definido</span>
       </div>
-      <div class="param-spec">Se requiere funcionalidad de CT lock para OIML R117 y salidas de pulsos de alta resolución.</div>
-      <div class="param-value">6 — MFC 400 (VE54) Compacto / 7 — MFC 400 (VE54) Campo (según selección en punto 8)</div>
+      <div class="param-spec">CT lock para OIML R117 y salidas de pulsos de alta resolución.</div>
+      <div class="param-value">6 — MFC 400 (VE54) Compacto / 7 — MFC 400 (VE54) Campo (según punto 8)</div>
     </div>
 
-    <!-- Functional Safety -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">14. Seguridad Funcional</span>
@@ -488,71 +396,69 @@ body {
 </div>
 
 <!-- ===== TRANSMISOR ===== -->
-<div class="section">
-  <div class="section-header" onclick="toggleSection(this)">
-    TRANSMISOR — MFC 400 (VE54) <span class="arrow">▼</span>
+<div class="section-label">Transmisor — MFC 400 (VE54)</div>
+<div class="card">
+  <div class="section-head" onclick="toggle(this)">
+    <span class="section-title">Parámetros del Transmisor</span>
+    <span class="arrow">▼</span>
   </div>
   <div class="section-body">
 
-    <!-- Power -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">15. Alimentación Eléctrica</span>
-        <span class="badge badge-decide">Decisión del cliente</span>
+        <span class="badge badge-decide">Decisión cliente</span>
       </div>
-      <div class="param-spec">Dual: 24 VCC (campo/baterías/vehículo) y 110-220 VCA (laboratorio).</div>
+      <div class="param-spec">Dual: 24 VCC (campo/baterías) y 110-220 VCA (laboratorio).</div>
       <div class="param-options" data-field="power">
         <label class="radio-option">
-          <input type="radio" name="power" value="1-12-24 VDC" onchange="selectOption(this)">
-          <span class="radio-label"><strong>1 — 12-24 VDC</strong><span class="radio-desc">Alimentación de campo. Compatible con baterías y sistema eléctrico del vehículo. Para uso en laboratorio, agregar fuente AC/DC externa (110-220 VAC → 24 VDC).</span></span>
+          <input type="radio" name="power" value="1" onchange="sel(this)">
+          <span class="radio-label"><strong>1 — 12-24 VDC</strong><span class="radio-desc">Alimentación de campo. Para laboratorio, agregar fuente AC/DC externa (110-220 VAC → 24 VDC).</span></span>
         </label>
         <label class="radio-option">
-          <input type="radio" name="power" value="A-100-230 VAC (50/60 Hz)" onchange="selectOption(this)">
-          <span class="radio-label"><strong>A — 100-230 VAC (50/60 Hz)</strong><span class="radio-desc">Alimentación de red. Para uso portátil en campo, requeriría inversor DC/AC o generador.</span></span>
+          <input type="radio" name="power" value="A" onchange="sel(this)">
+          <span class="radio-label"><strong>A — 100-230 VAC (50/60 Hz)</strong><span class="radio-desc">Alimentación de red. Para campo, requeriría inversor DC/AC o generador.</span></span>
         </label>
       </div>
-      <div class="note">El MFC 400 acepta una sola fuente. La spec pide dual. Solución recomendada: seleccionar 24 VDC + fuente AC/DC externa para laboratorio. Esto cubre ambos escenarios con mayor flexibilidad.</div>
+      <div class="note">El MFC 400 acepta una sola fuente. Solución recomendada: 24 VDC + fuente AC/DC externa para laboratorio.</div>
     </div>
 
-    <!-- Hazardous Area Conv -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">16. Certificación Área Clasificada (Transmisor)</span>
-        <span class="badge badge-decide">Decisión del cliente</span>
+        <span class="badge badge-decide">Decisión cliente</span>
       </div>
       <div class="param-spec">Debe coincidir con la certificación del sensor (punto 7).</div>
       <div class="param-options" data-field="hazarea_conv">
         <label class="radio-option">
-          <input type="radio" name="hazarea_conv" value="1-ATEX Ex zone 1 (d)" onchange="selectOption(this)">
-          <span class="radio-label"><strong>1 — ATEX Ex zona 1, compartimento terminal "d" (antideflagrante)</strong></span>
+          <input type="radio" name="hazarea_conv" value="1" onchange="sel(this)">
+          <span class="radio-label"><strong>1 — ATEX Ex zona 1, terminal "d" (antideflagrante)</strong></span>
         </label>
         <label class="radio-option">
-          <input type="radio" name="hazarea_conv" value="2-ATEX Ex zone 1 (e)" onchange="selectOption(this)">
-          <span class="radio-label"><strong>2 — ATEX Ex zona 1, compartimento terminal "e" (seguridad aumentada)</strong></span>
+          <input type="radio" name="hazarea_conv" value="2" onchange="sel(this)">
+          <span class="radio-label"><strong>2 — ATEX Ex zona 1, terminal "e" (seguridad aumentada)</strong></span>
         </label>
         <label class="radio-option">
-          <input type="radio" name="hazarea_conv" value="F-IECEx (d)" onchange="selectOption(this)">
-          <span class="radio-label"><strong>F — IECEx, compartimento terminal "d" (antideflagrante)</strong></span>
+          <input type="radio" name="hazarea_conv" value="F" onchange="sel(this)">
+          <span class="radio-label"><strong>F — IECEx, terminal "d" (antideflagrante)</strong></span>
         </label>
         <label class="radio-option">
-          <input type="radio" name="hazarea_conv" value="G-IECEx (e)" onchange="selectOption(this)">
-          <span class="radio-label"><strong>G — IECEx, compartimento terminal "e" (seguridad aumentada)</strong></span>
+          <input type="radio" name="hazarea_conv" value="G" onchange="sel(this)">
+          <span class="radio-label"><strong>G — IECEx, terminal "e" (seguridad aumentada)</strong></span>
         </label>
       </div>
-      <div class="note">Ex "d" (antideflagrante) es lo más robusto para GLP en campo. Si se seleccionó IECEx en el sensor, seleccionar F aquí.</div>
+      <div class="note">Ex "d" (antideflagrante) es lo más robusto para GLP en campo. Si se seleccionó IECEx en sensor → F aquí.</div>
     </div>
 
-    <!-- Cable Connection -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">17. Conexión de Cable</span>
         <span class="badge badge-fixed">Definido</span>
       </div>
-      <div class="param-spec">Entrada de cable estándar según tipo de certificación seleccionada.</div>
-      <div class="param-value">0 — Default (seleccionado automáticamente por el sistema según certificación Ex)</div>
+      <div class="param-spec">Entrada de cable estándar según certificación Ex seleccionada.</div>
+      <div class="param-value">0 — Default (automático según certificación Ex)</div>
     </div>
 
-    <!-- Language -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">18. Idioma de Operación</span>
@@ -561,7 +467,6 @@ body {
       <div class="param-value">8 — Español</div>
     </div>
 
-    <!-- Special Functions -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">19. Funciones Especiales</span>
@@ -571,113 +476,104 @@ body {
       <div class="param-value">A — CT lock Facility para OIML R117</div>
     </div>
 
-    <!-- Diagnostics -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">20. Diagnósticos de Proceso</span>
-        <span class="badge badge-decide">Decisión del cliente</span>
+        <span class="badge badge-decide">Decisión cliente</span>
       </div>
       <div class="param-spec">Smart Meter Verification para diagnósticos avanzados.</div>
       <div class="param-options" data-field="diag">
         <label class="radio-option">
-          <input type="radio" name="diag" value="D-Bluetooth BLE + OPTICHECK (activados)" onchange="selectOption(this)">
-          <span class="radio-label"><strong>D — Bluetooth BLE (activado) + OPTICHECK (activado)</strong><span class="radio-desc">Verificación in-situ sin herramientas de cableado + diagnósticos avanzados. Máxima funcionalidad para un patrón de campo.</span></span>
+          <input type="radio" name="diag" value="D" onchange="sel(this)">
+          <span class="radio-label"><strong>D — Bluetooth BLE + OPTICHECK (activados)</strong><span class="radio-desc">Verificación in-situ sin cableado + diagnósticos avanzados. Máxima funcionalidad.</span></span>
         </label>
         <label class="radio-option">
-          <input type="radio" name="diag" value="1-OPTICHECK activado (sin Bluetooth)" onchange="selectOption(this)">
+          <input type="radio" name="diag" value="1" onchange="sel(this)">
           <span class="radio-label"><strong>1 — OPTICHECK activado (sin Bluetooth)</strong><span class="radio-desc">Diagnósticos avanzados sin conectividad inalámbrica.</span></span>
         </label>
         <label class="radio-option">
-          <input type="radio" name="diag" value="0-Estándar (OPTICHECK desactivado)" onchange="selectOption(this)">
-          <span class="radio-label"><strong>0 — Estándar (OPTICHECK desactivado)</strong><span class="radio-desc">Sin diagnósticos avanzados. Activable posteriormente por KROHNE si se requiere.</span></span>
+          <input type="radio" name="diag" value="0" onchange="sel(this)">
+          <span class="radio-label"><strong>0 — Estándar (OPTICHECK desactivado)</strong><span class="radio-desc">Sin diagnósticos avanzados. Activable posteriormente.</span></span>
         </label>
       </div>
     </div>
 
-    <!-- Housing -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">21. Housing del Convertidor</span>
-        <span class="badge badge-decide">Decisión del cliente</span>
+        <span class="badge badge-decide">Decisión cliente</span>
       </div>
-      <div class="param-spec">Estructura portátil (skid) expuesta a condiciones de campo en estaciones de GLP.</div>
+      <div class="param-spec">Skid portátil expuesto a condiciones de campo en estaciones de GLP.</div>
       <div class="param-options" data-field="housing">
         <label class="radio-option">
-          <input type="radio" name="housing" value="1-Aluminio estándar" onchange="selectOption(this)">
+          <input type="radio" name="housing" value="1" onchange="sel(this)">
           <span class="radio-label"><strong>1 — Aluminio estándar</strong><span class="radio-desc">Adecuado para la mayoría de ambientes industriales.</span></span>
         </label>
         <label class="radio-option">
-          <input type="radio" name="housing" value="2-Acero Inoxidable 1.4408 (Compacto)" onchange="selectOption(this)">
-          <span class="radio-label"><strong>2 — Acero Inoxidable 1.4408 (Compacto)</strong><span class="radio-desc">Mayor resistencia a corrosión. Recomendado si el equipo estará expuesto a intemperie frecuente.</span></span>
+          <input type="radio" name="housing" value="2" onchange="sel(this)">
+          <span class="radio-label"><strong>2 — Acero Inoxidable 1.4408 (Compacto)</strong><span class="radio-desc">Mayor resistencia a corrosión. Recomendado para intemperie frecuente.</span></span>
         </label>
         <label class="radio-option">
-          <input type="radio" name="housing" value="3-Acero Inoxidable 1.4408 (Campo)" onchange="selectOption(this)">
+          <input type="radio" name="housing" value="3" onchange="sel(this)">
           <span class="radio-label"><strong>3 — Acero Inoxidable 1.4408 (Campo/Remoto)</strong><span class="radio-desc">Solo para configuración remota. Mayor resistencia a corrosión.</span></span>
         </label>
       </div>
     </div>
 
-    <!-- Base Module -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">22. Módulo Base de Salidas</span>
         <span class="badge badge-fixed">Definido</span>
       </div>
-      <div class="param-spec">Modbus RTU (RS-485) o Modbus TCP/IP para densidad, temperatura, alarmas y diagnósticos.</div>
+      <div class="param-spec">Modbus RTU (RS-485) para densidad, temperatura, alarmas y diagnósticos.</div>
       <div class="param-value">G — Modbus RTU (RS-485)</div>
     </div>
 
-    <!-- 1st IO -->
     <div class="param">
       <div class="param-head">
-        <span class="param-name">23. 1er Módulo I/O — Canal de Pulsos 1</span>
+        <span class="param-name">23. 1er Módulo I/O — Pulsos Canal 1</span>
         <span class="badge badge-fixed">Definido</span>
       </div>
-      <div class="param-spec">Tren de pulsos de alta resolución, dos canales desfasados 90°, frecuencia hasta 10 kHz, seguridad según API MPMS Cap. 5.5.</div>
+      <div class="param-spec">Tren de pulsos de alta resolución, dos canales desfasados 90°, hasta 10 kHz, API MPMS Cap. 5.5.</div>
       <div class="param-value">C — Salida de Pulsos activa / high current (Canal 1)</div>
     </div>
 
-    <!-- 2nd IO -->
     <div class="param">
       <div class="param-head">
-        <span class="param-name">24. 2do Módulo I/O — Canal de Pulsos 2</span>
+        <span class="param-name">24. 2do Módulo I/O — Pulsos Canal 2</span>
         <span class="badge badge-fixed">Definido</span>
       </div>
-      <div class="param-spec">Segundo canal de pulsos para seguridad de transmisión según ISO 6551 Nivel A.</div>
+      <div class="param-spec">Segundo canal para seguridad de transmisión según ISO 6551 Nivel A.</div>
       <div class="param-value">C — Salida de Pulsos activa / high current (Canal 2)</div>
-      <div class="confirm-note">Confirmar con KROHNE que el MFC 400 permite configurar desfase de 90° entre los dos canales de pulsos para cumplir API MPMS Cap. 5.5 / ISO 6551 Nivel A.</div>
+      <div class="confirm-note">Confirmar con KROHNE que el MFC 400 permita desfase de 90° entre los dos canales para API MPMS Cap. 5.5 / ISO 6551 Nivel A.</div>
     </div>
 
-    <!-- Measuring Functions -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">25. Funciones de Medición</span>
         <span class="badge badge-fixed">Definido</span>
       </div>
-      <div class="param-spec">Cálculos de volumen corregido según tablas API MPMS Capítulo 11.2.4 (Tablas 53E/54E).</div>
-      <div class="param-value">A — Standard + API oil standard (masa, densidad, temperatura, volumen + corrección API)</div>
+      <div class="param-spec">Volumen corregido según tablas API MPMS Cap. 11.2.4 (Tablas 53E/54E).</div>
+      <div class="param-value">A — Standard + API oil standard (masa, densidad, temp, vol + corrección API)</div>
     </div>
 
-    <!-- Manuals -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">26. Manuales</span>
         <span class="badge badge-fixed">Definido</span>
       </div>
-      <div class="param-value">0 — Quick Start estándar (manuales completos disponibles en línea)</div>
+      <div class="param-value">0 — Quick Start estándar (manuales completos en línea)</div>
     </div>
 
-    <!-- Remote Cable -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">27. Cable de Señal Remoto</span>
         <span class="badge badge-fixed">Definido</span>
       </div>
       <div class="param-spec">Solo aplica si se seleccionó configuración remota en punto 8.</div>
-      <div class="param-value">0 — No requerido (configuración compacta) / Seleccionar longitud si remoto</div>
+      <div class="param-value">0 — No requerido (compacto) / Seleccionar longitud si remoto</div>
     </div>
 
-    <!-- Destination -->
     <div class="param">
       <div class="param-head">
         <span class="param-name">28. Destino</span>
@@ -689,63 +585,74 @@ body {
   </div>
 </div>
 
-<!-- ===== ITEMS TO CONFIRM ===== -->
-<div class="section">
-  <div class="section-header" onclick="toggleSection(this)">
-    PUNTOS A CONFIRMAR CON KROHNE <span class="arrow">▼</span>
+<!-- ===== CONFIRMAR KROHNE ===== -->
+<div class="section-label">Puntos a confirmar con KROHNE</div>
+<div class="card">
+  <div class="section-head" onclick="toggle(this)">
+    <span class="section-title">5 Confirmaciones Pendientes</span>
+    <span class="arrow">▼</span>
   </div>
-  <div class="section-body" style="padding: 20px;">
-    <div class="confirm-note" style="margin-bottom: 12px;">
+  <div class="section-body" style="padding:12px 14px">
+    <div class="confirm-note" style="margin-bottom:8px">
       <strong>1. Incertidumbre del certificado:</strong> Confirmar que el certificado ISO/IEC 17025 con calibración 0.05% declare incertidumbre expandida (k=2) ≤ 0.06%.
     </div>
-    <div class="confirm-note" style="margin-bottom: 12px;">
-      <strong>2. Combinación Z + G:</strong> Verificar si las opciones extendidas Z (OIML R117-1) y G (Burst Disk) son seleccionables simultáneamente, o si Z ya incluye el disco de ruptura.
+    <div class="confirm-note" style="margin-bottom:8px">
+      <strong>2. Combinación Z + G:</strong> Verificar si las opciones Z (OIML R117-1) y G (Burst Disk) son seleccionables simultáneamente, o si Z ya incluye el disco de ruptura.
     </div>
-    <div class="confirm-note" style="margin-bottom: 12px;">
-      <strong>3. Desfase de pulsos 90°:</strong> Confirmar que el MFC 400 VE54 permita configurar desfase de 90° entre los dos canales de pulsos para cumplir API MPMS Cap. 5.5 / ISO 6551.
+    <div class="confirm-note" style="margin-bottom:8px">
+      <strong>3. Desfase de pulsos 90°:</strong> Confirmar que el MFC 400 VE54 permita desfase de 90° entre los dos canales de pulsos para API MPMS Cap. 5.5 / ISO 6551.
     </div>
-    <div class="confirm-note" style="margin-bottom: 12px;">
-      <strong>4. Rango de caudal Size 15:</strong> Confirmar que el OPTIMASS 6400 Size 15 cubra el rango completo de 5 a 60 L/min (162 a 1,944 kg/h) de GLP a 540 kg/m³ dentro de la especificación de ±0.05%.
+    <div class="confirm-note" style="margin-bottom:8px">
+      <strong>4. Rango Size 15:</strong> Confirmar que el OPTIMASS 6400 Size 15 cubra 5 a 60 L/min (162 a 1,944 kg/h) de GLP a 540 kg/m³ dentro de ±0.05%.
     </div>
     <div class="confirm-note">
-      <strong>5. Puntos de calibración:</strong> Solicitar que los 5 puntos de calibración cubran Qmin (5 L/min), Q25%, Q50%, Q75% y Qmax (60 L/min) del rango operativo del patrón.
+      <strong>5. Puntos de calibración:</strong> Solicitar que los 5 puntos cubran Qmin (5 L/min), Q25%, Q50%, Q75% y Qmax (60 L/min) del rango operativo.
     </div>
   </div>
 </div>
 
-<!-- ===== SUMMARY ===== -->
-<div class="summary-section">
-  <div class="summary-header">RESUMEN DE CONFIGURACIÓN</div>
+<!-- ===== RESUMEN ===== -->
+<div class="section-label">Resumen de configuración</div>
+<div class="summary-card-outer">
+  <div class="summary-title">OPTIMASS 6400 — MFS 6000 + MFC 400 VE54</div>
   <div class="summary-body">
-    <div class="summary-grid">
-      <div class="summary-card">
-        <h4>Equipo</h4>
-        <div class="val">OPTIMASS 6400 (MFS 6000 + MFC 400 VE54)</div>
+    <div class="grid2">
+      <div class="stat">
+        <div class="stat-label">Clase de Exactitud</div>
+        <div class="stat-val">Clase 0.3 · EMP ±0.2%</div>
       </div>
-      <div class="summary-card">
-        <h4>Clase de Exactitud</h4>
-        <div class="val">Clase 0.3 — EMP ±0.2% (Calibrado a 0.05%)</div>
+      <div class="stat">
+        <div class="stat-label">Conexión</div>
+        <div class="stat-val">1" ASME 300 lb RF</div>
       </div>
-      <div class="summary-card">
-        <h4>Conexión</h4>
-        <div class="val">1" ASME 300 lb RF — 316/316L</div>
+      <div class="stat">
+        <div class="stat-label">Calibración</div>
+        <div class="stat-val">5 pts 0.05% + ISO 10790</div>
       </div>
-      <div class="summary-card">
-        <h4>Calibración</h4>
-        <div class="val">5 puntos masa 0.05% + vol. ISO 10790 + ISO/IEC 17025</div>
+      <div class="stat">
+        <div class="stat-label">Comunicaciones</div>
+        <div class="stat-val">Modbus RTU + 2× Pulsos</div>
       </div>
-      <div class="summary-card">
-        <h4>Comunicaciones</h4>
-        <div class="val">Modbus RTU (RS-485) + 2× Pulsos high current</div>
+      <div class="stat">
+        <div class="stat-label">Conformidad</div>
+        <div class="stat-val">OIML R117 · CT Lock</div>
       </div>
-      <div class="summary-card">
-        <h4>Conformidad</h4>
-        <div class="val">OIML R 117-1 · CT Lock · API Oil Standard</div>
+      <div class="stat">
+        <div class="stat-label">Corrección API</div>
+        <div class="stat-val">MPMS Cap. 11.2.4</div>
       </div>
     </div>
 
-    <div class="pending-list" id="pendingList">
-      <h4>Decisiones pendientes del cliente:</h4>
+    <!-- Código de configuración -->
+    <div class="code-box" id="codeBox">
+      <div class="code-label">Código Sensor — MFS 6000</div>
+      <div class="code-val" id="sensorCode">MFS6000 / S-0-ME-0-0-0-[?]-[?]-S-0-Z-[?]-[?]-0</div>
+      <div class="code-label" style="margin-top:8px">Código Transmisor — MFC 400</div>
+      <div class="code-val" id="convCode">MFC400 / [?]-[?]-0-8-A-[?]-[?]-G-C-C-A-0-[?]-0</div>
+    </div>
+
+    <div class="pending-box" id="pendingBox">
+      <h4 id="pendingTitle">Decisiones pendientes del cliente (6):</h4>
       <ul id="pendingItems">
         <li>7. Certificación área clasificada (ATEX vs IECEx)</li>
         <li>8. Configuración sensor-transmisor (Compacto vs Remoto)</li>
@@ -756,16 +663,23 @@ body {
       </ul>
     </div>
 
-    <div class="confirm-list">
-      <h4>Puntos a confirmar con KROHNE antes de la orden:</h4>
+    <div class="confirm-box">
+      <h4>Confirmar con KROHNE antes de la orden:</h4>
       <ul>
         <li>Incertidumbre certificado ≤ 0.06% (k=2)</li>
         <li>Combinabilidad opciones Z + G (OIML + Burst Disk)</li>
         <li>Desfase 90° entre canales de pulsos</li>
-        <li>Cobertura de rango 5–60 L/min en Size 15</li>
-        <li>Distribución de puntos de calibración en el rango operativo</li>
+        <li>Cobertura 5–60 L/min en Size 15</li>
+        <li>Distribución de puntos de calibración</li>
       </ul>
     </div>
+
+    <!-- WhatsApp Button -->
+    <button class="wa-btn" onclick="shareWhatsApp()">
+      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Compartir por WhatsApp
+    </button>
+
   </div>
 </div>
 
@@ -774,46 +688,152 @@ body {
   Generado como guía de configuración — no constituye oferta comercial
 </div>
 
+</div><!-- .app -->
+
 <script>
-function toggleSection(header) {
-  const body = header.nextElementSibling;
+// Toggle sections
+function toggle(head){
+  const body=head.nextElementSibling;
   body.classList.toggle('hidden');
-  header.classList.toggle('collapsed');
+  head.classList.toggle('collapsed');
 }
 
-function selectOption(input) {
-  const container = input.closest('.param-options');
-  container.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
+// Radio selection
+function sel(input){
+  const c=input.closest('.param-options');
+  c.querySelectorAll('.radio-option').forEach(o=>o.classList.remove('selected'));
   input.closest('.radio-option').classList.add('selected');
-  updatePending();
+  updateAll();
 }
 
-function updatePending() {
-  const fields = {
-    'hazarea_sensor': '7. Certificación área clasificada',
-    'config': '8. Configuración sensor-transmisor',
-    'power': '15. Alimentación eléctrica',
-    'hazarea_conv': '16. Certificación área clasificada del transmisor',
-    'diag': '20. Diagnósticos de proceso',
-    'housing': '21. Housing del convertidor'
-  };
-  const pending = [];
-  for (const [name, label] of Object.entries(fields)) {
-    const checked = document.querySelector(`input[name="${name}"]:checked`);
-    if (!checked) pending.push(label);
+// Field definitions for code and pending tracking
+const fields={
+  hazarea_sensor:{pos:'sensor',idx:6,label:'7. Certificación área clasificada (ATEX vs IECEx)'},
+  config:{pos:'sensor',idx:7,label:'8. Configuración sensor-transmisor'},
+  power:{pos:'conv',idx:0,label:'15. Alimentación eléctrica (24 VDC vs VAC)'},
+  hazarea_conv:{pos:'conv',idx:1,label:'16. Certificación área clasificada transmisor'},
+  diag:{pos:'conv',idx:5,label:'20. Diagnósticos de proceso'},
+  housing:{pos:'conv',idx:6,label:'21. Housing del convertidor'}
+};
+
+// Fixed codes
+// Sensor: MFS6000 / S-0-ME-0-0-0-[haz]-[cfg]-S-0-Z-[burst?]-[conv]-0
+// Conv:   MFC400 / [pwr]-[haz]-0-8-A-[diag]-[housing]-G-C-C-A-0-[cable]-0
+
+const sensorFixed=['S','0','ME','0','0','0','?','?','S','0','Z','Z+G?','6/7','0'];
+const convFixed=['?','?','0','8','A','?','?','G','C','C','A','0','0','0'];
+
+function updateAll(){
+  const vals={};
+  for(const[name]of Object.entries(fields)){
+    const r=document.querySelector(`input[name="${name}"]:checked`);
+    vals[name]=r?r.value:null;
   }
-  const list = document.getElementById('pendingItems');
-  const container = document.getElementById('pendingList');
-  if (pending.length === 0) {
-    container.querySelector('h4').textContent = '✓ Todas las decisiones completadas';
-    list.innerHTML = '';
-  } else {
-    container.querySelector('h4').textContent = `Decisiones pendientes del cliente (${pending.length}):`;
-    list.innerHTML = pending.map(p => `<li>${p}</li>`).join('');
+
+  // Update sensor code
+  const sc=[...sensorFixed];
+  if(vals.hazarea_sensor) sc[6]=vals.hazarea_sensor;
+  if(vals.config) sc[7]=vals.config;
+  // Converter type depends on config
+  if(vals.config==='0') sc[12]='6';
+  else if(vals.config) sc[12]='7';
+
+  // Update converter code
+  const cc=[...convFixed];
+  if(vals.power) cc[0]=vals.power;
+  if(vals.hazarea_conv) cc[1]=vals.hazarea_conv;
+  if(vals.diag) cc[5]=vals.diag;
+  if(vals.housing) cc[6]=vals.housing;
+  // Cable: 0 if compact, need length if remote
+  if(vals.config==='0') cc[12]='0';
+  else if(vals.config) cc[12]='L?';
+
+  const fmt=arr=>arr.map(v=>v==='?'?'[?]':v).join('-');
+  document.getElementById('sensorCode').textContent='MFS6000 / '+fmt(sc);
+  document.getElementById('convCode').textContent='MFC400 / '+fmt(cc);
+
+  // Update pending
+  const pending=[];
+  for(const[name,f]of Object.entries(fields)){
+    if(!vals[name]) pending.push(f.label);
+  }
+  const box=document.getElementById('pendingBox');
+  const title=document.getElementById('pendingTitle');
+  const list=document.getElementById('pendingItems');
+  if(pending.length===0){
+    title.textContent='✓ Todas las decisiones completadas';
+    title.style.color='var(--ok-text)';
+    list.innerHTML='';
+    box.style.background='var(--ok-bg)';
+    box.style.borderColor='rgba(0,230,118,0.2)';
+  }else{
+    title.textContent=`Decisiones pendientes del cliente (${pending.length}):`;
+    title.style.color='';
+    list.innerHTML=pending.map(p=>`<li>${p}</li>`).join('');
+    box.style.background='';
+    box.style.borderColor='';
   }
 }
+
+// WhatsApp share
+function shareWhatsApp(){
+  const sCode=document.getElementById('sensorCode').textContent;
+  const cCode=document.getElementById('convCode').textContent;
+
+  // Gather selections
+  const selections=[];
+  const labels={
+    hazarea_sensor:'Cert. Área Clasif. Sensor',
+    config:'Configuración',
+    power:'Alimentación',
+    hazarea_conv:'Cert. Área Clasif. Transmisor',
+    diag:'Diagnósticos',
+    housing:'Housing'
+  };
+  const pending=[];
+  for(const[name,lbl]of Object.entries(labels)){
+    const r=document.querySelector(`input[name="${name}"]:checked`);
+    if(r){
+      const strong=r.closest('.radio-option').querySelector('strong');
+      selections.push(`• ${lbl}: ${strong.textContent}`);
+    }else{
+      pending.push(`• ${lbl}: ⚠ Sin definir`);
+    }
+  }
+
+  let msg=`*OPTIMASS 6400 — Selección GLP*\n`;
+  msg+=`Patrón Clase 0.3 · OIML R 117-1\n\n`;
+  msg+=`*Código Sensor:*\n${sCode}\n\n`;
+  msg+=`*Código Transmisor:*\n${cCode}\n\n`;
+
+  if(selections.length>0){
+    msg+=`*Selecciones:*\n${selections.join('\n')}\n\n`;
+  }
+  if(pending.length>0){
+    msg+=`*Pendientes:*\n${pending.join('\n')}\n\n`;
+  }
+
+  msg+=`*Parámetros fijos:*\n`;
+  msg+=`• Material: 316/316L Dual Cert.\n`;
+  msg+=`• Conexión: 1" ASME 300 lb RF\n`;
+  msg+=`• Calibración: 0.05% + ISO 10790 + ISO/IEC 17025\n`;
+  msg+=`• OIML R117-1 Clase 0.3 + CT Lock\n`;
+  msg+=`• Salidas: Modbus RTU + 2× Pulsos HC\n`;
+  msg+=`• Corrección API MPMS 11.2.4\n\n`;
+
+  msg+=`*Confirmar con KROHNE:*\n`;
+  msg+=`1. Incertidumbre ≤0.06% (k=2)\n`;
+  msg+=`2. Combinación Z+G (OIML+Burst Disk)\n`;
+  msg+=`3. Desfase 90° entre pulsos\n`;
+  msg+=`4. Rango Size 15: 5-60 L/min\n`;
+  msg+=`5. Distribución puntos calibración`;
+
+  const url='https://wa.me/?text='+encodeURIComponent(msg);
+  window.open(url,'_blank');
+}
+
+// Init
+updateAll();
 </script>
 </body>
 </html>
-
-</body></html>
